@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+    <link rel="stylesheet" href="/css/stile.css"/>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-logo">SIW Movie</a>
+            <ul class="navbar-links">
+                <li><a href="/formNewMovie">Aggiungi un film</a></li>
+                <li><a href="/movies">Lista dei film</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Contenuto della pagina -->
+    <div class="body-content">
+        <div class="mainPage">
+            <h1>Benvenuto nel sito!</h1>
+            <p>Scorri verso il basso per vedere la navbar dinamica in azione.</p>
+            
+            <!-- Aggiunta di contenuto fittizio per aumentare l'altezza -->
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum. Cras venenatis euismod malesuada.</p>
+            <p>Aliquam erat volutpat. Integer in ligula nec leo vehicula fringilla. Suspendisse potenti. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+            <p>Curabitur blandit tempus porttitor. Nullam quis risus eget urna mollis ornare vel eu leo. Donec sed odio dui.</p>
+            <p>Etiam porta sem malesuada magna mollis euismod. Aenean lacinia bibendum nulla sed consectetur.</p>
+            <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</p>
+        </div>
+    </div>
+
+    <!-- Footer informativo -->
+    <div class="footer">
+        <p>© 2025 SIW Movie. Tutti i diritti riservati.</p>
+        <p>Informazioni importanti: Questo sito è un progetto universitario.</p>
+        <p>Contatti: <a href="mailto:info@siwmovie.com">info@siwmovie.com</a></p>
+    </div>
+
+    <!-- Script per la navbar dinamica -->
+    <script>
+        window.addEventListener('scroll', function () {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('shrink');
+            } else {
+                navbar.classList.remove('shrink');
+            }
+        });
+    </script>
+</body>
+</html>

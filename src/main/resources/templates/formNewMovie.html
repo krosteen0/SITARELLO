@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Aggiungi un Nuovo Film</title>
+        <link rel="stylesheet" href="/css/stile.css" />
+    </head>
+  
+    <body>
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="navbar-container">
+                <a href="/" class="navbar-logo">SIW Movie</a>
+                <ul class="navbar-links">
+                    <li><a href="/movies">Lista dei film</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Contenitore Principale -->
+        <div class="mainPage">
+            <h1>Aggiungi un Nuovo Film</h1>
+            
+            <form th:action="@{/movie}" method="POST" th:object="${movie}">
+                <div>
+                    <label for="title">Titolo:</label>
+                    <input required type="text" id="title" th:field="${movie.title}" />
+                </div>
+                <div>
+                    <label for="year">Anno:</label>
+                    <input required type="number" id="year" th:field="${movie.year}" />
+                </div>
+                <div>
+                    <label for="urlImage">URL Immagine:</label>
+                    <input required type="url" id="urlImage" th:field="${movie.urlImage}" />
+                </div>
+                <button type="submit" class="button">Salva</button>
+            </form>
+        </div>
+    </body>
+</html>

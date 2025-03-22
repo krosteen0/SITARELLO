@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <title>Elenco Film</title>
+    <link rel="stylesheet" href="/css/stile.css"/>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-logo">SIW Movie</a>
+            <ul class="navbar-links">
+                <li><a href="/formNewMovie">Aggiungi un film</a></li>
+                <li><a href="/movies">Lista dei film</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Contenitore Principale -->
+    <div class="mainPage">
+        <h1>Elenco dei Film</h1>
+        
+        <!-- Messaggio se non ci sono film -->
+        <div th:if="${movies.isEmpty()}">
+            <p>Non ci sono film disponibili.</p>
+        </div>
+
+        <!-- Lista dei film -->
+        <ul th:if="${!movies.isEmpty()}">
+            <li th:each="movie : ${movies}">
+                <a th:href="@{'/movie/' + ${movie.id}}" th:text="${movie.title}">Titolo del Film</a>
+            </li>
+        </ul>
+
+        <!-- Link per aggiungere un nuovo film -->
+        <div>
+            <a href="/formNewMovie" class="button">Aggiungi un nuovo film</a>
+        </div>
+    </div>
+</body>
+
+</html>
