@@ -1,41 +1,25 @@
 <!DOCTYPE html>
-
-<html>
-    <head>
-        <title>Aggiungi un Nuovo Film</title>
-        <link rel="stylesheet" href="/css/stile.css" />
-    </head>
-  
-    <body>
-        <!-- Navbar -->
-        <nav class="navbar">
-            <div class="navbar-container">
-                <a href="/" class="navbar-logo">SIW Movie</a>
-                <ul class="navbar-links">
-                    <li><a href="/movies">Lista dei film</a></li>
-                </ul>
-            </div>
-        </nav>
-
-        <!-- Contenitore Principale -->
-        <div class="mainPage">
-            <h1>Aggiungi un Nuovo Film</h1>
-            
-            <form th:action="@{/movie}" method="POST" th:object="${movie}">
-                <div>
-                    <label for="title">Titolo:</label>
-                    <input required type="text" id="title" th:field="${movie.title}" />
-                </div>
-                <div>
-                    <label for="year">Anno:</label>
-                    <input required type="number" id="year" th:field="${movie.year}" />
-                </div>
-                <div>
-                    <label for="urlImage">URL Immagine:</label>
-                    <input required type="url" id="urlImage" th:field="${movie.urlImage}" />
-                </div>
-                <button type="submit" class="button">Salva</button>
-            </form>
-        </div>
-    </body>
+<html> 
+   <head>
+    <title>New Movie</title>
+    <link rel="stylesheet" href="/stile.css?version=3" />
+  </head>
+  <body>
+    <div><a href="/"><img src="/logo-siw.png" width="50%"/></a></div>
+    <h1>Aggiungi un film</h1>
+    <form th:action="@{/movie}" method="POST" th:object="${movie}">
+<div>
+        Titolo: <span><input required type="text" th:field="${movie.title}"/></span>
+      </div>
+      <div>
+        Anno: <span><input required type="text" th:field="${movie.year}"/></span>
+      </div>
+      <div>
+        URL immagine: <span><input type="url" th:field="${movie.urlImage}" /></span>
+      </div>
+      <div>
+        <span><button type="submit">Conferma</button></span>
+      </div>
+    </form>
+  </body>
 </html>

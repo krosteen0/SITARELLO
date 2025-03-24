@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.util.Objects;
 
 @Entity
 public class Movie {
@@ -15,7 +16,7 @@ public class Movie {
     private Integer year;
     private String urlImage;
 
-    // Getter and Setter for id
+    // Getter and Setter methods
     public Long getId() {
         return id;
     }
@@ -24,7 +25,6 @@ public class Movie {
         this.id = id;
     }
 
-    // Getter and Setter for title
     public String getTitle() {
         return title;
     }
@@ -33,7 +33,6 @@ public class Movie {
         this.title = title;
     }
 
-    // Getter and Setter for year
     public Integer getYear() {
         return year;
     }
@@ -42,7 +41,6 @@ public class Movie {
         this.year = year;
     }
 
-    // Getter and Setter for urlImage
     public String getUrlImage() {
         return urlImage;
     }
@@ -51,25 +49,17 @@ public class Movie {
         this.urlImage = urlImage;
     }
 
+    // equals and hashCode methods
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
         Movie movie = (Movie) obj;
-        return title != null && title.equals(movie.title) &&
-               year != null && year.equals(movie.year);
+        return Objects.equals(title, movie.title) && Objects.equals(year, movie.year);
     }
 
     @Override
     public int hashCode() {
-        int result = 17;
-        result = 31 * result + (title != null ? title.hashCode() : 0);
-        result = 31 * result + (year != null ? year.hashCode() : 0);
-        return result;
+        return Objects.hash(title, year);
     }
-
 }

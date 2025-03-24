@@ -1,34 +1,16 @@
 <!DOCTYPE html>
 <html>
-    
 <head>
-    <title th:text="${movie.title}">Dettagli Film</title>
-    <link rel="stylesheet" href="/css/stile.css"/>
-</head>
-
-<body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="navbar-container">
-            <a href="/" class="navbar-logo">SIW Movie</a>
-            <ul class="navbar-links">
-                <li><a href="/formNewMovie">Aggiungi un film</a></li>
-                <li><a href="/movies">Lista dei film</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <!-- Dettagli del Film -->
-    <div class="mainPage">
-        <h1 th:text="${movie.title}">Titolo del Film</h1>
-        <div>
-            <p>Anno: <span th:text="${movie.year}"></span></p>
-            <img th:src="${movie.urlImage}" alt="Poster del Film" width="30%" style="border-radius: 15px;"/>
-        </div>
-        <div>
-            <a href="/movies" class="button">Torna all'elenco dei film</a>
-        </div>
-    </div>
+<title>Film</title>
+    <link rel="stylesheet" href="/stile.css?version=2" />
+  </head>
+  <body>
+    <div><a href="/"><img src="/logo-siw.png" width="50%"/></a></div>
+ <div th:if="${movie}">
+<h1 th:text="${movie.title}">Titolo film</h1>
+ <div>Anno: <span th:text="${movie.year} ">2000</span></div>
+<span><img width="30%" th:src="${movie.urlImage}" /></span>
+</div>
+ <div th:unless="${movie}">Non esiste</div>
 </body>
-
 </html>

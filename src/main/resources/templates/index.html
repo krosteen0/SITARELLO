@@ -1,53 +1,87 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html>
-<head>
-    <title>Home</title>
-    <link rel="stylesheet" href="/css/stile.css"/>
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="navbar-container">
-            <a href="/" class="navbar-logo">SIW Movie</a>
-            <ul class="navbar-links">
-                <li><a href="/formNewMovie">Aggiungi un film</a></li>
-                <li><a href="/movies">Lista dei film</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <!-- Contenuto della pagina -->
-    <div class="body-content">
-        <div class="mainPage">
-            <h1>Benvenuto nel sito!</h1>
-            <p>Scorri verso il basso per vedere la navbar dinamica in azione.</p>
+    <head>
+        <title>Home</title>
+        <link rel="stylesheet" href="/css/stile.css" />
+    </head>
+    <body>
+        <div class="mainNav">
+            <div class="header">
+                <!-- Logo e titolo -->
+                <div class="start">
+                    <div class="logoNome">
+                        <img class="logo" src="/immagini/logoSiw.png" alt="Logo LearnLab"  />
+                        <h1>LearnLab</h1>
+                    </div>
+                    
+                  
+                    
+                </div>
+                <!-- Navbar -->
+                
+            </div>
+            <div class="nav-container">
+            <div class="navbar-search">
+                <form action="/search" method="GET" class="search-form">
+                    <!-- Campo per il servizio -->
+                    <input type="text" name="service" placeholder="Servizio" class="search-input" />
             
-            <!-- Aggiunta di contenuto fittizio per aumentare l'altezza -->
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum. Cras venenatis euismod malesuada.</p>
-            <p>Aliquam erat volutpat. Integer in ligula nec leo vehicula fringilla. Suspendisse potenti. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-            <p>Curabitur blandit tempus porttitor. Nullam quis risus eget urna mollis ornare vel eu leo. Donec sed odio dui.</p>
-            <p>Etiam porta sem malesuada magna mollis euismod. Aenean lacinia bibendum nulla sed consectetur.</p>
-            <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</p>
+                    <!-- Slider per il prezzo -->
+                    <div class="price-slider">
+                        <label for="maxPrice">Prezzo massimo:</label>
+                        <input type="range" id="maxPrice" name="maxPrice" min="0" max="1000" step="10" value="500" oninput="updatePriceValue(this.value)" />
+                        <span id="priceValue">500</span> €
+                    </div>
+            
+                    <!-- Stelle per il rating -->
+                    <div class="rating-stars">
+                        <label for="minRating">Rating minimo:</label>
+                        <div class="stars">
+                            <input type="radio" id="star5" name="minRating" value="5" />
+                            <label for="star5" title="5 stelle">★</label>
+                            <input type="radio" id="star4" name="minRating" value="4" />
+                            <label for="star4" title="4 stelle">★</label>
+                            <input type="radio" id="star3" name="minRating" value="3" />
+                            <label for="star3" title="3 stelle">★</label>
+                            <input type="radio" id="star2" name="minRating" value="2" />
+                            <label for="star2" title="2 stelle">★</label>
+                            <input type="radio" id="star1" name="minRating" value="1" />
+                            <label for="star1" title="1 stella">★</label>
+                        </div>
+                    </div>
+            
+                    <!-- Pulsante di ricerca -->
+                    <button type="submit" class="search-button">
+                        <img src="/immagini/search-icon.png" alt="Cerca" class="search-icon" />
+                    </button>
+                </form>
+            </div>
         </div>
-    </div>
-
-    <!-- Footer informativo -->
-    <div class="footer">
-        <p>© 2025 SIW Movie. Tutti i diritti riservati.</p>
-        <p>Informazioni importanti: Questo sito è un progetto universitario.</p>
-        <p>Contatti: <a href="mailto:info@siwmovie.com">info@siwmovie.com</a></p>
-    </div>
-
-    <!-- Script per la navbar dinamica -->
+            <div class="content">
+                <h4>Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                     Nobis, molestias incidunt! Quasi odio aliquam hic
+                      placeat non similique, est eius repudiandae libero
+                       illo tempora officiis. Iure exercitationem odit illo
+                        iste! Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                        Nobis, molestias incidunt! Quasi odio aliquam hic
+                         placeat non similique, est eius repudiandae libero
+                          illo tempora officiis. Iure exercitationem odit illo
+                           iste!</h4>
+            </div>
+            
+        </div>
+        
+        <!-- Script per la navbar dinamica -->
     <script>
-        window.addEventListener('scroll', function () {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('shrink');
-            } else {
-                navbar.classList.remove('shrink');
-            }
-        });
+        window.addEventListener("scroll", function () {
+    const navbar = document.querySelector(".navbar-search");
+    if (window.scrollY > 50) {
+        navbar.classList.add("shrink");
+    } else {
+        navbar.classList.remove("shrink");
+    }
+});
     </script>
-</body>
+    </body>
+    
 </html>
