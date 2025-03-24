@@ -1,55 +1,58 @@
 /* Stile generale per la pagina */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background-color: #f9f9f9;
     color: #333;
-    
+    line-height: 1.6;
 }
 
 /* Stile per il contenitore principale */
 .mainNav {
-    
     color: white;
-    
-    background-color: #fff;
+    background-color: #ffffff;
     height: 200vh;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
 }
 
 /* Stile per il titolo */
 h1 {
-    font-size: 2em;
+    font-size: 2.5em;
     margin: auto 0;
     color: #ff6600;
-
-    
+    text-align: center;
+    font-weight: bold;
 }
-
-
 
 /* Stile per la lista dei film */
 ul {
     list-style-type: none;
     padding: 0;
+    margin: 20px;
 }
 
 li {
     margin: 10px 0;
     font-size: 1.2em;
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Stile per i link */
 a {
     text-decoration: none;
-    color: #000000;
-    text-decoration-line: none;
+    color: #007bff;
+    font-weight: bold;
+    transition: color 0.3s ease;
 }
 
 a:hover {
     text-decoration: underline;
-    color: #6e6e6e;
-    text-decoration-line: none;
+    color: #0056b3;
 }
 
 /* Stile per il messaggio "Lista vuota" */
@@ -57,29 +60,34 @@ p {
     font-size: 1.2em;
     color: red;
     font-weight: bold;
+    text-align: center;
 }
-.logo{
-   width: 100px;
-   height: 100px;
+
+/* Stile per il logo */
+.logo {
+    width: 100px;
+    height: 100px;
     margin: 0;
-    
+    border-radius: 50%;
+    object-fit: cover;
 }
+
 /* Stile per l'header */
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 20px;
-    background-color: #f4f4f4;
+    padding: 15px 20px;
+    background-color: #ffffff;
     border-bottom: 2px solid #ccc;
-   
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
 }
 
 /* Stile per il logo e il titolo */
 .logoNome {
-   display: flex;
+    display: flex;
     align-items: center;
-    
 }
 
 .start h1 {
@@ -88,38 +96,83 @@ p {
     color: #ff6600;
 }
 
-
-/* Stile per il box di ricerca (navbar) */
 /* Stile per il box di ricerca (navbar) */
 .nav-container {
-    background-color: #fff; /* Colore di sfondo del contenitore */
-    width: 100%; /* Occupa tutta la larghezza */
-    position: sticky; /* Rende il contenitore "appiccicoso" */
-    top: 0; /* Posiziona il contenitore in alto */
-    z-index: 1000; /* Assicura che il contenitore sia sopra gli altri elementi */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Aggiunge un'ombra per separare visivamente il contenitore dal contenuto */
-    overflow: hidden; /* Nasconde il contenuto che esce dal container */
+    background-color: #ffffff;
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
 }
+
 .navbar-search {
     display: flex;
-    justify-content: center; /* Centra il contenuto orizzontalmente */
-    align-items: center; /* Allinea il contenuto verticalmente */
+    justify-content: center;
+    align-items: center;
     margin: 10px auto;
-    padding: 5px;
-    background-color: #fff;
-    border-radius: 10px;
-    width: 95%; /* La navbar occupa tutta la larghezza del contenitore */
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    width: 80%;
     height: 50px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Aggiunge un'ombra sotto la navbar */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: width 0.6s ease, border-radius 0.6s ease, top 0.6s ease;
 }
 
 /* Navbar ridotta */
 .navbar-search.shrink {
-    width: 80%; /* Larghezza ridotta */
+    width: 50%; /* Riduci ulteriormente la larghezza */
     border-radius: 15px;
     top: 20px;
+    padding: 5px; /* Riduci il padding per renderla più stretta */
+    height: 40px; /* Altezza ridotta */
+    overflow: hidden; /* Nascondi gli elementi in eccesso */
+    transition: height 0.3s ease, width 0.3s ease;
 }
+
+/* Mostra solo le etichette quando la navbar è ristretta */
+.navbar-search.shrink .price-slider,
+.navbar-search.shrink .rating-stars {
+    display: none;
+}
+
+.navbar-search.shrink .price-label,
+.navbar-search.shrink .rating-label {
+    display: inline-block;
+    cursor: pointer;
+    font-size: 0.9em;
+    color: #333;
+    margin-right: 10px;
+}
+
+/* Navbar espansa */
+.navbar-search.expanded {
+    width: 95%;
+    height: auto; /* Permetti di adattarsi al contenuto */
+    padding: 10px;
+    border-radius: 20px;
+    transition: height 0.3s ease, width 0.3s ease;
+}
+
+/* Mostra i controlli di input quando la navbar è espansa */
+.navbar-search.expanded .price-slider,
+.navbar-search.expanded .rating-stars {
+    display: flex;
+}
+
+.navbar-search.expanded .price-label,
+.navbar-search.expanded .rating-label {
+    display: none;
+}
+
+/* Assicurati che la scritta "Rating" sia sempre nera */
+.rating-label {
+    color: #333;
+}
+
 /* Prezzo e rating nella navbar ridotta */
 .price-container .price-dropdown,
 .rating-container .rating-dropdown {
@@ -144,84 +197,51 @@ p {
 /* Stile per il form di ricerca */
 .search-form {
     display: flex;
-    justify-content: space-between; /* Distribuisce gli elementi con spazi uniformi */
-    align-items: center; /* Allinea gli elementi verticalmente */
-    width: 100%; /* Occupa tutta la larghezza del contenitore */
-    height: 100%; /* Occupa tutta l'altezza del contenitore */
-    gap: 10px; /* Spazio tra gli elementi */
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    gap: 10px;
 }
 
 /* Stile per gli input */
 .search-input {
-    flex: 1; /* Permette all'input di occupare lo spazio disponibile */
-    max-width: 200px; /* Imposta una larghezza massima */
-    padding: 5px; /* Padding interno */
+    flex: 1;
+    max-width: 300px;
+    padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 0.9em; /* Dimensione del font */
+    border-radius: 20px;
+    font-size: 1em;
     outline: none;
     transition: border-color 0.3s ease;
-    height: 30px; /* Altezza uniforme */
-    box-sizing: border-box; /* Include padding e bordi nella larghezza totale */
+    height: 40px;
+    box-sizing: border-box;
 }
+
 .search-input:focus {
     border-color: #ff6600;
 }
 
-/* Stile per il cursore del prezzo */
-.price-slider {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1; /* Permette al cursore di occupare lo spazio disponibile */
-    max-width: 200px; /* Imposta una larghezza massima */
-    gap: 5px; /* Spazio tra l'etichetta e il cursore */
+/* Stile per il menu a discesa */
+.search-select {
+    flex: 1;
+    max-width: 300px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.3s ease;
+    height: 40px;
+    box-sizing: border-box;
+    background-color: #fff;
+    appearance: none; /* Rimuove lo stile predefinito del browser */
 }
 
-.price-slider input[type="range"] {
-    height: 4px; /* Ridotta l'altezza del cursore */
+.search-select:focus {
+    border-color: #ff6600;
 }
 
-/* Stile per le stelle del rating */
-.rating-stars {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1; /* Permette alle stelle di occupare lo spazio disponibile */
-    max-width: 200px; /* Imposta una larghezza massima */
-    gap: 5px; /* Spazio tra l'etichetta e le stelle */
-}
-
-.stars label {
-    font-size: 1em; /* Ridotta la dimensione delle stelle */
-    height: 100%;
-}
-
-/* Stile per il pulsante di ricerca */
-.search-button {
-    flex: 0 0 auto; /* Mantiene una dimensione fissa */
-    background-color: #ff6600;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.3s ease;
-    height: 30px; /* Altezza uniforme */
-    box-sizing: border-box; /* Include padding e bordi nella larghezza totale */
-}
-
-.search-button:hover {
-    background-color: #e55a00;
-}
-
-/* Stile per l'icona di ricerca */
-.search-icon {
-    width: 15px; /* Ridotta la dimensione dell'icona */
-    height: 15px;
-}
 /* Stile per il cursore del prezzo */
 .price-slider {
     display: flex; /* Usa Flexbox per disporre gli elementi orizzontalmente */
@@ -238,7 +258,7 @@ p {
 }
 .rating-stars label {
     font-size: 1em; /* Dimensione del testo */
-    color: #333; /* Colore del testo */
+    color: #333;/* Colore del testo */
     margin-right: 10px; /* Spazio tra l'etichetta e l'elemento */
     display: inline-block; /* Assicura che l'etichetta sia visibile */
     vertical-align: middle; /* Allinea verticalmente al centro */
@@ -270,15 +290,40 @@ p {
     background: #e55a00;
 }
 
+/* Stile per il pulsante di ricerca */
+.search-button {
+    flex: 0 0 auto;
+    background-color: #ff6600;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    height: 40px;
+    box-sizing: border-box;
+}
+
+.search-button:hover {
+    background-color: #e55a00;
+}
+
+/* Stile per l'icona di ricerca */
+.search-icon {
+    width: 15px; /* Ridotta la dimensione dell'icona */
+    height: 15px;
+}
+
 /* Stile per il contenitore delle stelle del rating */
 .rating-stars {
     display: flex;
-    flex-direction: row; /* Allinea le stelle orizzontalmente */
-    justify-content: center; /* Centra le stelle orizzontalmente */
-    align-items: center; /* Centra le stelle verticalmente */
-    gap: 10px; /* Spazio tra il label "Rating minimo" e le stelle */
-    height: 100%; /* Adatta l'altezza al container */
-    box-sizing: border-box; /* Include padding e bordi nell'altezza totale */
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+    box-sizing: border-box;
 }
 
 /* Stile per il contenitore delle stelle */
@@ -311,9 +356,57 @@ p {
     color: #e55a00;
 }
 
-.content{
-    background-color: black;
+/* Stile per il contenuto */
+.content {
+    background-color: #912525;
     min-height: 100vh;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Stile per il footer */
+.footer {
+    background-color: #333;
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.footer-section {
+    flex: 1;
+    margin: 10px;
+    min-width: 200px;
+}
+
+.footer-section h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.footer-section p {
+    font-size: 1em;
+    margin: 5px 0;
+}
+
+.footer-bottom {
+    background-color: #222;
+    color: #bbb;
+    padding: 10px 0;
+    font-size: 0.9em;
 }
 
 

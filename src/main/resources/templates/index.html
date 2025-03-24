@@ -21,39 +21,36 @@
                 
             </div>
             <div class="nav-container">
-            <div class="navbar-search">
-                <form action="/search" method="GET" class="search-form">
-                    <!-- Campo per il servizio -->
-                    <input type="text" name="service" placeholder="Servizio" class="search-input" />
-            
-                    <!-- Slider per il prezzo -->
+            <div class="navbar-search shrink">
+                <form class="search-form">
+                    <select class="search-select">
+                        <option value="" disabled selected>Seleziona una categoria</option>
+                        <option value="categoria1">Categoria 1</option>
+                        <option value="categoria2">Categoria 2</option>
+                        <option value="categoria3">Categoria 3</option>
+                        <option value="categoria4">Categoria 4</option>
+                    </select>
+                    <span class="price-label">Prezzo</span>
                     <div class="price-slider">
-                        <label for="maxPrice">Prezzo massimo:</label>
-                        <input type="range" id="maxPrice" name="maxPrice" min="0" max="1000" step="10" value="500" oninput="updatePriceValue(this.value)" />
-                        <span id="priceValue">500</span> €
+                        <label for="price">Prezzo:</label>
+                        <input type="range" id="price" name="price" min="0" max="100">
                     </div>
-            
-                    <!-- Stelle per il rating -->
+                    <span class="rating-label">Rating</span>
                     <div class="rating-stars">
-                        <label for="minRating">Rating minimo:</label>
                         <div class="stars">
-                            <input type="radio" id="star5" name="minRating" value="5" />
-                            <label for="star5" title="5 stelle">★</label>
-                            <input type="radio" id="star4" name="minRating" value="4" />
-                            <label for="star4" title="4 stelle">★</label>
-                            <input type="radio" id="star3" name="minRating" value="3" />
-                            <label for="star3" title="3 stelle">★</label>
-                            <input type="radio" id="star2" name="minRating" value="2" />
-                            <label for="star2" title="2 stelle">★</label>
-                            <input type="radio" id="star1" name="minRating" value="1" />
-                            <label for="star1" title="1 stella">★</label>
+                            <input type="radio" id="star5" name="rating" value="5">
+                            <label for="star5">★</label>
+                            <input type="radio" id="star4" name="rating" value="4">
+                            <label for="star4">★</label>
+                            <input type="radio" id="star3" name="rating" value="3">
+                            <label for="star3">★</label>
+                            <input type="radio" id="star2" name="rating" value="2">
+                            <label for="star2">★</label>
+                            <input type="radio" id="star1" name="rating" value="1">
+                            <label for="star1">★</label>
                         </div>
                     </div>
-            
-                    <!-- Pulsante di ricerca -->
-                    <button type="submit" class="search-button">
-                        <img src="/immagini/search-icon.png" alt="Cerca" class="search-icon" />
-                    </button>
+                    <button type="submit" class="search-button">Cerca</button>
                 </form>
             </div>
         </div>
@@ -81,7 +78,52 @@
         navbar.classList.remove("shrink");
     }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const navbar = document.querySelector('.navbar-search');
+    const priceLabel = document.querySelector('.price-label');
+    const ratingLabel = document.querySelector('.rating-label');
+
+    // Funzione per espandere la navbar
+    const expandNavbar = () => {
+        navbar.classList.remove('shrink');
+        navbar.classList.add('expanded');
+    };
+
+    // Funzione per ridurre la navbar
+    const shrinkNavbar = () => {
+        navbar.classList.remove('expanded');
+        navbar.classList.add('shrink');
+    };
+
+    // Aggiungi eventi di click sulle etichette
+    priceLabel.addEventListener('click', expandNavbar);
+    ratingLabel.addEventListener('click', expandNavbar);
+
+    // Riduci la navbar quando si clicca fuori
+    document.addEventListener('click', (event) => {
+        if (!navbar.contains(event.target) && navbar.classList.contains('expanded')) {
+            shrinkNavbar();
+        }
+    });
+});
     </script>
+    <footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section about">
+            <h2>Chi Siamo</h2>
+            <p>Informazioni sull'azienda, la missione e i valori.</p>
+        </div>
+        <div class="footer-section contact">
+            <h2>Contatti</h2>
+            <p>Email: info@example.com</p>
+            <p>Telefono: +39 123 456 789</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        &copy; 2025 Sitarello. All rights reserved.
+    </div>
+</footer>
     </body>
     
 </html>
