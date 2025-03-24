@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dettagli Prodotto</title>
+    <link rel="stylesheet" href="/css/stile.css">
+</head>
+<body>
+    <header>
+        <h1>Dettagli Prodotto</h1>
+    </header>
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#products">Prodotti</a>
+        <a href="#contact">Contatti</a>
+    </nav>
+    <main>
+        <section id="product-details">
+            <div class="product-card">
+                <h2 th:text="${product.categoria}">Categoria</h2>
+                <p>Prezzo: <span th:text="${product.prezzo}">0.00</span> €</p>
+                <p>Rating: <span th:text="${product.rating}">0.0</span></p>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Il Mio Sitarello. Tutti i diritti riservati.</p>
+    </footer>
+</body>
+</html>
