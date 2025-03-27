@@ -54,18 +54,41 @@
                 </form>
             </div>
         </div>
-            <div class="content">
-                <h4>Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                     Nobis, molestias incidunt! Quasi odio aliquam hic
-                      placeat non similique, est eius repudiandae libero
-                       illo tempora officiis. Iure exercitationem odit illo
-                        iste! Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Nobis, molestias incidunt! Quasi odio aliquam hic
-                         placeat non similique, est eius repudiandae libero
-                          illo tempora officiis. Iure exercitationem odit illo
-                           iste!</h4>
+          
+            <div class="categories-section">
+                <h2>Categorie più ricercate</h2>
+                <div class="categories-slider">
+                    <div class="category-card">
+                        <h3>Categoria 1</h3>
+                        <img src="https://fiverr-res.cloudinary.com/q_auto,f_auto,w_188,dpr_1.0/v1/attachments/generic_asset/asset/ece24f7f595e2dd44b26567705d1c600-1728279781879/UGC%20Video%20img.png" alt="Categoria 1">
+                        
+                    </div>
+                    <div class="category-card">
+                        <h3>Categoria 2</h3>
+                        <img src="https://fiverr-res.cloudinary.com/q_auto,f_auto,w_188,dpr_1.0/v1/attachments/generic_asset/asset/798403f5b92b1b5af997acc704a3d21c-1702465156494/logo-design.png" alt="Categoria 2">
+                        
+                    </div>
+                    <div class="category-card">
+                        <h3>Categoria 3</h3>
+                        <img src="https://fiverr-res.cloudinary.com/q_auto,f_auto,w_188,dpr_1.0/v1/attachments/generic_asset/asset/798403f5b92b1b5af997acc704a3d21c-1702465156488/seo.png" alt="Categoria 3">
+                        
+                    </div>
+                    <div class="category-card">
+                        <h3>Categoria 4</h3>
+                        <img src="https://fiverr-res.cloudinary.com/q_auto,f_auto,w_188,dpr_1.0/v1/attachments/generic_asset/asset/798403f5b92b1b5af997acc704a3d21c-1702465156473/architecture-design.png" alt="Categoria 4">
+                        
+                    </div>
+                    <div class="category-card">
+                        <h3>Categoria 5</h3>
+                        <img src="https://fiverr-res.cloudinary.com/q_auto,f_auto,w_188,dpr_1.0/v1/attachments/generic_asset/asset/798403f5b92b1b5af997acc704a3d21c-1702465156479/voice-over.png" alt="Categoria 5">
+                        
+                    </div>
+                </div>
+                <div class="slider-controls">
+                    <button class="prev-btn">❮</button>
+                    <button class="next-btn">❯</button>
+                </div>
             </div>
-            
         </div>
         
         <!-- Script per la navbar dinamica -->
@@ -107,6 +130,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slider = document.querySelector('.categories-slider');
+            const prevBtn = document.querySelector('.prev-btn');
+            const nextBtn = document.querySelector('.next-btn');
+    
+            prevBtn.addEventListener('click', () => {
+                slider.scrollBy({ left: -200, behavior: 'smooth' });
+            });
+    
+            nextBtn.addEventListener('click', () => {
+                slider.scrollBy({ left: 200, behavior: 'smooth' });
+            });
+        });
     </script>
     <footer class="footer">
     <div class="footer-content">

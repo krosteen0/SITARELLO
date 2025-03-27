@@ -578,5 +578,107 @@ form button:hover {
     background-color: #45a049;
 }
 
+/* Stile per la sezione delle categorie */
+.categories-section {
+    padding: 20px;
+    background-color: #f9f9f9;
+    text-align: center;
+}
+
+.categories-section h2 {
+    font-size: 2em;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Stile per lo slider */
+.categories-slider {
+    display: flex;
+    overflow-x: auto; /* Permette lo scorrimento orizzontale */
+    gap: 20px;
+    padding: 10px;
+    scroll-behavior: smooth; /* Scorrimento fluido */
+}
+
+.categories-slider::-webkit-scrollbar {
+    display: none; /* Nasconde la scrollbar */
+}
+
+/* Stile per le card delle categorie */
+.category-card {
+    display: flex; /* Impedisce che le card si ridimensionino */
+    flex-direction: column;
+    width: 200px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding: 10px;
+    transition: transform 0.3s ease;
+    min-height: 230px;
+    justify-content: space-between;
+}
+
+.category-card:hover {
+    transform: scale(1.05); /* Effetto di zoom al passaggio del mouse */
+}
+
+.category-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 15px;
+    bottom: 0%;
+}
+
+.category-card h3 {
+    margin-top: 10px;
+    font-size: 1.5em;
+    color: #333;
+    text-align: left;
+}
+
+/* Stile per i controlli dello slider */
+.slider-controls {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.slider-controls .prev-btn,
+.slider-controls .next-btn {
+    position: absolute;
+    top: 50%; /* Centra verticalmente i bottoni */
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%; /* Rende i bottoni circolari */
+    background-color: rgba(0, 0, 0, 0.5); /* Colore nero con trasparenza */
+    color: white;
+    font-size: 1.5em;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s ease;
+    z-index: 10; /* Assicura che i bottoni siano sopra lo slider */
+}
+
+.slider-controls .prev-btn {
+    left: -20px; /* Posiziona il bottone a sinistra dello slider */
+}
+
+.slider-controls .next-btn {
+    right: -20px; /* Posiziona il bottone a destra dello slider */
+}
+
+.slider-controls .prev-btn:hover,
+.slider-controls .next-btn:hover {
+    background-color: rgba(0, 0, 0, 0.7); /* Aumenta l'opacità al passaggio del mouse */
+}
+
 
 
