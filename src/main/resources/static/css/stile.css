@@ -140,7 +140,7 @@ p {
 
 /* Stile per il box di ricerca (navbar) */
 .nav-container {
-    background-color: #ffffff;
+    
     width: 100%;
     position: sticky;
     top: 0;
@@ -148,6 +148,7 @@ p {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     overflow: hidden;
+    background-color: #ffffff;
 }
 
 .navbar-search {
@@ -155,12 +156,12 @@ p {
     justify-content: center;
     align-items: center;
     margin: 10px auto;
-    padding: 10px;
-    background-color: #ffffff;
+    padding: 20px;
+    background-color: rgb(255, 255, 255,1);
     border-radius: 20px;
     width: 80%;
     height: 50px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    
     transition: width 0.6s ease, border-radius 0.6s ease, top 0.6s ease;
 }
 
@@ -172,7 +173,7 @@ p {
     padding: 5px; /* Riduci il padding per renderla più stretta */
     height: 40px; /* Altezza ridotta */
     overflow: hidden; /* Nascondi gli elementi in eccesso */
-    transition: height 0.3s ease, width 0.3s ease;
+    transition: all 0.6s ease; /* Transizione fluida per tutte le proprietà */
 }
 
 /* Mostra solo le etichette quando la navbar è ristretta */
@@ -192,11 +193,78 @@ p {
 
 /* Navbar espansa */
 .navbar-search.expanded {
-    width: 95%;
-    height: auto; /* Permetti di adattarsi al contenuto */
-    padding: 10px;
+    display: flex;
+    justify-content: space-between; /* Distribuisce gli elementi su tutta la larghezza */
+    align-items: center; /* Allinea verticalmente gli elementi */
+    padding: 10px 20px; /* Aggiunge un po' di spazio interno */
+    width: 95%; /* Occupa quasi tutta la larghezza */
+    height: auto; /* Adatta l'altezza al contenuto */
     border-radius: 20px;
-    transition: height 0.3s ease, width 0.3s ease;
+    transition: all 0.6s ease; /* Transizione fluida per tutte le proprietà */
+}
+
+/* Stile per la navbar espansa */
+.navbar-search.expanded {
+    display: flex;
+    justify-content: space-between; /* Distribuisce gli elementi su tutta la larghezza */
+    align-items: center; /* Allinea verticalmente gli elementi */
+    padding: 10px 20px; /* Aggiunge un po' di spazio interno */
+}
+
+/* Search form all'interno della navbar */
+.navbar-search.expanded .search-form {
+    display: flex; /* Usa Flexbox per disporre gli elementi orizzontalmente */
+    justify-content: space-between; /* Distribuisce gli elementi uniformemente */
+     /* Allinea gli elementi verticalmente */
+    gap: 20px; /* Spaziatura tra gli elementi */
+    width: 100%; /* Occupa tutta la larghezza disponibile */
+    height: auto; /* Adatta l'altezza al contenuto */
+    box-sizing: border-box; /* Include padding e bordi nella larghezza */
+    flex-wrap: nowrap; /* Impedisce che gli elementi vadano a capo */
+    
+}
+
+/* Stile per gli elementi interni del form */
+.search-select,
+.price-slider,
+.rating-stars,
+.search-button {
+    flex: 1; /* Ogni elemento occupa una parte uguale della larghezza */
+    min-width: 150px; /* Imposta una larghezza minima per evitare che diventino troppo piccoli */
+    max-width: 300px; /* Imposta una larghezza massima per evitare che diventino troppo grandi */
+    box-sizing: border-box; /* Include padding e bordi nella larghezza */
+}
+
+/* Stile per il pulsante di ricerca */
+.search-button {
+    flex: 0 0 auto; /* Impedisce al pulsante di ridimensionarsi come gli altri elementi */
+    max-width: 200px; /* Imposta una larghezza massima per il pulsante */
+    padding: 10px 20px; /* Aggiunge spazio interno */
+    text-align: center; /* Centra il testo */
+}
+
+.navbar-search .search-form {
+   
+    justify-content: space-between; /* Distribuisce gli elementi uniformemente */
+    align-items: center; /* Allinea verticalmente gli elementi */
+    padding: 2%;
+    gap: 20px; /* Spaziatura tra gli elementi */
+    width: 100%; /* Occupa tutta la larghezza disponibile */
+    height: auto; /* Adatta l'altezza al contenuto */
+    box-sizing: border-box; /* Include padding e bordi nella larghezza */
+    vertical-align: middle;
+}
+
+/* Stile per gli elementi interni del form */
+.search-select,
+.price-slider,
+.rating-stars,
+.search-button {
+    flex: 1; /* Ogni elemento occupa una parte uguale della larghezza */
+    min-width: 150px; /* Imposta una larghezza minima per evitare che diventino troppo piccoli */
+    max-width: 300px; /* Imposta una larghezza massima per evitare che diventino troppo grandi */
+    box-sizing: border-box; /* Include padding e bordi nella larghezza */
+    vertical-align: middle;
 }
 
 /* Mostra i controlli di input quando la navbar è espansa */
@@ -338,13 +406,15 @@ p {
     background-color: #ff6600;
     border: none;
     border-radius: 20px;
-    padding: 10px 20px;
+    padding: 0.5rem 1rem;
     cursor: pointer;
     color: white;
     font-weight: bold;
     transition: background-color 0.3s ease;
     height: 40px;
     box-sizing: border-box;
+    max-width: 200px; /* Imposta una larghezza massima per il pulsante */
+    text-align: center; /* Centra il testo */
 }
 
 .search-button:hover {
@@ -364,8 +434,9 @@ p {
     justify-content: center;
     align-items: center;
     gap: 10px;
-    height: 100%;
+    
     box-sizing: border-box;
+    vertical-align: middle;
 }
 
 /* Stile per il contenitore delle stelle */
@@ -375,6 +446,7 @@ p {
     justify-content: center; /* Centra le stelle orizzontalmente */
     align-items: center; /* Centra le stelle verticalmente */
     gap: 5px; /* Spazio tra le stelle */
+    vertical-align: middle;
 }
 
 .stars input[type="radio"] {
@@ -475,16 +547,15 @@ p {
 
 /* Stile per il form */
 form {
-    background-color: white;
+    
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin: 2rem auto;
-    padding: 2rem;
-    max-width: 400px;
+    background-color: none;
+   
 }
 
 form div {
-    margin-bottom: 1rem;
+    
 }
 
 form input {
