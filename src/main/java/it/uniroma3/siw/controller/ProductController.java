@@ -25,4 +25,20 @@ public class ProductController {
         model.addAttribute("categoria", categoria); // Passa anche la categoria al modello
         return "products";
     }
+
+    @GetMapping("/products")
+    public String searchProducts(
+            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false) Integer price,
+            @RequestParam(required = false) Integer rating,
+            Model model) {
+        // Filtra i prodotti in base ai parametri
+        List<Product> filteredProducts = productService.filterProducts(categoria, price, rating);
+
+        // Aggiungi i prodotti filtrati al modello
+        model.addAttribute("products", filteredProducts);
+
+        // Ritorna la vista con i risultati
+        return "products";
+    }
 }

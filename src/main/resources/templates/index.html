@@ -25,15 +25,15 @@
                 <form action="/products" method="GET" class="search-form">
                     <select name="categoria" class="search-select">
                         <option value="" disabled selected>Seleziona una categoria</option>
-                        <option value="categoria1">Categoria 1</option>
-                        <option value="categoria2">Categoria 2</option>
-                        <option value="categoria3">Categoria 3</option>
-                        <option value="categoria4">Categoria 4</option>
+                        <option value="1">Categoria 1</option>
+                        <option value="2">Categoria 2</option>
+                        <option value="3">Categoria 3</option>
+                        <option value="4">Categoria 4</option>
                     </select>
                     <span class="price-label">Prezzo</span>
                     <div class="price-slider">
                         <label for="price">Prezzo:</label>
-                        <input type="range" id="price" name="price" min="0" max="100">
+                        <input type="range" id="price" name="price" min="0" max="100" value="100" >
                     </div>
                     <span class="rating-label">Rating</span>
                     <div class="rating-stars">
@@ -164,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     </script>
+ 
     <footer class="footer">
     <div class="footer-content">
         <div class="footer-section about">
