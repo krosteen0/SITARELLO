@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prodotti</title>
+    <title>Risultati Ricerca</title>
     <link rel="stylesheet" href="/css/stile.css">
 </head>
 <body>
     <header>
-        <h1>Prodotti</h1>
+        <h1>Risultati della Ricerca</h1>
     </header>
     <nav>
         <a href="#home">Home</a>
@@ -18,12 +18,16 @@
     <main>
         <section id="products">
             <div class="product-list">
-                <!-- Itera sui prodotti -->
-                <div class="product-card" th:each="product : ${products}">
-                    <h2 th:text="${product.categoria}">Categoria</h2>
-                    <p>Prezzo: <span th:text="${product.prezzo}">0.00</span> €</p>
-                    <p>Rating: <span th:text="${product.rating}">0.0</span></p>
-                </div>
+                <ul>
+                    <th:block th:each="prodotto : ${prodotti}">
+                        <li>
+                            <h2 th:text="${prodotto.nome}"></h2>
+                            <p th:text="'Categoria: ' + ${prodotto.categoria}"></p>
+                            <p th:text="'Prezzo: €' + ${prodotto.prezzo}"></p>
+                            <p th:text="'Rating: ' + ${prodotto.rating} + '★'"></p>
+                        </li>
+                    </th:block>
+                </ul>
             </div>
         </section>
     </main>

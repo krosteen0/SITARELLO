@@ -32,9 +32,13 @@ public class ProductController {
     }
 
     @GetMapping("/products/categoria")
-    public String getProductsByCategoria(@RequestParam String categoria, Model model) {
-        List<Product> products = productService.getProductsByCategoria(categoria);
-        model.addAttribute("products", products);
-        return "products";
+    public String getProductsByCategoria(
+            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false) Integer price,
+            @RequestParam(required = false) Integer rating,
+            Model model) {
+        List<Product> prodotti = productService.getProducts(categoria, price, rating);
+        model.addAttribute("prodotti", prodotti);
+        return "prodotti";
     }
 }
