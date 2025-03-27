@@ -593,10 +593,12 @@ form button:hover {
 
 /* Stile per lo slider */
 .categories-slider {
-    display: flex;
-    overflow-x: auto; /* Permette lo scorrimento orizzontale */
-    gap: 20px;
+    display: flex; /* Usa Flexbox per gestire il layout */
+    justify-content: flex-start; /* Centra le card orizzontalmente */
+    align-items: center; /* Centra le card verticalmente */
+    gap: 20px; /* Spaziatura tra le card */
     padding: 10px;
+    overflow-x: auto; /* Permette lo scorrimento orizzontale se necessario */
     scroll-behavior: smooth; /* Scorrimento fluido */
 }
 
@@ -606,17 +608,20 @@ form button:hover {
 
 /* Stile per le card delle categorie */
 .category-card {
-    display: flex; /* Impedisce che le card si ridimensionino */
-    flex-direction: column;
-    width: 200px;
+    flex: 0 0 auto; /* Impedisce il ridimensionamento delle card */
+    width: 200px; /* Larghezza fissa */
+    height: 230px; /* Altezza fissa */
     background-color: white;
     border-radius: 15px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     text-align: center;
     padding: 10px;
-    transition: transform 0.3s ease;
-    min-height: 230px;
+    transition: transform 0.3s ease; /* Mantieni l'effetto hover */
+    display: flex;
+    flex-direction: column;
     justify-content: space-between;
+    align-items: center;
+    
 }
 
 .category-card:hover {
@@ -658,27 +663,33 @@ form button:hover {
 .category-card:nth-child(5) {
     background-color: #ee7b1e; /* Viola chiaro */
 }
-
+.category-card:nth-child(6) {
+    background-color: #149545; /* Blu chiaro */
+}
+.category-card:nth-child(7) {
+    background-color: #ae1569; /* Arancione chiaro */
+}
+.category-card:nth-child(8) {
+    background-color: #ee7b1e; /* Viola chiaro */
+}
 
 /* Stile per i controlli dello slider */
 .slider-controls {
     position: relative;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
+    
+    
 }
 
 .slider-controls .prev-btn,
 .slider-controls .next-btn {
     position: absolute;
-    top: 50%; /* Centra verticalmente i bottoni */
-    transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
+    
+    transform: translateY(180%); /* Corregge l'allineamento verticale */
+    width: 60px;
+    height: 60px;
     border: none;
-    border-radius: 50%; /* Rende i bottoni circolari */
-    background-color: rgba(0, 0, 0, 0.5); /* Colore nero con trasparenza */
+    border-radius: 50%; /* Bottoni circolari */
+    background-color: rgba(0, 0, 0, 0.5); /* Sfondo nero semitrasparente */
     color: white;
     font-size: 1.5em;
     cursor: pointer;
