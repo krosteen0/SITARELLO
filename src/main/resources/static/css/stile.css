@@ -593,10 +593,12 @@ form button:hover {
 
 /* Stile per lo slider */
 .categories-slider {
-    display: flex;
-    overflow-x: auto; /* Permette lo scorrimento orizzontale */
-    gap: 20px;
+    display: flex; /* Usa Flexbox per gestire il layout */
+    justify-content: center; /* Centra le card orizzontalmente */
+    align-items: center; /* Centra le card verticalmente */
+    gap: 20px; /* Spaziatura tra le card */
     padding: 10px;
+    overflow-x: auto; /* Permette lo scorrimento orizzontale se necessario */
     scroll-behavior: smooth; /* Scorrimento fluido */
 }
 
