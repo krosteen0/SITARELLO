@@ -11,9 +11,9 @@ import it.uniroma3.siw.model.Product;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategoria(String categoria);
 
-    List<Product> findByCategoriaAndPriceLessThanEqual(String categoria, Integer price);
+    List<Product> findByCategoriaAndPriceLessThanEqual(String categoria, Double price);
 
     List<Product> findByCategoriaAndRatingGreaterThanEqual(String categoria, Integer rating);
 
-    List<Product> findByCategoriaAndPriceLessThanEqualAndRatingGreaterThanEqual(String categoria, Integer price, Integer rating);
+    List<Product> findByCategoriaAndPriceLessThanEqualAndRatingGreaterThanEqual(String categoria, Double price, Integer rating);
 }

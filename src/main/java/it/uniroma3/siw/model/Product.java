@@ -10,17 +10,27 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String categoria;
-    private double prezzo;
-    private double rating;
 
-    // Getters and setters
+    private String nome;
+    private String categoria;
+    private Double price; // Aggiunta della proprietà price
+    private Integer rating; // Aggiunta della proprietà rating
+
+    // Getters e Setters
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getCategoria() {
@@ -31,19 +41,19 @@ public class Product {
         this.categoria = categoria;
     }
 
-    public double getPrezzo() {
-        return prezzo;
+    public Double getPrice() {
+        return price;
     }
 
-    public void setPrezzo(double prezzo) {
-        this.prezzo = prezzo;
+    public void setPrice(Double price) {
+        this.price = price;
     }
 
-    public double getRating() {
+    public Integer getRating() {
         return rating;
     }
 
-    public void setRating(double rating) {
+    public void setRating(Integer rating) {
         this.rating = rating;
     }
 }

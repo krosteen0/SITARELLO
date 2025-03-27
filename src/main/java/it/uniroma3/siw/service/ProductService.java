@@ -25,7 +25,7 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public List<Product> getProducts(String categoria, Integer price, Integer rating) {
+    public List<Product> getProducts(String categoria, Double price, Integer rating) {
         if (categoria != null && price != null && rating != null) {
             return productRepository.findByCategoriaAndPriceLessThanEqualAndRatingGreaterThanEqual(categoria, price, rating);
         } else if (categoria != null && price != null) {
