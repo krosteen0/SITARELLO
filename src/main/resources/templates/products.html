@@ -8,10 +8,9 @@
 </head>
 <body>
     <header>
-        <h1>Risultati della Ricerca</h1>
+        <h1 th:text="'Risultati della Ricerca per Categoria: ' + ${categoria}"></h1>
     </header>
     <nav>
-        <a href="#home">Home</a>
         <a href="#products">Prodotti</a>
         <a href="#contact">Contatti</a>
     </nav>
@@ -19,12 +18,15 @@
         <section id="products">
             <div class="product-list">
                 <ul>
-                    <th:block th:each="prodotto : ${prodotti}">
+                    <th:block th:if="${products.isEmpty()}">
+                        <p>Nessun prodotto trovato per la categoria selezionata.</p>
+                    </th:block>
+                    <th:block th:each="product : ${products}">
                         <li>
-                            <h2 th:text="${prodotto.nome}"></h2>
-                            <p th:text="'Categoria: ' + ${prodotto.categoria}"></p>
-                            <p th:text="'Prezzo: €' + ${prodotto.prezzo}"></p>
-                            <p th:text="'Rating: ' + ${prodotto.rating} + '★'"></p>
+                            <h2 th:text="${product.nome}"></h2>
+                            <p th:text="'Categoria: ' + ${product.categoria}"></p>
+                            <p th:text="'Prezzo: €' + ${product.price}"></p>
+                            <p th:text="'Rating: ' + ${product.rating} + '★'"></p>
                         </li>
                     </th:block>
                 </ul>

@@ -9,8 +9,8 @@ import jakarta.persistence.Id;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    
     private Long id;
-
     private String nome;
     private String categoria;
     private Double price; // Aggiunta della proprietà price

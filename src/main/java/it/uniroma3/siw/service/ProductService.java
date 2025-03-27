@@ -24,18 +24,12 @@ public class ProductService {
     public Product saveProduct(Product product) {
         return productRepository.save(product);
     }
-
-    public List<Product> getProducts(String categoria, Double price, Integer rating) {
-        if (categoria != null && price != null && rating != null) {
-            return productRepository.findByCategoriaAndPriceLessThanEqualAndRatingGreaterThanEqual(categoria, price, rating);
-        } else if (categoria != null && price != null) {
-            return productRepository.findByCategoriaAndPriceLessThanEqual(categoria, price);
-        } else if (categoria != null && rating != null) {
-            return productRepository.findByCategoriaAndRatingGreaterThanEqual(categoria, rating);
-        } else if (categoria != null) {
+    
+    public List<Product> getProductsByCategoria(String categoria) {
+        if (categoria != null && !categoria.isEmpty()) {
             return productRepository.findByCategoria(categoria);
         } else {
-            return productRepository.findAll();
+            return productRepository.findAll(); // Restituisce tutti i prodotti se la categoria non è specificata
         }
     }
 }

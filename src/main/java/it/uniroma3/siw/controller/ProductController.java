@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import it.uniroma3.siw.model.Product;
@@ -17,28 +16,13 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    @GetMapping("/products")
-    public String getAllProducts(Model model) {
-        Iterable<Product> products = productService.getAllProducts();
-        model.addAttribute("products", products);
-        return "products";
-    }
-
-    @GetMapping("/products/{id}")
-    public String getProductById(@PathVariable Long id, Model model) {
-        Product product = productService.getProductById(id);
-        model.addAttribute("product", product);
-        return "product";
-    }
-
     @GetMapping("/products/categoria")
     public String getProductsByCategoria(
             @RequestParam(required = false) String categoria,
-            @RequestParam(required = false) Double price,
-            @RequestParam(required = false) Integer rating,
             Model model) {
-        List<Product> prodotti = productService.getProducts(categoria, price, rating);
+        List<Product> prodotti = productService.getProductsByCategoria(categoria);
         model.addAttribute("products", prodotti);
+        model.addAttribute("categoria", categoria); // Passa anche la categoria al modello
         return "products";
     }
 }
