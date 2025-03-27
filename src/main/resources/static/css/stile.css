@@ -634,9 +634,31 @@ form button:hover {
 .category-card h3 {
     margin-top: 10px;
     font-size: 1.5em;
-    color: #333;
+    color: #ffffff;
     text-align: left;
+    font-family: 'Macan', 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Font desiderato */
 }
+
+.category-card:nth-child(1) {
+    background-color: #fc8496; /* Rosso chiaro */
+}
+
+.category-card:nth-child(2) {
+    background-color: #c59b28; /* Verde chiaro */
+}
+
+.category-card:nth-child(3) {
+    background-color: #149545; /* Blu chiaro */
+}
+
+.category-card:nth-child(4) {
+    background-color: #ae1569; /* Arancione chiaro */
+}
+
+.category-card:nth-child(5) {
+    background-color: #ee7b1e; /* Viola chiaro */
+}
+
 
 /* Stile per i controlli dello slider */
 .slider-controls {
