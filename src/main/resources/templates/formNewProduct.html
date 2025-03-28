@@ -1,25 +1,105 @@
 <!DOCTYPE html>
-<html> 
-   <head>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nuovo Prodotto</title>
     <link rel="stylesheet" href="/css/stile.css" />
   </head>
   <body>
-    <div><a href="/"><img src="/logo-siw.png" width="50%"/></a></div>
-    <h1>Aggiungi un prodotto</h1>
-    <form th:action="@{/product}" method="POST" th:object="${product}">
-      <div>
-        Categoria: <span><input required type="text" th:field="${product.categoria}"/></span>
+    <div class="mainNav">
+      <div class="header">
+          <!-- Logo e titolo -->
+          <div class="start">
+              <div class="logoNome">
+                  <a href="/">
+                      <img class="logo" src="/immagini/logoSiw.png" alt="Logo LearnLab" />
+                  </a>
+                  <a href="/" class="home-link">
+                      <h1>LearnLab</h1>
+                  </a>
+              </div>   
+          </div>
       </div>
-      <div>
-        Prezzo: <span><input required type="number" step="0.01" th:field="${product.prezzo}"/></span>
+    </div>
+    <!-- Contenuto principale -->
+    <main>
+      <h1>Aggiungi un prodotto</h1>
+
+      <!-- Notifica di successo -->
+      <div th:if="${successMessage}" class="notification success" id="successNotification">
+        <p th:text="${successMessage}"></p>
+        <button class="close-btn" onclick="closeNotification('successNotification')">&times;</button>
       </div>
-      <div>
-        Rating: <span><input required type="number" step="0.1" min="0" max="5" th:field="${product.rating}"/></span>
+
+      <!-- Notifica di errore -->
+      <div th:if="${errorMessage}" class="notification error" id="errorNotification">
+        <p th:text="${errorMessage}"></p>
+        <button class="close-btn" onclick="closeNotification('errorNotification')">&times;</button>
       </div>
-      <div>
-        <span><button type="submit">Conferma</button></span>
+
+      <form th:action="@{/product}" method="POST" th:object="${product}" class="form-container">
+        <div class="form-group">
+          <label for="nome">Nome:</label>
+          <input required type="text" id="nome" th:field="${product.nome}" placeholder="Nome del prodotto" />
+        </div>
+        <div class="form-group">
+          <label for="categoria">Categoria:</label>
+          <input required type="text" id="categoria" th:field="${product.categoria}" placeholder="Categoria" />
+        </div>
+        <div class="form-group">
+          <label for="prezzo">Prezzo:</label>
+          <input required type="number" id="prezzo" step="0.01" th:field="${product.prezzo}" placeholder="Prezzo" />
+        </div>
+        <div class="form-group">
+          <label for="rating">Rating:</label>
+          <input required type="number" id="rating" step="0.1" min="0" max="5" th:field="${product.rating}" placeholder="Rating" />
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn">Conferma</button>
+        </div>
+      </form>
+    </main>
+
+    <script>
+      function closeNotification(notificationId) {
+        const notification = document.getElementById(notificationId);
+        if (notification) {
+          notification.style.opacity = '0'; // Nasconde la notifica con un'animazione
+          setTimeout(() => notification.remove(), 500); // Rimuove l'elemento dopo l'animazione
+        }
+      }
+
+      // Nascondi automaticamente la notifica dopo 5 secondi
+      setTimeout(() => {
+        const successNotification = document.getElementById('successNotification');
+        if (successNotification) {
+          closeNotification('successNotification');
+        }
+
+        const errorNotification = document.getElementById('errorNotification');
+        if (errorNotification) {
+          closeNotification('errorNotification');
+        }
+      }, 5000); // 5000 millisecondi = 5 secondi
+    </script>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+          <div class="footer-section about">
+              <h2>Chi Siamo</h2>
+              <p>Informazioni sull'azienda, la missione e i valori.</p>
+          </div>
+          <div class="footer-section contact">
+              <h2>Contatti</h2>
+              <p>Email: info@example.com</p>
+              <p>Telefono: +39 123 456 789</p>
+          </div>
       </div>
-    </form>
+      <div class="footer-bottom">
+          &copy; 2025 Sitarello. All rights reserved.
+      </div>
+      </footer>
   </body>
 </html>

@@ -40,21 +40,10 @@ main {
     padding: 2rem;
 }
 
-footer {
-    background-color: #333;
-    color: white;
-    text-align: center;
-    padding: 1rem;
-    position: fixed;
-    width: 100%;
-    bottom: 0;
-}
-
 /* Stile per il contenitore principale */
 .mainNav {
     color: white;
     background-color: #ffffff;
-    height: 200vh;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
 }
@@ -133,6 +122,11 @@ p {
     border-bottom: 2px solid #ccc;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
+    transition: box-shadow 0.3s ease;
+}
+
+.header.scrolled {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Ombra più pronunciata quando si scorre */
 }
 
 /* Stile per il logo e il titolo */
@@ -488,48 +482,81 @@ p {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Stile per il footer */
-.footer {
-    background-color: #333;
-    color: #fff;
-    padding: 20px 0;
+/* Stile generale del footer */
+footer {
     text-align: center;
-    position: relative;
-    bottom: 0;
-    width: 100%;
+    padding: 10px 0;
+    background-color: #f1f1f1;
+    margin-top: 20px;
+}
+
+.footer {
+    background-color: #333; /* Colore di sfondo scuro */
+    color: #fff; /* Testo bianco */
+    padding: 20px 0;
+    font-size: 14px;
 }
 
 .footer-content {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: flex-start;
-    flex-wrap: wrap;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 0 20px;
+    flex-wrap: wrap; /* Permette di adattarsi su dispositivi più piccoli */
 }
 
 .footer-section {
     flex: 1;
     margin: 10px;
-    min-width: 200px;
+    min-width: 250px; /* Imposta una larghezza minima per le sezioni */
 }
 
 .footer-section h2 {
-    font-size: 1.5em;
+    font-size: 18px;
     margin-bottom: 10px;
+    color: #ffcc00; /* Colore del titolo */
 }
 
 .footer-section p {
-    font-size: 1em;
-    margin: 5px 0;
+    line-height: 1.6;
+    color: #ddd; /* Colore del testo */
 }
 
+.footer-section a {
+    color: #ffcc00; /* Colore dei link */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-section a:hover {
+    color: #fff; /* Cambia colore al passaggio del mouse */
+}
+
+/* Stile per le icone social */
+.footer-section.social {
+    text-align: center;
+}
+
+.footer-section.social .social-icon {
+    width: 30px;
+    height: 30px;
+    margin: 0 10px;
+    transition: transform 0.3s ease;
+}
+
+.footer-section.social .social-icon:hover {
+    transform: scale(1.2); /* Effetto di ingrandimento al passaggio del mouse */
+}
+
+/* Stile per la parte inferiore del footer */
 .footer-bottom {
-    background-color: #222;
-    color: #bbb;
+    text-align: center;
     padding: 10px 0;
-    font-size: 0.9em;
+    background-color: #222; /* Colore più scuro per il footer inferiore */
+    color: #bbb; /* Colore del testo */
+    font-size: 12px;
 }
 
 /* Stile per la lista dei prodotti */
@@ -581,6 +608,51 @@ form button {
 
 form button:hover {
     background-color: #45a049;
+}
+
+/* Stile per il modulo */
+.form-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  text-decoration: none;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #45a049;
 }
 
 /* Stile per la sezione delle categorie */
@@ -716,6 +788,91 @@ form button:hover {
 .slider-controls .prev-btn:hover,
 .slider-controls .next-btn:hover {
     background-color: rgba(0, 0, 0, 0.7); /* Aumenta l'opacità al passaggio del mouse */
+}
+
+/* Stile per le notifiche */
+.notification {
+  display: flex; /* Usa Flexbox per allineare il contenuto */
+  align-items: center; /* Allinea verticalmente il contenuto */
+  justify-content: space-between; /* Spaziatura tra testo e icona */
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  border-radius: 12px; /* Angoli arrotondati */
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Ombra più pronunciata */
+  animation: fadeIn 0.5s ease-in-out, fadeOut 0.5s ease-in-out 4.5s; /* Animazione di comparsa e scomparsa */
+  position: relative; /* Per posizionare l'icona di chiusura */
+  opacity: 1; /* Per l'animazione di scomparsa */
+  transition: opacity 0.5s ease-in-out; /* Transizione per la scomparsa */
+}
+
+/* Notifica di successo */
+.notification.success {
+  background-color: #d4edda; /* Verde chiaro */
+  color: #155724; /* Verde scuro */
+  border: 1px solid #c3e6cb;
+}
+
+/* Notifica di errore */
+.notification.error {
+  background-color: #f8d7da; /* Rosso chiaro */
+  color: #721c24; /* Rosso scuro */
+  border: 1px solid #f5c6cb;
+}
+
+/* Icona di successo */
+.notification.success::before {
+  content: '✔'; /* Icona di successo */
+  font-size: 20px;
+  margin-right: 10px;
+  color: #155724;
+}
+
+/* Icona di errore */
+.notification.error::before {
+  content: '✖'; /* Icona di errore */
+  font-size: 20px;
+  margin-right: 10px;
+  color: #721c24;
+}
+
+/* Icona di chiusura */
+.notification .close-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  color: inherit;
+  cursor: pointer;
+  margin-left: 15px;
+  transition: color 0.3s ease;
+}
+
+.notification .close-btn:hover {
+  color: #000; /* Cambia colore al passaggio del mouse */
+}
+
+/* Animazione di comparsa */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animazione di scomparsa */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 

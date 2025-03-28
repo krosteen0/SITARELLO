@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import it.uniroma3.siw.model.Product;
@@ -40,5 +42,28 @@ public class ProductController {
 
         // Ritorna la vista con i risultati
         return "products";
+    }
+
+    @PostMapping("/product")
+    public String addProduct(
+            @ModelAttribute Product product,
+            Model model) {
+        try {
+            // Salva il prodotto
+            productService.saveProduct(product);
+            // Aggiungi un messaggio di conferma al modello
+            model.addAttribute("successMessage", "Prodotto aggiunto con successo!");
+        } catch (Exception e) {
+            // Aggiungi un messaggio di errore al modello
+            model.addAttribute("errorMessage", "Errore durante l'aggiunta del prodotto.");
+            e.printStackTrace();
+        }
+        return "formNewProduct"; // Ritorna alla pagina del modulo
+    }
+
+    @GetMapping("/formNewProduct")
+    public String showFormNewProduct(Model model) {
+        model.addAttribute("product", new Product()); // Aggiunge un oggetto vuoto al modello
+        return "formNewProduct"; // Nome del template HTML
     }
 }

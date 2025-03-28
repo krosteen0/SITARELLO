@@ -67,16 +67,29 @@
                     <div class="product-card">
                         <h2 th:text="${product.nome}"></h2>
                         <p th:text="'Categoria: ' + ${product.categoria}"></p>
-                        <p th:text="'Prezzo: €' + ${product.price}"></p>
+                        <p th:text="'Prezzo: €' + ${product.prezzo}"></p>
                         <p th:text="'Rating: ' + ${product.rating} + '★'"></p>
                     </div>
                 </th:block>
             </div>
         </section>
     </main>
-    <footer>
-        <p>&copy; 2025 Il Mio Sitarello. Tutti i diritti riservati.</p>
-    </footer>
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section about">
+                <h2>Chi Siamo</h2>
+                <p>Informazioni sull'azienda, la missione e i valori.</p>
+            </div>
+            <div class="footer-section contact">
+                <h2>Contatti</h2>
+                <p>Email: info@example.com</p>
+                <p>Telefono: +39 123 456 789</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2025 Sitarello. All rights reserved.
+        </div>
+        </footer>
     <script>
         window.addEventListener("scroll", function () {
     const navbar = document.querySelector(".navbar-search");

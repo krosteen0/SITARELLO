@@ -23,8 +23,8 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    public Product saveProduct(Product product) {
-        return productRepository.save(product);
+    public void saveProduct(Product product) {
+        productRepository.save(product); // Salva il prodotto nel database
     }
     
     public List<Product> getProductsByCategoria(String categoria) {
@@ -42,7 +42,7 @@ public class ProductService {
         // Filtra i prodotti in base ai parametri
         return allProducts.stream()
                 .filter(product -> categoria == null || product.getCategoria().equalsIgnoreCase(categoria))
-                .filter(product -> price == null || product.getPrice() <= price)
+                .filter(product -> price == null || product.getPrezzo() <= price)
                 .filter(product -> rating == null || product.getRating() >= rating)
                 .collect(Collectors.toList());
     }

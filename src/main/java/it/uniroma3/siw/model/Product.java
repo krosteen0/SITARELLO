@@ -9,12 +9,12 @@ import jakarta.persistence.Id;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    
     private Long id;
+
     private String nome;
     private String categoria;
-    private Double price; // Aggiunta della proprietà price
-    private Integer rating; // Aggiunta della proprietà rating
+    private Double prezzo;
+    private Double rating;
 
     // Getters e Setters
     public Long getId() {
@@ -41,19 +41,19 @@ public class Product {
         this.categoria = categoria;
     }
 
-    public Double getPrice() {
-        return price;
+    public Double getPrezzo() {
+        return prezzo;
     }
 
-    public void setPrice(Double price) {
-        this.price = price;
+    public void setPrezzo(Double prezzo) {
+        this.prezzo = prezzo;
     }
 
-    public Integer getRating() {
+    public Double getRating() {
         return rating;
     }
 
-    public void setRating(Integer rating) {
+    public void setRating(Double rating) {
         this.rating = rating;
     }
 }

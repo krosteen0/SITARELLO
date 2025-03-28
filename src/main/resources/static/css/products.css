@@ -46,22 +46,88 @@ main {
     padding: 2rem;
 }
 
+/* Stile generale del footer */
+.footer {
+    background-color: #333; /* Colore di sfondo scuro */
+    color: #fff; /* Testo bianco */
+    padding: 20px 0;
+    font-size: 14px;
+}
+
 footer {
-    background-color: #333;
-    color: white;
     text-align: center;
-    padding: 1rem;
-    position: fixed;
-    width: 100%;
-    bottom: 0;
+    padding: 10px 0;
+    background-color: #f1f1f1;
+    margin-top: 20px;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    flex-wrap: wrap; /* Permette di adattarsi su dispositivi più piccoli */
+}
+
+.footer-section {
+    flex: 1;
+    margin: 10px;
+    min-width: 250px; /* Imposta una larghezza minima per le sezioni */
+}
+
+.footer-section h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #ffcc00; /* Colore del titolo */
+}
+
+.footer-section p {
+    line-height: 1.6;
+    color: #ddd; /* Colore del testo */
+}
+
+.footer-section a {
+    color: #ffcc00; /* Colore dei link */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-section a:hover {
+    color: #fff; /* Cambia colore al passaggio del mouse */
+}
+
+/* Stile per le icone social */
+.footer-section.social {
+    text-align: center;
+}
+
+.footer-section.social .social-icon {
+    width: 30px;
+    height: 30px;
+    margin: 0 10px;
+    transition: transform 0.3s ease;
+}
+
+.footer-section.social .social-icon:hover {
+    transform: scale(1.2); /* Effetto di ingrandimento al passaggio del mouse */
+}
+
+/* Stile per la parte inferiore del footer */
+.footer-bottom {
+    text-align: center;
+    padding: 10px 0;
+    background-color: #222; /* Colore più scuro per il footer inferiore */
+    color: #bbb; /* Colore del testo */
+    font-size: 12px;
 }
 
 /* Stile per il contenitore principale */
 .mainNav {
     color: white;
     background-color: #ffffff;
-    height: 200vh;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    height: 100%;
     border-radius: 10px;
 }
 
