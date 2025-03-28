@@ -114,6 +114,15 @@ p {
     object-fit: cover;
 }
 
+.home-link {
+    text-decoration: none; /* Rimuove la sottolineatura */
+    color: inherit; /* Mantiene il colore del testo */
+}
+
+.home-link:hover {
+    text-decoration: none; /* Assicura che non ci sia sottolineatura anche al passaggio del mouse */
+}
+
 /* Stile per l'header */
 .header {
     display: flex;
@@ -552,10 +561,6 @@ form {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     background-color: none;
    
-}
-
-form div {
-    
 }
 
 form input {
