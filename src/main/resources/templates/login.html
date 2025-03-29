@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/stile.css">
+</head>
+<body>
+    <div class="auth-form-container">
+        <form action="/login" method="POST" class="auth-form">
+            <h2>Login</h2>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Inserisci la tua email" required>
+            
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Inserisci la tua password" required>
+            
+            <button type="submit" class="auth-submit-button">Accedi</button>
+        </form>
+    </div>
+</body>
+</html>

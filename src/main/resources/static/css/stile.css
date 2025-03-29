@@ -40,10 +40,21 @@ main {
     padding: 2rem;
 }
 
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
 /* Stile per il contenitore principale */
 .mainNav {
     color: white;
     background-color: #ffffff;
+    height: 200vh;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
 }
@@ -95,21 +106,31 @@ p {
 }
 
 /* Stile per il logo */
+.logo-link {
+    text-decoration: none;
+}
+
 .logo {
+    display: block;
+    margin: 0 auto;
     width: 100px;
     height: 100px;
-    margin: 0;
     border-radius: 50%;
     object-fit: cover;
 }
 
-.home-link {
-    text-decoration: none; /* Rimuove la sottolineatura */
-    color: inherit; /* Mantiene il colore del testo */
+/* Stile per il nome del sito */
+.site-name {
+    text-decoration: none;
+    color: #4CAF50;
+    font-size: 2rem;
+    text-align: center;
+    display: block;
+    margin-top: 0.5rem;
 }
 
-.home-link:hover {
-    text-decoration: none; /* Assicura che non ci sia sottolineatura anche al passaggio del mouse */
+.site-name:hover {
+    color: #45a049;
 }
 
 /* Stile per l'header */
@@ -122,11 +143,6 @@ p {
     border-bottom: 2px solid #ccc;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
-    transition: box-shadow 0.3s ease;
-}
-
-.header.scrolled {
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Ombra più pronunciata quando si scorre */
 }
 
 /* Stile per il logo e il titolo */
@@ -236,14 +252,6 @@ p {
     min-width: 150px; /* Imposta una larghezza minima per evitare che diventino troppo piccoli */
     max-width: 300px; /* Imposta una larghezza massima per evitare che diventino troppo grandi */
     box-sizing: border-box; /* Include padding e bordi nella larghezza */
-}
-
-/* Stile per il pulsante di ricerca */
-.search-button {
-    flex: 0 0 auto; /* Impedisce al pulsante di ridimensionarsi come gli altri elementi */
-    max-width: 200px; /* Imposta una larghezza massima per il pulsante */
-    padding: 10px 20px; /* Aggiunge spazio interno */
-    text-align: center; /* Centra il testo */
 }
 
 .navbar-search .search-form {
@@ -403,25 +411,63 @@ p {
     background: #e55a00;
 }
 
-/* Stile per il pulsante di ricerca */
+
+/* Stile per il pulsante "Aggiungi Prodotto"  e "Cerca"*/
+.add-product-button,
 .search-button {
-    flex: 0 0 auto;
-    background-color: #ff6600;
-    border: none;
-    border-radius: 20px;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    color: white;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-    height: 40px;
-    box-sizing: border-box;
-    max-width: 200px; /* Imposta una larghezza massima per il pulsante */
+    display: inline-block;
+    background-color: #ff6600; /* Colore arancione */
+    color: white; /* Testo bianco */
+    padding: 12px 24px; /* Spaziatura interna */
+    border-radius: 15px; /* Angoli arrotondati */
+    text-decoration: none; /* Rimuove la sottolineatura */
+    font-size: 1.2rem; /* Dimensione del testo */
+    font-weight: bold; /* Testo in grassetto */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombra leggera */
+    transition: all 0.3s ease; /* Transizione per gli effetti */
     text-align: center; /* Centra il testo */
+    margin: 20px auto; /* Centra il pulsante e aggiunge margine */
+    display: block; /* Rende il pulsante un elemento a blocco */
+    max-width: 200px; /* Larghezza massima */
 }
 
+/* Effetto hover */
+.add-product-button:hover,
 .search-button:hover {
-    background-color: #e55a00;
+    background-color: #e55a00; /* Colore arancione più scuro al passaggio del mouse */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Ombra più pronunciata */
+    transform: scale(1.05); /* Leggero ingrandimento */
+    text-decoration: none; /* Assicura che non ci sia sottolineatura */
+    color: white; /* Mantiene il testo bianco */
+}
+
+/* Effetto attivo (quando cliccato) */
+.add-product-button:active,
+.search-button:active {
+    background-color: #cc5200; /* Colore arancione ancora più scuro */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Ombra ridotta */
+    transform: scale(0.98); /* Leggero rimpicciolimento */
+    text-decoration: none; /* Assicura che non ci sia sottolineatura */
+    color: white; /* Mantiene il testo bianco */
+}
+
+/* Stile per il pulsante "Registrati" */
+.register-button {
+    display: inline-block;
+    background-color: #4CAF50; /* Colore verde */
+    color: white; /* Testo bianco */
+    padding: 10px 20px; /* Spaziatura interna */
+    border-radius: 8px; /* Angoli arrotondati */
+    text-decoration: none; /* Rimuove la sottolineatura */
+    font-size: 1rem; /* Dimensione del testo */
+    font-weight: bold; /* Testo in grassetto */
+    margin-left: 10px; /* Spaziatura tra i pulsanti */
+    transition: background-color 0.3s ease; /* Transizione per gli effetti */
+}
+
+/* Effetto hover per il pulsante "Registrati" */
+.register-button:hover {
+    background-color: #45a049; /* Colore verde più scuro */
 }
 
 /* Stile per l'icona di ricerca */
@@ -482,81 +528,48 @@ p {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Stile generale del footer */
-footer {
-    text-align: center;
-    padding: 10px 0;
-    background-color: #f1f1f1;
-    margin-top: 20px;
-}
-
+/* Stile per il footer */
 .footer {
-    background-color: #333; /* Colore di sfondo scuro */
-    color: #fff; /* Testo bianco */
+    background-color: #333;
+    color: #fff;
     padding: 20px 0;
-    font-size: 14px;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    width: 100%;
 }
 
 .footer-content {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: flex-start;
+    flex-wrap: wrap;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
-    flex-wrap: wrap; /* Permette di adattarsi su dispositivi più piccoli */
+    padding: 20px;
 }
 
 .footer-section {
     flex: 1;
     margin: 10px;
-    min-width: 250px; /* Imposta una larghezza minima per le sezioni */
+    min-width: 200px;
 }
 
 .footer-section h2 {
-    font-size: 18px;
+    font-size: 1.5em;
     margin-bottom: 10px;
-    color: #ffcc00; /* Colore del titolo */
 }
 
 .footer-section p {
-    line-height: 1.6;
-    color: #ddd; /* Colore del testo */
+    font-size: 1em;
+    margin: 5px 0;
 }
 
-.footer-section a {
-    color: #ffcc00; /* Colore dei link */
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.footer-section a:hover {
-    color: #fff; /* Cambia colore al passaggio del mouse */
-}
-
-/* Stile per le icone social */
-.footer-section.social {
-    text-align: center;
-}
-
-.footer-section.social .social-icon {
-    width: 30px;
-    height: 30px;
-    margin: 0 10px;
-    transition: transform 0.3s ease;
-}
-
-.footer-section.social .social-icon:hover {
-    transform: scale(1.2); /* Effetto di ingrandimento al passaggio del mouse */
-}
-
-/* Stile per la parte inferiore del footer */
 .footer-bottom {
-    text-align: center;
+    background-color: #222;
+    color: #bbb;
     padding: 10px 0;
-    background-color: #222; /* Colore più scuro per il footer inferiore */
-    color: #bbb; /* Colore del testo */
-    font-size: 12px;
+    font-size: 0.9em;
 }
 
 /* Stile per la lista dei prodotti */
@@ -590,6 +603,10 @@ form {
    
 }
 
+form div {
+    
+}
+
 form input {
     width: 100%;
     padding: 0.5rem;
@@ -608,51 +625,6 @@ form button {
 
 form button:hover {
     background-color: #45a049;
-}
-
-/* Stile per il modulo */
-.form-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-}
-
-.btn {
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: #4CAF50;
-  color: white;
-  text-decoration: none;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.btn:hover {
-  background-color: #45a049;
 }
 
 /* Stile per la sezione delle categorie */
@@ -790,90 +762,52 @@ form button:hover {
     background-color: rgba(0, 0, 0, 0.7); /* Aumenta l'opacità al passaggio del mouse */
 }
 
-/* Stile per le notifiche */
-.notification {
-  display: flex; /* Usa Flexbox per allineare il contenuto */
-  align-items: center; /* Allinea verticalmente il contenuto */
-  justify-content: space-between; /* Spaziatura tra testo e icona */
-  padding: 15px 20px;
-  margin-bottom: 20px;
-  border-radius: 12px; /* Angoli arrotondati */
-  font-size: 16px;
-  font-weight: bold;
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Ombra più pronunciata */
-  animation: fadeIn 0.5s ease-in-out, fadeOut 0.5s ease-in-out 4.5s; /* Animazione di comparsa e scomparsa */
-  position: relative; /* Per posizionare l'icona di chiusura */
-  opacity: 1; /* Per l'animazione di scomparsa */
-  transition: opacity 0.5s ease-in-out; /* Transizione per la scomparsa */
+/* Stile per il contenitore del modulo di registrazione */
+.auth-form-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: white;
 }
 
-/* Notifica di successo */
-.notification.success {
-  background-color: #d4edda; /* Verde chiaro */
-  color: #155724; /* Verde scuro */
-  border: 1px solid #c3e6cb;
+/* Stile per il titolo del modulo */
+.auth-form h2 {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-/* Notifica di errore */
-.notification.error {
-  background-color: #f8d7da; /* Rosso chiaro */
-  color: #721c24; /* Rosso scuro */
-  border: 1px solid #f5c6cb;
+/* Stile per le etichette */
+.auth-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
 }
 
-/* Icona di successo */
-.notification.success::before {
-  content: '✔'; /* Icona di successo */
-  font-size: 20px;
-  margin-right: 10px;
-  color: #155724;
+/* Stile per i campi di input */
+.auth-form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
-/* Icona di errore */
-.notification.error::before {
-  content: '✖'; /* Icona di errore */
-  font-size: 20px;
-  margin-right: 10px;
-  color: #721c24;
+/* Stile per il pulsante di invio */
+.auth-submit-button {
+    width: 100%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-/* Icona di chiusura */
-.notification .close-btn {
-  background: none;
-  border: none;
-  font-size: 18px;
-  font-weight: bold;
-  color: inherit;
-  cursor: pointer;
-  margin-left: 15px;
-  transition: color 0.3s ease;
+.auth-submit-button:hover {
+    background-color: #45a049;
 }
-
-.notification .close-btn:hover {
-  color: #000; /* Cambia colore al passaggio del mouse */
-}
-
-/* Animazione di comparsa */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Animazione di scomparsa */
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-
-
