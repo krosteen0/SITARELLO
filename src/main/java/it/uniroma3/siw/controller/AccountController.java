@@ -25,12 +25,24 @@ public class AccountController {
 
     @PostMapping("/registration")
     public String register(@ModelAttribute User user, Model model) {
+        // Controlla se le password coincidono
         if (!user.getPassword().equals(user.getConfirmPassword())) {
             model.addAttribute("error", "Le password non coincidono");
             return "registration";
         }
+
+        // Controlla se l'email è già registrata
+        if (userService.existsByEmail(user.getEmail())) {
+            model.addAttribute("error", "Email già registrata");
+            return "registration";
+        }
+
+        // Salva l'utente
         userService.saveUser(user);
-        return "redirect:/login";
+
+        // Aggiungi un messaggio di conferma
+        model.addAttribute("success", "Registrazione completata con successo! Ora puoi accedere.");
+        return "login"; // Mostra la pagina di login con il messaggio di successo
     }
 
     @GetMapping("/login")
@@ -40,12 +52,14 @@ public class AccountController {
 
     @PostMapping("/login")
     public String login(@RequestParam String email, @RequestParam String password, Model model) {
-        // Logica di autenticazione (da implementare)
-        // Esempio: verifica email e password nel database
-        if (email.equals("test@example.com") && password.equals("password")) {
-            return "redirect:/"; // Reindirizza alla homepage se il login ha successo
+        // Verifica le credenziali nel database
+        User user = userService.findByEmail(email);
+        if (user == null || !userService.checkPassword(user, password)) {
+            model.addAttribute("error", "Credenziali non valide");
+            return "login"; // Ritorna alla pagina di login con un messaggio di errore
         }
-        model.addAttribute("error", "Credenziali non valide");
-        return "login"; // Ritorna alla pagina di login con un messaggio di errore
+
+        // Se il login ha successo, reindirizza alla homepage
+        return "redirect:/";
     }
 }
