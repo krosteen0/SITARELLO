@@ -5,7 +5,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import it.uniroma3.siw.model.User;
+import it.uniroma3.siw.model.Users;
 import it.uniroma3.siw.repository.UserRepository;
 
 @Service
@@ -17,7 +17,7 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Transactional
-    public User saveUser(User user) {
+    public Users saveUser(Users user) {
         user.setPassword(passwordEncoder.encode(user.getPassword())); // Crittografa la password
         return userRepository.save(user); // Salva l'utente nel database
     }
@@ -28,12 +28,12 @@ public class UserService {
     }
 
     // Trova un utente tramite email
-    public User findByEmail(String email) {
+    public Users findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
     // Verifica se la password fornita corrisponde a quella salvata
-    public boolean checkPassword(User user, String rawPassword) {
+    public boolean checkPassword(Users user, String rawPassword) {
         return passwordEncoder.matches(rawPassword, user.getPassword());
     }
 }
