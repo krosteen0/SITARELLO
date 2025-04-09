@@ -12,7 +12,7 @@ import it.uniroma3.siw.model.User;
 import it.uniroma3.siw.service.UserService;
 
 @Controller
-public class AccountController {
+public class UserController {
 
     @Autowired
     private UserService userService;
@@ -23,26 +23,22 @@ public class AccountController {
         return "registration"; // Ritorna il nome della vista (registration.html)
     }
 
-    @PostMapping("/registration")
+    @PostMapping("/register")
     public String register(@ModelAttribute User user, Model model) {
-        // Controlla se le password coincidono
+
         if (!user.getPassword().equals(user.getConfirmPassword())) {
             model.addAttribute("error", "Le password non coincidono");
             return "registration";
         }
 
-        // Controlla se l'email è già registrata
         if (userService.existsByEmail(user.getEmail())) {
             model.addAttribute("error", "Email già registrata");
             return "registration";
         }
 
-        // Salva l'utente
         userService.saveUser(user);
-
-        // Aggiungi un messaggio di conferma
         model.addAttribute("success", "Registrazione completata con successo! Ora puoi accedere.");
-        return "login"; // Mostra la pagina di login con il messaggio di successo
+        return "products"; // Ritorna alla pagina dei prodotti dopo la registrazione
     }
 
     @GetMapping("/login")

@@ -18,8 +18,8 @@ public class UserService {
 
     @Transactional
     public User saveUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        user.setPassword(passwordEncoder.encode(user.getPassword())); // Crittografa la password
+        return userRepository.save(user); // Salva l'utente nel database
     }
 
     // Verifica se un'email è già registrata

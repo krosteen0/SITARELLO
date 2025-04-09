@@ -12,7 +12,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/", "/registration", "/css/**", "/js/**", "/images/**").permitAll() // Pagine pubbliche
+                .requestMatchers("/", "/registration", "/css/**", "/js/**", "/images/**", "/product", "/products").permitAll() // Pagine pubbliche
                 .anyRequest().authenticated() // Tutte le altre pagine richiedono autenticazione
             )
             .formLogin(form -> form

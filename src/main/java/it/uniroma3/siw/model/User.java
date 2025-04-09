@@ -4,8 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "users")
@@ -19,7 +19,7 @@ public class User {
     private String username;
     private String password;
 
-    @Transient
+    @Transient // Non salvare nel database
     private String confirmPassword;
 
     // Getters e Setters
