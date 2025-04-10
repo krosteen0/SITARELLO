@@ -10,4 +10,5 @@ import it.uniroma3.siw.model.Product;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategoria(String categoria);
+    List<Product> findByAutore(String autore);
 }

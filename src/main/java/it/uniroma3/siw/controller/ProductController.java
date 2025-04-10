@@ -7,11 +7,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import it.uniroma3.siw.model.Product;
+import it.uniroma3.siw.model.Users;
 import it.uniroma3.siw.service.ProductService;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class ProductController {
@@ -47,23 +50,116 @@ public class ProductController {
     @PostMapping("/product")
     public String addProduct(
             @ModelAttribute Product product,
+            HttpSession session,
             Model model) {
-        try {
-            // Salva il prodotto
-            productService.saveProduct(product);
-            // Aggiungi un messaggio di conferma al modello
-            model.addAttribute("successMessage", "Prodotto aggiunto con successo!");
-        } catch (Exception e) {
-            // Aggiungi un messaggio di errore al modello
-            model.addAttribute("errorMessage", "Errore durante l'aggiunta del prodotto.");
-            e.printStackTrace();
+        // Recupera l'utente loggato dalla sessione
+        Users loggedUser = (Users) session.getAttribute("loggedUser");
+        if (loggedUser == null) {
+            model.addAttribute("errorMessage", "Devi essere loggato per aggiungere un prodotto.");
+            return "login"; // Reindirizza alla pagina di login se l'utente non è loggato
         }
-        return "formNewProduct"; // Ritorna alla pagina del modulo
+
+        // Imposta l'autore del prodotto
+        product.setAutore(loggedUser.getUsername());
+
+        // Salva il prodotto
+        productService.saveProduct(product);
+
+        model.addAttribute("successMessage", "Prodotto aggiunto con successo!");
+        return "redirect:/"; // Reindirizza alla homepage o a un'altra pagina
+    }
+
+    @PostMapping("/product/delete/{id}")
+    public String deleteProduct(@PathVariable Long id, HttpSession session, Model model) {
+        // Recupera l'utente loggato dalla sessione
+        Users loggedUser = (Users) session.getAttribute("loggedUser");
+        if (loggedUser == null) {
+            return "redirect:/login"; // Reindirizza al login se l'utente non è loggato
+        }
+
+        // Verifica che il prodotto appartenga all'utente loggato
+        Product product = productService.findById(id);
+        if (product != null && product.getAutore().equals(loggedUser.getUsername())) {
+            productService.deleteProduct(id); // Elimina il prodotto
+        } else {
+            model.addAttribute("errorMessage", "Non puoi rimuovere questo prodotto.");
+        }
+
+        return "redirect:/my-products"; // Reindirizza alla pagina "I Miei Prodotti"
     }
 
     @GetMapping("/formNewProduct")
     public String showFormNewProduct(Model model) {
         model.addAttribute("product", new Product()); // Aggiunge un oggetto vuoto al modello
         return "formNewProduct"; // Nome del template HTML
+    }
+
+    @GetMapping("/my-products")
+    public String getMyProducts(HttpSession session, Model model) {
+        // Recupera l'utente loggato dalla sessione
+        Users loggedUser = (Users) session.getAttribute("loggedUser");
+        if (loggedUser == null) {
+            return "redirect:/login"; // Reindirizza al login se l'utente non è loggato
+        }
+
+        // Recupera i prodotti creati dall'utente loggato
+        List<Product> myProducts = productService.findProductsByAutore(loggedUser.getUsername());
+        model.addAttribute("products", myProducts);
+
+        return "myProducts"; // Ritorna il template myProducts.html
+    }
+
+    // Mostra la pagina di modifica del prodotto
+    @GetMapping("/product/edit/{id}")
+    public String editProduct(@PathVariable Long id, HttpSession session, Model model) {
+        // Recupera l'utente loggato dalla sessione
+        Users loggedUser = (Users) session.getAttribute("loggedUser");
+        if (loggedUser == null) {
+            return "redirect:/login"; // Reindirizza al login se l'utente non è loggato
+        }
+
+        // Recupera il prodotto da modificare
+        Product product = productService.findById(id);
+        if (product == null || !product.getAutore().equals(loggedUser.getUsername())) {
+            return "redirect:/my-products"; // Reindirizza se il prodotto non appartiene all'utente
+        }
+
+        model.addAttribute("product", product);
+        return "editProduct"; // Ritorna il template editProduct.html
+    }
+
+    // Salva le modifiche al prodotto
+    @PostMapping("/product/update/{id}")
+    public String updateProduct(@PathVariable Long id, @ModelAttribute Product product, HttpSession session) {
+        // Recupera l'utente loggato dalla sessione
+        Users loggedUser = (Users) session.getAttribute("loggedUser");
+        if (loggedUser == null) {
+            return "redirect:/login"; // Reindirizza al login se l'utente non è loggato
+        }
+
+        // Verifica che il prodotto appartenga all'utente loggato
+        Product existingProduct = productService.findById(id);
+        if (existingProduct == null || !existingProduct.getAutore().equals(loggedUser.getUsername())) {
+            return "redirect:/my-products"; // Reindirizza se il prodotto non appartiene all'utente
+        }
+
+        // Aggiorna i dettagli del prodotto
+        existingProduct.setNome(product.getNome());
+        existingProduct.setCategoria(product.getCategoria());
+        existingProduct.setPrezzo(product.getPrezzo());
+        existingProduct.setRating(product.getRating());
+
+        productService.saveProduct(existingProduct); // Salva le modifiche
+        return "redirect:/my-products"; // Reindirizza alla pagina "I Miei Prodotti"
+    }
+
+    @GetMapping("/product/{id}")
+    public String getProduct(@PathVariable Long id, Model model) {
+        Product product = productService.findById(id);
+        if (product == null) {
+            return "redirect:/products"; // Reindirizza alla lista dei prodotti se il prodotto non esiste
+        }
+        model.addAttribute("product", product);
+        return "product"; // Ritorna il template product.html
     }
 }

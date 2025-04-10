@@ -4,6 +4,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Transient;
+import java.util.List;
 
 @Entity
 public class Product {
@@ -14,7 +18,21 @@ public class Product {
     private String nome;
     private String categoria;
     private Double prezzo;
-    private Double rating;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Rating> ratings; // Lista dei rating associati al prodotto
+
+    @Transient // Campo calcolato, non salvato nel database
+    private Double averageRating;
+
+    private String autore; // Campo per l'username dell'utente che aggiunge il prodotto
+
+    public Double getAverageRating() {
+        if (ratings == null || ratings.isEmpty()) {
+            return 0.0;
+        }
+        return ratings.stream().mapToDouble(Rating::getValue).average().orElse(0.0);
+    }
 
     // Getters e Setters
     public Long getId() {
@@ -50,10 +68,26 @@ public class Product {
     }
 
     public Double getRating() {
-        return rating;
+        return averageRating;
     }
 
     public void setRating(Double rating) {
-        this.rating = rating;
+        this.averageRating = rating;
+    }
+
+    public String getAutore() {
+        return autore;
+    }
+
+    public void setAutore(String autore) {
+        this.autore = autore;
+    }
+
+    public List<Rating> getRatings() {
+        return ratings;
+    }
+
+    public void setRatings(List<Rating> ratings) {
+        this.ratings = ratings;
     }
 }

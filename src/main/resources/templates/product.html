@@ -18,9 +18,23 @@
     <main>
         <section id="product-details">
             <div class="product-card">
-                <h2 th:text="${product.categoria}">Categoria</h2>
-                <p>Prezzo: <span th:text="${product.prezzo}">0.00</span> €</p>
-                <p>Rating: <span th:text="${product.rating}">0.0</span></p>
+                <h2 th:text="${product.nome}">Nome del prodotto</h2>
+                <p th:text="'Categoria: ' + ${product.categoria}">Categoria</p>
+                <p th:text="'Prezzo: €' + ${product.prezzo}">Prezzo</p>
+                <p th:text="'Rating medio: ' + ${product.averageRating}">Rating medio</p>
+
+                <!-- Mostra un messaggio di errore se presente -->
+                <div th:if="${errorMessage}" class="error-message">
+                    <p th:text="${errorMessage}"></p>
+                </div>
+
+                <!-- Form per votare -->
+                <form th:if="${session.loggedUser != null and session.loggedUser.username != product.autore}" 
+                      th:action="@{/product/{id}/rate(id=${product.id})}" method="POST">
+                    <label for="rating">Dai un voto:</label>
+                    <input type="number" id="rating" name="value" step="0.1" min="0" max="5" required>
+                    <button type="submit">Invia</button>
+                </form>
             </div>
         </section>
     </main>

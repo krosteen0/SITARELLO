@@ -32,6 +32,16 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
+    // Trova un utente tramite username o email
+    public Users findByUsernameOrEmail(String usernameOrEmail) {
+        // Cerca l'utente per email o username
+        Users user = userRepository.findByEmail(usernameOrEmail);
+        if (user == null) {
+            user = userRepository.findByUsername(usernameOrEmail);
+        }
+        return user;
+    }
+
     // Verifica se la password fornita corrisponde a quella salvata
     public boolean checkPassword(Users user, String rawPassword) {
         return passwordEncoder.matches(rawPassword, user.getPassword());

@@ -12,12 +12,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/", "/registration", "/css/**", "/js/**", "/images/**", "/product", "/products").permitAll() // Pagine pubbliche
+                .requestMatchers("/**", "/css/**", "/js/**", "/images/**").permitAll() // Pagine pubbliche
                 .anyRequest().authenticated() // Tutte le altre pagine richiedono autenticazione
             )
             .formLogin(form -> form
-                .loginPage("/login") // Pagina di login personalizzata
+                .loginPage("/login") // Usa la tua pagina di login personalizzata
+                .loginProcessingUrl("/perform-login") // Endpoint personalizzato per il login
                 .permitAll()
+                .defaultSuccessUrl("/") // Reindirizza alla homepage dopo il login
+                .failureUrl("/login?error=true") // Reindirizza a /login?error=true in caso di errore
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")

@@ -1,7 +1,5 @@
 package it.uniroma3.siw.model;
 
-import org.hibernate.annotations.Tables;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,6 +20,9 @@ public class Users {
 
     @Transient // Non salvare nel database
     private String confirmPassword;
+
+    @Transient // Campo non persistente nel database
+    private String usernameOrEmail;
 
     // Getters e Setters
     public Long getId() {
@@ -62,5 +63,13 @@ public class Users {
 
     public void setConfirmPassword(String confirmPassword) {
         this.confirmPassword = confirmPassword;
+    }
+
+    public String getUsernameOrEmail() {
+        return usernameOrEmail;
+    }
+
+    public void setUsernameOrEmail(String usernameOrEmail) {
+        this.usernameOrEmail = usernameOrEmail;
     }
 }

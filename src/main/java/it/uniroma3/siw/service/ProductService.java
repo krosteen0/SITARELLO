@@ -15,8 +15,12 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    public Product getProductById(Long id) {
+    public Product findById(Long id) {
         return productRepository.findById(id).orElse(null);
+    }
+
+    public void deleteProduct(Long id) {
+        productRepository.deleteById(id);
     }
 
     public Iterable<Product> getAllProducts() {
@@ -24,7 +28,7 @@ public class ProductService {
     }
 
     public void saveProduct(Product product) {
-        productRepository.save(product); // Salva il prodotto nel database
+        productRepository.save(product);
     }
     
     public List<Product> getProductsByCategoria(String categoria) {
@@ -45,5 +49,9 @@ public class ProductService {
                 .filter(product -> price == null || product.getPrezzo() <= price)
                 .filter(product -> rating == null || product.getRating() >= rating)
                 .collect(Collectors.toList());
+    }
+
+    public List<Product> findProductsByAutore(String autore) {
+        return productRepository.findByAutore(autore);
     }
 }
