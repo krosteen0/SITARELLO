@@ -7,24 +7,30 @@
     <link rel="stylesheet" href="/css/stile.css">
 </head>
 <body>
-    <div class="header">
+    <header>
         <h1>Modifica Prodotto</h1>
-    </div>
+    </header>
     <main>
-        <form th:action="@{/product/update/{id}(id=${product.id})}" method="POST" th:object="${product}" class="edit-form">
+        <a th:href="${redirectUrl}" class="back-button">Torna Indietro</a>
+        <form th:action="@{/product/update/{id}(id=${product.id})}" method="POST" th:object="${product}">
+            <input type="hidden" name="redirectUrl" th:value="${redirectUrl}" />
+    
             <label for="nome">Nome:</label>
-            <input type="text" id="nome" th:field="*{nome}" required>
+            <input type="text" id="nome" th:field="*{nome}" required />
 
             <label for="categoria">Categoria:</label>
-            <input type="text" id="categoria" th:field="*{categoria}" required>
+            <input type="text" id="categoria" th:field="*{categoria}" required />
 
             <label for="prezzo">Prezzo:</label>
-            <input type="number" id="prezzo" th:field="*{prezzo}" step="0.01" required>
+            <input type="number" id="prezzo" th:field="*{prezzo}" step="0.01" required />
 
-            <label for="rating">Rating:</label>
-            <input type="number" id="rating" th:field="*{rating}" step="0.1" required>
+            <label for="descrizione">Descrizione:</label>
+            <textarea id="descrizione" th:field="*{descrizione}"></textarea>
 
-            <button type="submit" class="save-button">Salva Modifiche</button>
+            <label for="foto">Foto:</label>
+            <input type="text" id="foto" th:field="*{foto}" />
+
+            <button type="submit">Salva</button>
         </form>
     </main>
 </body>

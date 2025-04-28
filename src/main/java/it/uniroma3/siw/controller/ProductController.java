@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import it.uniroma3.siw.model.Product;
 import it.uniroma3.siw.model.Users;
 import it.uniroma3.siw.service.ProductService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -50,13 +51,11 @@ public class ProductController {
     @PostMapping("/product")
     public String addProduct(
             @ModelAttribute Product product,
-            HttpSession session,
-            Model model) {
+            HttpSession session) {
         // Recupera l'utente loggato dalla sessione
         Users loggedUser = (Users) session.getAttribute("loggedUser");
         if (loggedUser == null) {
-            model.addAttribute("errorMessage", "Devi essere loggato per aggiungere un prodotto.");
-            return "login"; // Reindirizza alla pagina di login se l'utente non è loggato
+            return "redirect:/login"; // Reindirizza alla pagina di login se l'utente non è loggato
         }
 
         // Imposta l'autore del prodotto
@@ -65,8 +64,7 @@ public class ProductController {
         // Salva il prodotto
         productService.saveProduct(product);
 
-        model.addAttribute("successMessage", "Prodotto aggiunto con successo!");
-        return "redirect:/"; // Reindirizza alla homepage o a un'altra pagina
+        return "redirect:/my-products"; // Reindirizza alla pagina "I Miei Prodotti"
     }
 
     @PostMapping("/product/delete/{id}")
@@ -95,23 +93,24 @@ public class ProductController {
     }
 
     @GetMapping("/my-products")
-    public String getMyProducts(HttpSession session, Model model) {
-        // Recupera l'utente loggato dalla sessione
-        Users loggedUser = (Users) session.getAttribute("loggedUser");
-        if (loggedUser == null) {
-            return "redirect:/login"; // Reindirizza al login se l'utente non è loggato
-        }
-
-        // Recupera i prodotti creati dall'utente loggato
-        List<Product> myProducts = productService.findProductsByAutore(loggedUser.getUsername());
-        model.addAttribute("products", myProducts);
-
-        return "myProducts"; // Ritorna il template myProducts.html
+public String getMyProducts(HttpSession session, Model model, HttpServletRequest request) {
+    // Recupera l'utente loggato dalla sessione
+    Users loggedUser = (Users) session.getAttribute("loggedUser");
+    if (loggedUser == null) {
+        return "redirect:/login"; // Reindirizza al login se l'utente non è loggato
     }
+
+    // Recupera i prodotti creati dall'utente loggato
+    List<Product> myProducts = productService.findProductsByAutore(loggedUser.getUsername());
+    model.addAttribute("products", myProducts);
+    model.addAttribute("redirectUrl", request.getRequestURI()); // Passa redirectUrl al modello
+
+    return "myProducts"; // Ritorna il template myProducts.html
+}
 
     // Mostra la pagina di modifica del prodotto
     @GetMapping("/product/edit/{id}")
-    public String editProduct(@PathVariable Long id, HttpSession session, Model model) {
+    public String editProduct(@PathVariable Long id, HttpSession session, Model model, @RequestParam(required = false) String redirectUrl) {
         // Recupera l'utente loggato dalla sessione
         Users loggedUser = (Users) session.getAttribute("loggedUser");
         if (loggedUser == null) {
@@ -125,41 +124,48 @@ public class ProductController {
         }
 
         model.addAttribute("product", product);
+        model.addAttribute("redirectUrl", redirectUrl); // Aggiungi il redirectUrl al modello
         return "editProduct"; // Ritorna il template editProduct.html
     }
 
     // Salva le modifiche al prodotto
     @PostMapping("/product/update/{id}")
-    public String updateProduct(@PathVariable Long id, @ModelAttribute Product product, HttpSession session) {
-        // Recupera l'utente loggato dalla sessione
+    public String updateProduct(
+            @PathVariable Long id,
+            @ModelAttribute Product product,
+            @RequestParam(required = false) String redirectUrl,
+            HttpSession session) {
         Users loggedUser = (Users) session.getAttribute("loggedUser");
         if (loggedUser == null) {
             return "redirect:/login"; // Reindirizza al login se l'utente non è loggato
         }
 
-        // Verifica che il prodotto appartenga all'utente loggato
         Product existingProduct = productService.findById(id);
         if (existingProduct == null || !existingProduct.getAutore().equals(loggedUser.getUsername())) {
             return "redirect:/my-products"; // Reindirizza se il prodotto non appartiene all'utente
         }
 
-        // Aggiorna i dettagli del prodotto
+        // Aggiorna i campi modificabili
         existingProduct.setNome(product.getNome());
         existingProduct.setCategoria(product.getCategoria());
         existingProduct.setPrezzo(product.getPrezzo());
-        existingProduct.setRating(product.getRating());
+        existingProduct.setDescrizione(product.getDescrizione());
+        existingProduct.setFoto(product.getFoto());
 
         productService.saveProduct(existingProduct); // Salva le modifiche
-        return "redirect:/my-products"; // Reindirizza alla pagina "I Miei Prodotti"
+
+        // Reindirizza alla pagina precedente o a "my-products" se il redirectUrl è nullo
+        return (redirectUrl != null && !redirectUrl.isEmpty()) ? "redirect:" + redirectUrl : "redirect:/my-products";
     }
 
     @GetMapping("/product/{id}")
-    public String getProduct(@PathVariable Long id, Model model) {
+    public String getProduct(@PathVariable Long id, HttpServletRequest request, Model model) {
         Product product = productService.findById(id);
         if (product == null) {
             return "redirect:/products"; // Reindirizza alla lista dei prodotti se il prodotto non esiste
         }
         model.addAttribute("product", product);
+        model.addAttribute("redirectUrl", request.getHeader("Referer")); // Usa l'header Referer per tornare alla pagina precedente
         return "product"; // Ritorna il template product.html
     }
 }

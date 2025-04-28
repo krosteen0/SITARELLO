@@ -41,15 +41,23 @@
       <form th:action="@{/product}" method="POST" th:object="${product}" class="form-container">
         <div class="form-group">
           <label for="nome">Nome:</label>
-          <input required type="text" id="nome" th:field="${product.nome}" placeholder="Nome del prodotto" />
+          <input required type="text" id="nome" th:field="*{nome}" placeholder="Nome del prodotto" />
         </div>
         <div class="form-group">
           <label for="categoria">Categoria:</label>
-          <input required type="text" id="categoria" th:field="${product.categoria}" placeholder="Categoria" />
+          <input required type="text" id="categoria" th:field="*{categoria}" placeholder="Categoria" />
         </div>
         <div class="form-group">
           <label for="prezzo">Prezzo:</label>
-          <input required type="number" id="prezzo" step="0.01" th:field="${product.prezzo}" placeholder="Prezzo" />
+          <input required type="number" id="prezzo" step="0.01" th:field="*{prezzo}" placeholder="Prezzo" />
+        </div>
+        <div class="form-group">
+          <label for="descrizione">Descrizione:</label>
+          <textarea id="descrizione" th:field="*{descrizione}" placeholder="Descrizione del prodotto"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="foto">URL Foto:</label>
+          <input type="text" id="foto" th:field="*{foto}" placeholder="URL della foto" />
         </div>
         <div class="form-group">
           <button type="submit" class="btn">Conferma</button>

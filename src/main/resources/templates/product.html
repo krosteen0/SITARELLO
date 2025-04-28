@@ -11,31 +11,42 @@
         <h1>Dettagli Prodotto</h1>
     </header>
     <nav>
-        <a href="#home">Home</a>
-        <a href="#products">Prodotti</a>
+        <a href="/">Home</a> <!-- Reindirizza alla pagina di home -->
+        <a href="/products">Prodotti</a> <!-- Reindirizza alla pagina dei prodotti -->
         <a href="#contact">Contatti</a>
     </nav>
     <main>
+        <a th:href="${redirectUrl}" class="back-button">Torna Indietro</a>
         <section id="product-details">
             <div class="product-card">
                 <h2 th:text="${product.nome}">Nome del prodotto</h2>
                 <p th:text="'Categoria: ' + ${product.categoria}">Categoria</p>
                 <p th:text="'Prezzo: €' + ${product.prezzo}">Prezzo</p>
-                <p th:text="'Rating medio: ' + ${product.averageRating}">Rating medio</p>
-
-                <!-- Mostra un messaggio di errore se presente -->
-                <div th:if="${errorMessage}" class="error-message">
-                    <p th:text="${errorMessage}"></p>
-                </div>
-
-                <!-- Form per votare -->
-                <form th:if="${session.loggedUser != null and session.loggedUser.username != product.autore}" 
-                      th:action="@{/product/{id}/rate(id=${product.id})}" method="POST">
-                    <label for="rating">Dai un voto:</label>
-                    <input type="number" id="rating" name="value" step="0.1" min="0" max="5" required>
-                    <button type="submit">Invia</button>
-                </form>
+                <p th:text="${product.descrizione}">Descrizione</p>
+                <img th:src="${product.foto}" alt="Foto del prodotto" class="product-image" />
             </div>
+            <p th:if="${session.loggedUser == null or session.loggedUser.username != product.autore}" 
+               th:text="${#numbers.formatDecimal(product.averageRating, 1, 1).replace(',', '.')}+ ' ★'">
+               Rating
+            </p>
+
+            <!-- Pulsante per modificare il prodotto -->
+            <div th:if="${session.loggedUser != null and session.loggedUser.username == product.autore}">
+                <a th:href="@{/product/edit/{id}(id=${product.id}, redirectUrl=${redirectUrl})}" class="edit-button">Modifica</a>
+            </div>
+
+            <!-- Mostra un messaggio di errore se presente -->
+            <div th:if="${errorMessage}" class="error-message">
+                <p th:text="${errorMessage}"></p>
+            </div>
+
+            <!-- Form per votare -->
+            <form th:if="${session.loggedUser != null and session.loggedUser.username != product.autore}" 
+                  th:action="@{/product/{id}/rate(id=${product.id})}" method="POST">
+                <label for="rating">Dai un voto:</label>
+                <input type="number" id="rating" name="value" step="0.1" min="0" max="5" required>
+                <button type="submit">Invia</button>
+            </form>
         </section>
     </main>
     <footer class="footer">

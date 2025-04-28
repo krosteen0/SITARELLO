@@ -877,3 +877,18 @@ form button:hover {
 .remove-button:hover {
     background-color: #ff1a1a;
 }
+
+.back-button {
+    display: inline-block;
+    margin: 10px 0;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.back-button:hover {
+    background-color: #0056b3;
+}

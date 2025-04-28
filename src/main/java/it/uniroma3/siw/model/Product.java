@@ -1,13 +1,14 @@
 package it.uniroma3.siw.model;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Transient;
-import java.util.List;
 
 @Entity
 public class Product {
@@ -26,6 +27,10 @@ public class Product {
     private Double averageRating;
 
     private String autore; // Campo per l'username dell'utente che aggiunge il prodotto
+
+    private String descrizione; // Campo per la descrizione del prodotto
+
+    private String foto; // URL o percorso per la foto del prodotto
 
     public Double getAverageRating() {
         if (ratings == null || ratings.isEmpty()) {
@@ -89,5 +94,21 @@ public class Product {
 
     public void setRatings(List<Rating> ratings) {
         this.ratings = ratings;
+    }
+
+    public String getDescrizione() {
+        return descrizione;
+    }
+
+    public void setDescrizione(String descrizione) {
+        this.descrizione = descrizione;
+    }
+
+    public String getFoto() {
+        return foto;
+    }
+
+    public void setFoto(String foto) {
+        this.foto = foto;
     }
 }

@@ -610,3 +610,8 @@ p {
     font-size: 0.9em;
     color: #666;
 }
+
+.product-image {
+    width: 150px;
+    height: auto;
+}

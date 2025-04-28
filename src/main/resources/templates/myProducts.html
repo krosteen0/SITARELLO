@@ -20,10 +20,9 @@
                     <h2 th:text="${product.nome}">Nome del prodotto</h2>
                     <p th:text="'Categoria: ' + ${product.categoria}">Categoria</p>
                     <p th:text="'Prezzo: €' + ${product.prezzo}">Prezzo</p>
-                    <p th:text="'Rating: ' + ${product.averageRating}">Rating</p>
-                    <!-- Pulsante per modificare il prodotto -->
-                    <a th:href="@{/product/edit/{id}(id=${product.id})}" class="edit-button">Modifica</a>
-                    <!-- Pulsante per rimuovere il prodotto -->
+                    <p th:text="${product.descrizione}">Descrizione</p>
+                    <img th:src="${product.foto}" alt="Foto del prodotto" class="product-image" />
+                    <a th:href="@{/product/edit/{id}(id=${product.id}, redirectUrl=${redirectUrl})}" class="edit-button">Modifica</a>
                     <form th:action="@{/product/delete/{id}(id=${product.id})}" method="POST" onsubmit="return confirm('Sei sicuro di voler rimuovere questo prodotto?');">
                         <button type="submit" class="remove-button">Rimuovi</button>
                     </form>
