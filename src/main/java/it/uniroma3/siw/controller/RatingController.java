@@ -26,28 +26,51 @@ public class RatingController {
     public String rateProduct(@PathVariable Long id, @RequestParam Double value, HttpSession session, Model model) {
         Users loggedUser = (Users) session.getAttribute("loggedUser");
         if (loggedUser == null) {
-            return "redirect:/login"; // Reindirizza al login se l'utente non è loggato
+            return "redirect:/login";
         }
 
         Product product = productService.findById(id);
         if (product == null) {
-            return "redirect:/products"; // Reindirizza se il prodotto non esiste
+            return "redirect:/products";
         }
 
-        // Verifica che l'utente non sia l'autore del prodotto
         if (product.getAutore().equals(loggedUser.getUsername())) {
             model.addAttribute("errorMessage", "Non puoi votare il tuo prodotto.");
             return "redirect:/product/" + id;
         }
 
-        // Verifica che l'utente non abbia già votato il prodotto
         if (ratingService.hasUserRatedProduct(loggedUser, product)) {
             model.addAttribute("errorMessage", "Hai già votato questo prodotto.");
             return "redirect:/product/" + id;
         }
 
-        // Aggiungi il voto
         ratingService.addRating(id, loggedUser, value);
-        return "redirect:/product/" + id; // Reindirizza alla pagina del prodotto
+        return "redirect:/product/" + id;
+    }
+
+    @PostMapping("/product/{id}/updateRating")
+    public String updateRating(@PathVariable Long id, @RequestParam Double value, HttpSession session, Model model) {
+        Users loggedUser = (Users) session.getAttribute("loggedUser");
+        if (loggedUser == null) {
+            return "redirect:/login";
+        }
+
+        Product product = productService.findById(id);
+        if (product == null) {
+            return "redirect:/products";
+        }
+
+        if (product.getAutore().equals(loggedUser.getUsername())) {
+            model.addAttribute("errorMessage", "Non puoi votare il tuo prodotto.");
+            return "redirect:/product/" + id;
+        }
+
+        if (!ratingService.hasUserRatedProduct(loggedUser, product)) {
+            model.addAttribute("errorMessage", "Non hai ancora votato questo prodotto.");
+            return "redirect:/product/" + id;
+        }
+
+        ratingService.updateRating(id, loggedUser, value);
+        return "redirect:/product/" + id;
     }
 }

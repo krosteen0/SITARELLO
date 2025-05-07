@@ -21,8 +21,9 @@
                     <p th:text="'Categoria: ' + ${product.categoria}">Categoria</p>
                     <p th:text="'Prezzo: €' + ${product.prezzo}">Prezzo</p>
                     <p th:text="${product.descrizione}">Descrizione</p>
+                    <p th:text="${#numbers.formatDecimal(product.averageRating, 1, 1).replace(',', '.')}+ ' ★'">Rating</p>
                     <img th:src="${product.foto}" alt="Foto del prodotto" class="product-image" />
-                    <a th:href="@{/product/edit/{id}(id=${product.id}, redirectUrl=${redirectUrl})}" class="edit-button">Modifica</a>
+                    <a th:href="@{/product/edit/{id}(id=${product.id}, redirectUrl='/my-products')}" class="edit-button">Modifica</a>
                     <form th:action="@{/product/delete/{id}(id=${product.id})}" method="POST" onsubmit="return confirm('Sei sicuro di voler rimuovere questo prodotto?');">
                         <button type="submit" class="remove-button">Rimuovi</button>
                     </form>

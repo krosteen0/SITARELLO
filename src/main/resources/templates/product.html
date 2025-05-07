@@ -11,8 +11,8 @@
         <h1>Dettagli Prodotto</h1>
     </header>
     <nav>
-        <a href="/">Home</a> <!-- Reindirizza alla pagina di home -->
-        <a href="/products">Prodotti</a> <!-- Reindirizza alla pagina dei prodotti -->
+        <a href="/">Home</a>
+        <a href="/products">Prodotti</a>
         <a href="#contact">Contatti</a>
     </nav>
     <main>
@@ -25,9 +25,9 @@
                 <p th:text="${product.descrizione}">Descrizione</p>
                 <img th:src="${product.foto}" alt="Foto del prodotto" class="product-image" />
             </div>
-            <p th:if="${session.loggedUser == null or session.loggedUser.username != product.autore}" 
-               th:text="${#numbers.formatDecimal(product.averageRating, 1, 1).replace(',', '.')}+ ' ★'">
-               Rating
+            <!-- Mostra la media dei voti per tutti gli utenti -->
+            <p th:text="${#numbers.formatDecimal(product.averageRating, 1, 1).replace(',', '.')}+ ' ★'">
+                Rating
             </p>
 
             <!-- Pulsante per modificare il prodotto -->
@@ -40,13 +40,26 @@
                 <p th:text="${errorMessage}"></p>
             </div>
 
-            <!-- Form per votare -->
-            <form th:if="${session.loggedUser != null and session.loggedUser.username != product.autore}" 
-                  th:action="@{/product/{id}/rate(id=${product.id})}" method="POST">
-                <label for="rating">Dai un voto:</label>
-                <input type="number" id="rating" name="value" step="0.1" min="0" max="5" required>
-                <button type="submit">Invia</button>
-            </form>
+            <!-- Form per votare o modificare il voto -->
+            <div th:if="${session.loggedUser != null and session.loggedUser.username != product.autore}">
+                <!-- Caso in cui l'utente non ha ancora votato -->
+                <div th:unless="${hasRated}">
+                    <form th:action="@{/product/{id}/rate(id=${product.id})}" method="POST">
+                        <label for="rating">Dai un voto:</label>
+                        <input type="number" id="rating" name="value" step="0.1" min="0" max="5" required>
+                        <button type="submit">Invia</button>
+                    </form>
+                </div>
+                <!-- Caso in cui l'utente ha già votato -->
+                <div th:if="${hasRated}">
+                    <p th:text="'Il tuo voto attuale: ' + ${userRating} + ' ★'">Il tuo voto</p>
+                    <form th:action="@{/product/{id}/updateRating(id=${product.id})}" method="POST">
+                        <label for="newRating">Modifica il tuo voto:</label>
+                        <input type="number" id="newRating" name="value" step="0.1" min="0" max="5" th:value="${userRating}" required>
+                        <button type="submit">Modifica</button>
+                    </form>
+                </div>
+            </div>
         </section>
     </main>
     <footer class="footer">
@@ -62,8 +75,8 @@
             </div>
         </div>
         <div class="footer-bottom">
-            &copy; 2025 Sitarello. All rights reserved.
+            © 2025 Sitarello. All rights reserved.
         </div>
-        </footer>
+    </footer>
 </body>
 </html>

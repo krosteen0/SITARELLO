@@ -27,9 +27,7 @@ public class Product {
     private Double averageRating;
 
     private String autore; // Campo per l'username dell'utente che aggiunge il prodotto
-
     private String descrizione; // Campo per la descrizione del prodotto
-
     private String foto; // URL o percorso per la foto del prodotto
 
     public Double getAverageRating() {
@@ -70,14 +68,6 @@ public class Product {
 
     public void setPrezzo(Double prezzo) {
         this.prezzo = prezzo;
-    }
-
-    public Double getRating() {
-        return averageRating;
-    }
-
-    public void setRating(Double rating) {
-        this.averageRating = rating;
     }
 
     public String getAutore() {

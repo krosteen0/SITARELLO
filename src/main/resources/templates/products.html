@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="it">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Risultati Ricerca</title>
-        <link rel="stylesheet" href="/css/products.css">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risultati Ricerca</title>
+    <link rel="stylesheet" href="/css/products.css">
+</head>
 <body>
     <div class="mainNav">
         <div class="header">
@@ -23,37 +23,38 @@
         </div>
         <!-- Navbar -->
         <div class="nav-container">
-        <div class="navbar-search shrink">
-            <form action="/products" method="GET" class="search-form">
-                <select name="categoria" class="search-select">
-                    <option value="" disabled selected>Seleziona una categoria</option>
-                    <option value="1">Categoria 1</option>
-                    <option value="2">Categoria 2</option>
-                    <option value="3">Categoria 3</option>
-                    <option value="4">Categoria 4</option>
-                </select>
-                <span class="price-label">Prezzo</span>
-                <div class="price-slider">
-                    <label for="price">Prezzo:</label>
-                    <input type="range" id="price" name="price" min="0" max="100" value="100" >
-                </div>
-                <span class="rating-label">Rating</span>
-                <div class="rating-stars">
-                    <div class="stars">
-                        <input type="radio" id="star5" name="rating" value="5">
-                        <label for="star5">★</label>
-                        <input type="radio" id="star4" name="rating" value="4">
-                        <label for="star4">★</label>
-                        <input type="radio" id="star3" name="rating" value="3">
-                        <label for="star3">★</label>
-                        <input type="radio" id="star2" name="rating" value="2">
-                        <label for="star2">★</label>
-                        <input type="radio" id="star1" name="rating" value="1">
-                        <label for="star1">★</label>
+            <div class="navbar-search shrink">
+                <form action="/products" method="GET" class="search-form">
+                    <select name="categoria" class="search-select">
+                        <option value="" disabled selected>Seleziona una categoria</option>
+                        <option value="1">Categoria 1</option>
+                        <option value="2">Categoria 2</option>
+                        <option value="3">Categoria 3</option>
+                        <option value="4">Categoria 4</option>
+                    </select>
+                    <span class="price-label">Prezzo</span>
+                    <div class="price-slider">
+                        <label for="price">Prezzo:</label>
+                        <input type="range" id="price" name="price" min="0" max="100" value="100">
                     </div>
-                </div>
-                <button type="submit" class="search-button">Cerca</button>
-            </form>
+                    <span class="rating-label">Rating</span>
+                    <div class="rating-stars">
+                        <div class="stars">
+                            <input type="radio" id="star5" name="rating" value="5">
+                            <label for="star5">★</label>
+                            <input type="radio" id="star4" name="rating" value="4">
+                            <label for="star4">★</label>
+                            <input type="radio" id="star3" name="rating" value="3">
+                            <label for="star3">★</label>
+                            <input type="radio" id="star2" name="rating" value="2">
+                            <label for="star2">★</label>
+                            <input type="radio" id="star1" name="rating" value="1">
+                            <label for="star1">★</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="search-button">Cerca</button>
+                </form>
+            </div>
         </div>
     </div>
     <main>
@@ -64,13 +65,14 @@
                     <p>Nessun prodotto trovato per la categoria selezionata.</p>
                 </th:block>
                 <th:block th:each="product : ${products}">
-                    <div th:each="product : ${products}" class="product-card">
+                    <div class="product-card">
                         <h2 th:text="${product.nome}">Nome del prodotto</h2>
                         <p th:text="'Categoria: ' + ${product.categoria}">Categoria</p>
                         <p th:text="'Prezzo: €' + ${product.prezzo}">Prezzo</p>
                         <p th:text="${product.descrizione}">Descrizione</p>
+                        <p th:text="${#numbers.formatDecimal(product.averageRating, 1, 1).replace(',', '.')}+ ' ★'">Rating</p>
                         <img th:src="${product.foto}" alt="Foto del prodotto" class="product-image" />
-                        <a th:href="@{/product/{id}(id=${product.id})}" class="details-button">Dettagli</a>
+                        <a th:href="@{/product/{id}(id=${product.id}, redirectUrl=${redirectUrl})}" class="details-button">Dettagli</a>
                     </div>
                 </th:block>
             </div>
@@ -89,47 +91,43 @@
             </div>
         </div>
         <div class="footer-bottom">
-            &copy; 2025 Sitarello. All rights reserved.
+            © 2025 Sitarello. All rights reserved.
         </div>
-        </footer>
+    </footer>
     <script>
         window.addEventListener("scroll", function () {
-    const navbar = document.querySelector(".navbar-search");
-    if (window.scrollY > 50) {
-        navbar.classList.add("shrink");
-    } else {
-        navbar.classList.remove("shrink");
-    }
-});
+            const navbar = document.querySelector(".navbar-search");
+            if (window.scrollY > 50) {
+                navbar.classList.add("shrink");
+            } else {
+                navbar.classList.remove("shrink");
+            }
+        });
 
-document.addEventListener('DOMContentLoaded', () => {
-    const navbar = document.querySelector('.navbar-search');
-    const priceLabel = document.querySelector('.price-label');
-    const ratingLabel = document.querySelector('.rating-label');
+        document.addEventListener('DOMContentLoaded', () => {
+            const navbar = document.querySelector('.navbar-search');
+            const priceLabel = document.querySelector('.price-label');
+            const ratingLabel = document.querySelector('.rating-label');
 
-    // Funzione per espandere la navbar
-    const expandNavbar = () => {
-        navbar.classList.remove('shrink');
-        navbar.classList.add('expanded');
-    };
+            const expandNavbar = () => {
+                navbar.classList.remove('shrink');
+                navbar.classList.add('expanded');
+            };
 
-    // Funzione per ridurre la navbar
-    const shrinkNavbar = () => {
-        navbar.classList.remove('expanded');
-        navbar.classList.add('shrink');
-    };
+            const shrinkNavbar = () => {
+                navbar.classList.remove('expanded');
+                navbar.classList.add('shrink');
+            };
 
-    // Aggiungi eventi di click sulle etichette
-    priceLabel.addEventListener('click', expandNavbar);
-    ratingLabel.addEventListener('click', expandNavbar);
+            priceLabel.addEventListener('click', expandNavbar);
+            ratingLabel.addEventListener('click', expandNavbar);
 
-    // Riduci la navbar quando si clicca fuori
-    document.addEventListener('click', (event) => {
-        if (!navbar.contains(event.target) && navbar.classList.contains('expanded')) {
-            shrinkNavbar();
-        }
-    });
-});
+            document.addEventListener('click', (event) => {
+                if (!navbar.contains(event.target) && navbar.classList.contains('expanded')) {
+                    shrinkNavbar();
+                }
+            });
+        });
     </script>
 </body>
 </html>

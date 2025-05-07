@@ -14,13 +14,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import it.uniroma3.siw.model.Product;
 import it.uniroma3.siw.model.Users;
 import it.uniroma3.siw.service.ProductService;
+import it.uniroma3.siw.service.RatingService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class ProductController {
+
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private RatingService ratingService; // Aggiunto per gestire i voti
 
     @GetMapping("/products/categoria")
     public String getProductsByCategoria(
@@ -28,7 +33,8 @@ public class ProductController {
             Model model) {
         List<Product> prodotti = productService.getProductsByCategoria(categoria);
         model.addAttribute("products", prodotti);
-        model.addAttribute("categoria", categoria); // Passa anche la categoria al modello
+        model.addAttribute("categoria", categoria);
+        model.addAttribute("redirectUrl", categoria != null ? "/products/categoria?categoria=" + categoria : "/products");
         return "products";
     }
 
@@ -38,13 +44,22 @@ public class ProductController {
             @RequestParam(required = false) Integer price,
             @RequestParam(required = false) Integer rating,
             Model model) {
-        // Filtra i prodotti in base ai parametri
         List<Product> filteredProducts = productService.filterProducts(categoria, price, rating);
-
-        // Aggiungi i prodotti filtrati al modello
         model.addAttribute("products", filteredProducts);
-
-        // Ritorna la vista con i risultati
+        StringBuilder redirectUrl = new StringBuilder("/products");
+        boolean hasParams = false;
+        if (categoria != null) {
+            redirectUrl.append(hasParams ? "&" : "?").append("categoria=").append(categoria);
+            hasParams = true;
+        }
+        if (price != null) {
+            redirectUrl.append(hasParams ? "&" : "?").append("price=").append(price);
+            hasParams = true;
+        }
+        if (rating != null) {
+            redirectUrl.append(hasParams ? "&" : "?").append("rating=").append(rating);
+        }
+        model.addAttribute("redirectUrl", redirectUrl.toString());
         return "products";
     }
 
@@ -52,83 +67,63 @@ public class ProductController {
     public String addProduct(
             @ModelAttribute Product product,
             HttpSession session) {
-        // Recupera l'utente loggato dalla sessione
         Users loggedUser = (Users) session.getAttribute("loggedUser");
         if (loggedUser == null) {
-            return "redirect:/login"; // Reindirizza alla pagina di login se l'utente non è loggato
+            return "redirect:/login";
         }
-
-        // Imposta l'autore del prodotto
         product.setAutore(loggedUser.getUsername());
-
-        // Salva il prodotto
         productService.saveProduct(product);
-
-        return "redirect:/my-products"; // Reindirizza alla pagina "I Miei Prodotti"
+        return "redirect:/my-products";
     }
 
     @PostMapping("/product/delete/{id}")
     public String deleteProduct(@PathVariable Long id, HttpSession session, Model model) {
-        // Recupera l'utente loggato dalla sessione
         Users loggedUser = (Users) session.getAttribute("loggedUser");
         if (loggedUser == null) {
-            return "redirect:/login"; // Reindirizza al login se l'utente non è loggato
+            return "redirect:/login";
         }
-
-        // Verifica che il prodotto appartenga all'utente loggato
         Product product = productService.findById(id);
         if (product != null && product.getAutore().equals(loggedUser.getUsername())) {
-            productService.deleteProduct(id); // Elimina il prodotto
+            productService.deleteProduct(id);
         } else {
             model.addAttribute("errorMessage", "Non puoi rimuovere questo prodotto.");
         }
-
-        return "redirect:/my-products"; // Reindirizza alla pagina "I Miei Prodotti"
+        return "redirect:/my-products";
     }
 
     @GetMapping("/formNewProduct")
     public String showFormNewProduct(Model model) {
-        model.addAttribute("product", new Product()); // Aggiunge un oggetto vuoto al modello
-        return "formNewProduct"; // Nome del template HTML
+        model.addAttribute("product", new Product());
+        return "formNewProduct";
     }
 
     @GetMapping("/my-products")
-public String getMyProducts(HttpSession session, Model model, HttpServletRequest request) {
-    // Recupera l'utente loggato dalla sessione
-    Users loggedUser = (Users) session.getAttribute("loggedUser");
-    if (loggedUser == null) {
-        return "redirect:/login"; // Reindirizza al login se l'utente non è loggato
-    }
-
-    // Recupera i prodotti creati dall'utente loggato
-    List<Product> myProducts = productService.findProductsByAutore(loggedUser.getUsername());
-    model.addAttribute("products", myProducts);
-    model.addAttribute("redirectUrl", request.getRequestURI()); // Passa redirectUrl al modello
-
-    return "myProducts"; // Ritorna il template myProducts.html
-}
-
-    // Mostra la pagina di modifica del prodotto
-    @GetMapping("/product/edit/{id}")
-    public String editProduct(@PathVariable Long id, HttpSession session, Model model, @RequestParam(required = false) String redirectUrl) {
-        // Recupera l'utente loggato dalla sessione
+    public String getMyProducts(HttpSession session, Model model, HttpServletRequest request) {
         Users loggedUser = (Users) session.getAttribute("loggedUser");
         if (loggedUser == null) {
-            return "redirect:/login"; // Reindirizza al login se l'utente non è loggato
+            return "redirect:/login";
         }
-
-        // Recupera il prodotto da modificare
-        Product product = productService.findById(id);
-        if (product == null || !product.getAutore().equals(loggedUser.getUsername())) {
-            return "redirect:/my-products"; // Reindirizza se il prodotto non appartiene all'utente
-        }
-
-        model.addAttribute("product", product);
-        model.addAttribute("redirectUrl", redirectUrl); // Aggiungi il redirectUrl al modello
-        return "editProduct"; // Ritorna il template editProduct.html
+        List<Product> myProducts = productService.findProductsByAutore(loggedUser.getUsername());
+        model.addAttribute("products", myProducts);
+        model.addAttribute("redirectUrl", request.getRequestURI());
+        return "myProducts";
     }
 
-    // Salva le modifiche al prodotto
+    @GetMapping("/product/edit/{id}")
+    public String editProduct(@PathVariable Long id, HttpSession session, Model model, @RequestParam(required = false) String redirectUrl) {
+        Users loggedUser = (Users) session.getAttribute("loggedUser");
+        if (loggedUser == null) {
+            return "redirect:/login";
+        }
+        Product product = productService.findById(id);
+        if (product == null || !product.getAutore().equals(loggedUser.getUsername())) {
+            return "redirect:/my-products";
+        }
+        model.addAttribute("product", product);
+        model.addAttribute("redirectUrl", redirectUrl);
+        return "editProduct";
+    }
+
     @PostMapping("/product/update/{id}")
     public String updateProduct(
             @PathVariable Long id,
@@ -137,35 +132,50 @@ public String getMyProducts(HttpSession session, Model model, HttpServletRequest
             HttpSession session) {
         Users loggedUser = (Users) session.getAttribute("loggedUser");
         if (loggedUser == null) {
-            return "redirect:/login"; // Reindirizza al login se l'utente non è loggato
+            return "redirect:/login";
         }
-
         Product existingProduct = productService.findById(id);
         if (existingProduct == null || !existingProduct.getAutore().equals(loggedUser.getUsername())) {
-            return "redirect:/my-products"; // Reindirizza se il prodotto non appartiene all'utente
+            return "redirect:/my-products";
         }
-
-        // Aggiorna i campi modificabili
         existingProduct.setNome(product.getNome());
         existingProduct.setCategoria(product.getCategoria());
         existingProduct.setPrezzo(product.getPrezzo());
         existingProduct.setDescrizione(product.getDescrizione());
         existingProduct.setFoto(product.getFoto());
-
-        productService.saveProduct(existingProduct); // Salva le modifiche
-
-        // Reindirizza alla pagina precedente o a "my-products" se il redirectUrl è nullo
+        productService.saveProduct(existingProduct);
         return (redirectUrl != null && !redirectUrl.isEmpty()) ? "redirect:" + redirectUrl : "redirect:/my-products";
     }
 
     @GetMapping("/product/{id}")
-    public String getProduct(@PathVariable Long id, HttpServletRequest request, Model model) {
+    public String getProduct(
+            @PathVariable Long id,
+            @RequestParam(required = false) String redirectUrl,
+            HttpSession session,
+            HttpServletRequest request,
+            Model model) {
         Product product = productService.findById(id);
         if (product == null) {
-            return "redirect:/products"; // Reindirizza alla lista dei prodotti se il prodotto non esiste
+            return "redirect:/products";
         }
+
+        Users loggedUser = (Users) session.getAttribute("loggedUser");
+        boolean hasRated = loggedUser != null && ratingService.hasUserRatedProduct(loggedUser, product);
+        Double userRating = null;
+        if (hasRated) {
+            userRating = ratingService.getUserRating(loggedUser, product);
+        }
+
+        String finalRedirectUrl = redirectUrl != null && !redirectUrl.isEmpty() ? redirectUrl : request.getHeader("Referer");
+        if (finalRedirectUrl == null || finalRedirectUrl.contains("/product/" + id)) {
+            finalRedirectUrl = "/products";
+        }
+
         model.addAttribute("product", product);
-        model.addAttribute("redirectUrl", request.getHeader("Referer")); // Usa l'header Referer per tornare alla pagina precedente
-        return "product"; // Ritorna il template product.html
+        model.addAttribute("hasRated", hasRated);
+        model.addAttribute("userRating", userRating);
+        model.addAttribute("redirectUrl", finalRedirectUrl);
+
+        return "product";
     }
 }

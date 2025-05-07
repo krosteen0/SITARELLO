@@ -13,4 +13,5 @@ import it.uniroma3.siw.model.Users;
 public interface RatingRepository extends JpaRepository<Rating, Long> {
     List<Rating> findByProduct(Product product);
     boolean existsByUserAndProduct(Users user, Product product);
+    Rating findByUserAndProduct(Users user, Product product);
 }

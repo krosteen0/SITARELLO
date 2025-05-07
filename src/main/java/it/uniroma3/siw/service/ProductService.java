@@ -16,7 +16,15 @@ public class ProductService {
     private ProductRepository productRepository;
 
     public Product findById(Long id) {
-        return productRepository.findById(id).orElse(null);
+        return productRepository.findById(id)
+                .map(product -> {
+                    // Forza il caricamento della lista ratings
+                    if (product.getRatings() != null) {
+                        product.getRatings().size(); // Inizializza la lista
+                    }
+                    return product;
+                })
+                .orElse(null);
     }
 
     public void deleteProduct(Long id) {
@@ -24,7 +32,14 @@ public class ProductService {
     }
 
     public Iterable<Product> getAllProducts() {
-        return productRepository.findAll();
+        return productRepository.findAll().stream()
+                .peek(product -> {
+                    // Forza il caricamento della lista ratings
+                    if (product.getRatings() != null) {
+                        product.getRatings().size();
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     public void saveProduct(Product product) {
@@ -32,11 +47,19 @@ public class ProductService {
     }
     
     public List<Product> getProductsByCategoria(String categoria) {
+        List<Product> products;
         if (categoria != null && !categoria.isEmpty()) {
-            return productRepository.findByCategoria(categoria);
+            products = productRepository.findByCategoria(categoria);
         } else {
-            return productRepository.findAll(); // Restituisce tutti i prodotti se la categoria non è specificata
+            products = productRepository.findAll();
         }
+        // Forza il caricamento della lista ratings per ogni prodotto
+        products.forEach(product -> {
+            if (product.getRatings() != null) {
+                product.getRatings().size();
+            }
+        });
+        return products;
     }
 
     public List<Product> filterProducts(String categoria, Integer price, Integer rating) {
@@ -47,11 +70,24 @@ public class ProductService {
         return allProducts.stream()
                 .filter(product -> categoria == null || product.getCategoria().equalsIgnoreCase(categoria))
                 .filter(product -> price == null || product.getPrezzo() <= price)
-                .filter(product -> rating == null || product.getRating() >= rating)
+                .filter(product -> rating == null || product.getAverageRating() >= rating) // Modificato da getRating a getAverageRating
+                .peek(product -> {
+                    // Forza il caricamento della lista ratings
+                    if (product.getRatings() != null) {
+                        product.getRatings().size();
+                    }
+                })
                 .collect(Collectors.toList());
     }
 
     public List<Product> findProductsByAutore(String autore) {
-        return productRepository.findByAutore(autore);
+        List<Product> products = productRepository.findByAutore(autore);
+        // Forza il caricamento della lista ratings per ogni prodotto
+        products.forEach(product -> {
+            if (product.getRatings() != null) {
+                product.getRatings().size();
+            }
+        });
+        return products;
     }
 }
