@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import it.uniroma3.siw.model.UserSettingsDTO;
 import it.uniroma3.siw.model.Users;
 import it.uniroma3.siw.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -85,13 +86,18 @@ public class UserController {
         if (loggedUser == null) {
             return "redirect:/login";
         }
-        model.addAttribute("users", loggedUser);
+        UserSettingsDTO userSettingsDTO = new UserSettingsDTO();
+        userSettingsDTO.setUsername(loggedUser.getUsername());
+        userSettingsDTO.setEmail(loggedUser.getEmail());
+        model.addAttribute("userSettingsDTO", userSettingsDTO);
+        logger.info("Caricato DTO per utente: username={}, email={}", 
+                    userSettingsDTO.getUsername(), userSettingsDTO.getEmail());
         return "settings";
     }
 
     // Gestisce l'aggiornamento delle impostazioni
     @PostMapping("/settings")
-    public String updateSettings(@ModelAttribute @Valid Users user, BindingResult bindingResult, 
+    public String updateSettings(@ModelAttribute @Valid UserSettingsDTO userSettingsDTO, BindingResult bindingResult, 
                                 Model model, HttpSession session) {
         Users loggedUser = (Users) session.getAttribute("loggedUser");
         if (loggedUser == null) {
@@ -99,45 +105,45 @@ public class UserController {
         }
 
         if (bindingResult.hasErrors()) {
+            logger.error("Errori di validazione: {}", bindingResult.getAllErrors());
             return "settings";
         }
 
         try {
-            // Verifica se l'email è già in uso da un altro utente
-            Users existingUser = userService.findByEmail(user.getEmail());
+            // Verifica se l'email è già in uso
+            Users existingUser = userService.findByEmail(userSettingsDTO.getEmail());
             if (existingUser != null && !existingUser.getId().equals(loggedUser.getId())) {
                 model.addAttribute("errorMessage", "Email già registrata");
                 return "settings";
             }
 
-            // Verifica se lo username è già in uso da un altro utente
-            existingUser = userService.findByUsername(user.getUsername());
+            // Verifica se lo username è già in uso
+            existingUser = userService.findByUsername(userSettingsDTO.getUsername());
             if (existingUser != null && !existingUser.getId().equals(loggedUser.getId())) {
                 model.addAttribute("errorMessage", "Username già in uso");
                 return "settings";
             }
 
-            // Verifica la password (se fornita)
-            if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-                if (!user.getPassword().equals(user.getConfirmPassword())) {
+            // Verifica la password
+            if (userSettingsDTO.getPassword() != null && !userSettingsDTO.getPassword().isEmpty()) {
+                if (!userSettingsDTO.getPassword().equals(userSettingsDTO.getConfirmPassword())) {
                     model.addAttribute("errorMessage", "Le password non corrispondono");
                     return "settings";
                 }
             }
 
-            // Aggiorna i dati dell'utente
-            loggedUser.setUsername(user.getUsername());
-            loggedUser.setEmail(user.getEmail());
-            if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-                loggedUser.setPassword(user.getPassword());
-            }
+            // Aggiorna i dati
+            loggedUser.setUsername(userSettingsDTO.getUsername());
+            loggedUser.setEmail(userSettingsDTO.getEmail());
 
             // Salva le modifiche
             userService.updateUser(loggedUser);
-            session.setAttribute("loggedUser", loggedUser); // Aggiorna la sessione
+            logger.info("Utente aggiornato: username={}, email={}", loggedUser.getUsername(), loggedUser.getEmail());
+            session.setAttribute("loggedUser", loggedUser);
             model.addAttribute("successMessage", "Impostazioni aggiornate con successo!");
-            return "settings";
+            return "redirect:/settings";
         } catch (RuntimeException e) {
+            logger.error("Errore durante l'aggiornamento: {}", e.getMessage());
             model.addAttribute("errorMessage", e.getMessage());
             return "settings";
         }
