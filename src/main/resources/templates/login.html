@@ -1,60 +1,48 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/stile.css" />
+    <title>Login</title>
+    <link rel="stylesheet" th:href="@{/css/stile.css}" />
 </head>
 <body>
     <div class="header">
-        <!-- Logo e titolo -->
         <div class="start">
             <div class="logoNome">
-                <a href="/">
-                    <img class="logo" src="/immagini/logoSiw.png" alt="Logo LearnLab" />
+                <a th:href="@{/}">
+                    <img class="logo" th:src="@{/immagini/logoSiw.png}" alt="Logo LearnLab" />
                 </a>
-                <a href="/" class="home-link">
+                <a th:href="@{/}" class="home-link">
                     <h1>LearnLab</h1>
                 </a>
             </div>
         </div>
+    </div>
 
-        <!-- Controlla se l'utente è loggato -->
-        <div th:if="${session.loggedUser == null}">
-            <a href="/login" class="login-button">Accedi</a>
+    <main>
+        <h1>Login</h1>
+        <div th:if="${successMessage}" class="notification success">
+            <p th:text="${successMessage}"></p>
         </div>
-        <div th:if="${session.loggedUser != null}" class="dropdown">
-            <button class="dropdown-button">
-                Benvenuto, <span th:text="${session.loggedUser.username}">Utente</span>
-            </button>
-            <div class="dropdown-content">
-                <a href="/settings">Impostazioni</a>
-                <a href="/formNewProduct">Aggiungi Prodotto</a>
-                <a href="/my-products">Vedi i tuoi Prodotti</a>
-                <a href="/logout">Logout</a>
+        <div th:if="${errorMessage}" class="notification error">
+            <p th:text="${errorMessage}"></p>
+        </div>
+        <form th:action="@{/login}" method="POST" th:object="${user}" class="auth-form">
+            <div class="form-group">
+                <label for="usernameOrEmail">Username o Email:</label>
+                <input type="text" id="usernameOrEmail" th:field="*{usernameOrEmail}" placeholder="Inserisci il tuo username o email" required />
+                <div th:errors="*{usernameOrEmail}" class="error-message"></div>
             </div>
-        </div>
-    </div>
-
-    <h1>Login</h1>
-
-    <!-- Mostra il messaggio di successo -->
-    <div th:if="${success}" class="notification success">
-        <p th:text="${success}"></p>
-    </div>
-
-    <form th:action="@{/login}" method="POST" th:object="${user}" class="auth-form">
-
-        <label for="usernameOrEmail">Username o Email:</label>
-        <input type="text" id="usernameOrEmail" th:field="*{usernameOrEmail}" placeholder="Inserisci il tuo username o email" required>
-
-        <label for="password">Password:</label>
-        <input type="password" id="password" th:field="*{password}" placeholder="Inserisci la tua password" required>
-
-        <button type="submit" class="auth-submit-button">Accedi</button>
-    </form>
-    <!-- Link per la registrazione -->
-    <p>Non hai un account? <a href="/registration">Registrati qui</a></p>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" th:field="*{password}" placeholder="Inserisci la tua password" required />
+                <div th:errors="*{password}" class="error-message"></div>
+            </div>
+            <button type="submit" class="auth-submit-button">Accedi</button>
+        </form>
+        <p>Non hai un account? <a th:href="@{/registration}">Registrati qui</a></p>
+    </main>
 
     <footer class="footer">
         <div class="footer-content">
@@ -69,8 +57,8 @@
             </div>
         </div>
         <div class="footer-bottom">
-            &copy; 2025 Sitarello. All rights reserved.
+            © 2025 Sitarello. All rights reserved.
         </div>
-        </footer>
+    </footer>
 </body>
 </html>

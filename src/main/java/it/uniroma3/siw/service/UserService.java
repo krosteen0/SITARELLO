@@ -24,7 +24,7 @@ public class UserService {
 
     @Transactional
     public Users updateUser(Users user) {
-        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+        if (user.getPassword() != null && !user.getPassword().isEmpty() && !passwordEncoder.matches(user.getPassword(), user.getPassword())) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
         return userRepository.save(user);
@@ -47,14 +47,14 @@ public class UserService {
     }
 
     public Users findByUsernameOrEmail(String usernameOrEmail) {
-        Users user = userRepository.findByEmail(usernameOrEmail);
-        if (user == null) {
-            user = userRepository.findByUsername(usernameOrEmail);
-        }
-        return user;
+        return userRepository.findByUsernameOrEmail(usernameOrEmail);
     }
 
     public boolean checkPassword(Users user, String rawPassword) {
         return passwordEncoder.matches(rawPassword, user.getPassword());
+    }
+
+    public String encodePassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
     }
 }

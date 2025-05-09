@@ -9,7 +9,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import it.uniroma3.siw.model.LoginDTO;
 import it.uniroma3.siw.model.UserSettingsDTO;
 import it.uniroma3.siw.model.Users;
 import it.uniroma3.siw.service.UserService;
@@ -35,18 +37,19 @@ public class UserController {
     @PostMapping("/registration")
     public String registerUser(@ModelAttribute @Valid Users user, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
+            logger.warn("Errori di validazione durante la registrazione: {}", bindingResult.getAllErrors());
             return "registration";
         }
         try {
-            Users existingUser = userService.findByEmail(user.getEmail());
-            if (existingUser != null) {
+            if (userService.existsByEmail(user.getEmail())) {
                 model.addAttribute("errorMessage", "Email già registrata");
                 return "registration";
             }
             userService.saveUser(user);
             model.addAttribute("successMessage", "Registrazione completata con successo! Ora puoi accedere.");
             return "redirect:/login";
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
+            logger.error("Errore durante la registrazione: {}", e.getMessage(), e);
             model.addAttribute("errorMessage", e.getMessage());
             return "registration";
         }
@@ -54,29 +57,47 @@ public class UserController {
 
     // Mostra il modulo di login
     @GetMapping("/login")
-    public String showLoginForm(Model model) {
-        model.addAttribute("user", new Users());
+    public String showLoginForm(Model model, @RequestParam(value = "error", required = false) String error,
+                               @RequestParam(value = "logout", required = false) String logout) {
+        model.addAttribute("user", new LoginDTO());
+        if (error != null) {
+            model.addAttribute("errorMessage", "Credenziali non valide");
+            logger.warn("Errore di login rilevato: {}", error);
+        }
+        if (logout != null) {
+            model.addAttribute("successMessage", "Logout effettuato con successo");
+            logger.info("Logout completato");
+        }
         return "login";
     }
 
     // Gestisce il login degli utenti
     @PostMapping("/login")
-    public String loginUser(@ModelAttribute Users user, Model model, HttpSession session) {
-        logger.info("Tentativo di login con username o email: {}", user.getUsernameOrEmail());
+    public String loginUser(@ModelAttribute("user") LoginDTO loginDTO, Model model, HttpSession session) {
+        logger.info("Tentativo di login con username o email: {}", loginDTO.getUsernameOrEmail());
 
-        Users existingUser = userService.findByUsernameOrEmail(user.getUsernameOrEmail());
+        Users existingUser = userService.findByUsernameOrEmail(loginDTO.getUsernameOrEmail());
         if (existingUser == null) {
+            logger.warn("Utente non trovato: {}", loginDTO.getUsernameOrEmail());
             model.addAttribute("errorMessage", "Utente non trovato");
+            model.addAttribute("user", new LoginDTO());
             return "login";
         }
 
-        if (!userService.checkPassword(existingUser, user.getPassword())) {
+        logger.info("Utente trovato: username={}, email={}", existingUser.getUsername(), existingUser.getEmail());
+        boolean passwordValid = userService.checkPassword(existingUser, loginDTO.getPassword());
+        logger.info("Password valida: {}", passwordValid);
+        if (!passwordValid) {
+            logger.warn("Password non valida per utente: {}", loginDTO.getUsernameOrEmail());
             model.addAttribute("errorMessage", "Password non valida");
+            model.addAttribute("user", new LoginDTO());
             return "login";
         }
 
         session.setAttribute("loggedUser", existingUser);
-        return "redirect:/";
+        logger.info("Sessione aggiornata: loggedUser={}", existingUser.getUsername());
+        logger.info("Reindirizzamento a /my-products per utente: {}", existingUser.getUsername());
+        return "redirect:/my-products";
     }
 
     // Mostra il form delle impostazioni
@@ -84,6 +105,7 @@ public class UserController {
     public String showSettingsForm(Model model, HttpSession session) {
         Users loggedUser = (Users) session.getAttribute("loggedUser");
         if (loggedUser == null) {
+            logger.warn("Nessun utente loggato, reindirizzamento a /login");
             return "redirect:/login";
         }
         UserSettingsDTO userSettingsDTO = new UserSettingsDTO();
@@ -101,6 +123,7 @@ public class UserController {
                                 Model model, HttpSession session) {
         Users loggedUser = (Users) session.getAttribute("loggedUser");
         if (loggedUser == null) {
+            logger.warn("Nessun utente loggato, reindirizzamento a /login");
             return "redirect:/login";
         }
 
@@ -111,25 +134,116 @@ public class UserController {
 
         try {
             // Verifica se l'email è già in uso
-            Users existingUser = userService.findByEmail(userSettingsDTO.getEmail());
-            if (existingUser != null && !existingUser.getId().equals(loggedUser.getId())) {
-                model.addAttribute("errorMessage", "Email già registrata");
-                return "settings";
+            if (!userSettingsDTO.getEmail().equals(loggedUser.getEmail())) {
+                if (userService.existsByEmail(userSettingsDTO.getEmail())) {
+                    model.addAttribute("errorMessage", "Email già registrata");
+                    return "settings";
+                }
             }
 
             // Verifica se lo username è già in uso
-            existingUser = userService.findByUsername(userSettingsDTO.getUsername());
-            if (existingUser != null && !existingUser.getId().equals(loggedUser.getId())) {
-                model.addAttribute("errorMessage", "Username già in uso");
-                return "settings";
+            if (!userSettingsDTO.getUsername().equals(loggedUser.getUsername())) {
+                if (userService.existsByUsername(userSettingsDTO.getUsername())) {
+                    model.addAttribute("errorMessage", "Username già in uso");
+                    return "settings";
+                }
             }
 
-            // Verifica la password
+            // Verifica e aggiorna la password
             if (userSettingsDTO.getPassword() != null && !userSettingsDTO.getPassword().isEmpty()) {
                 if (!userSettingsDTO.getPassword().equals(userSettingsDTO.getConfirmPassword())) {
                     model.addAttribute("errorMessage", "Le password non corrispondono");
                     return "settings";
                 }
+                // La codifica della password avviene in updateUser
+                loggedUser.setPassword(userSettingsDTO.getPassword());
+            }
+
+            // Aggiorna i dati
+            loggedUser.setUsername(userSettingsDTO.getUsername());
+            loggedUser.setEmail(userSettingsDTO.getEmail());
+
+            // Salva le modifiche nel database
+            Users updatedUser = userService.updateUser(loggedUser);
+            logger.info("Utente aggiornato: username={}, email={}", updatedUser.getUsername(), updatedUser.getEmail());
+
+            // Aggiorna la sessione
+            session.setAttribute("loggedUser", updatedUser);
+            model.addAttribute("successMessage", "Impostazioni aggiornate con successo!");
+            return "settings";
+        } catch (Exception e) {
+            logger.error("Errore durante l'aggiornamento: {}", e.getMessage(), e);
+            model.addAttribute("errorMessage", "Errore durante l'aggiornamento: " + e.getMessage());
+            return "settings";
+        }
+    }
+
+    // Gestisce il logout
+    @PostMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        logger.info("Sessione invalidata per logout");
+        return "redirect:/login?logout";
+    }
+
+    // Mostra la pagina del profilo
+    @GetMapping("/profile")
+    public String showProfile(Model model, HttpSession session) {
+        Users loggedUser = (Users) session.getAttribute("loggedUser");
+        if (loggedUser == null) {
+            logger.warn("Nessun utente loggato, reindirizzamento a /login");
+            return "redirect:/login";
+        }
+        model.addAttribute("loggedUser", loggedUser);
+        logger.info("Caricato profilo per utente: username={}, email={}", 
+                    loggedUser.getUsername(), loggedUser.getEmail());
+        return "profile";
+    }
+
+    // Gestisce l'aggiornamento delle impostazioni dal profilo
+    @PostMapping("/profile")
+    public String updateProfile(@ModelAttribute @Valid UserSettingsDTO userSettingsDTO, BindingResult bindingResult, 
+                               Model model, HttpSession session) {
+        Users loggedUser = (Users) session.getAttribute("loggedUser");
+        if (loggedUser == null) {
+            logger.warn("Nessun utente loggato, reindirizzamento a /login");
+            return "redirect:/login";
+        }
+
+        if (bindingResult.hasErrors()) {
+            logger.error("Errori di validazione: {}", bindingResult.getAllErrors());
+            model.addAttribute("loggedUser", loggedUser);
+            return "profile";
+        }
+
+        try {
+            // Verifica se l'email è già in uso
+            if (!userSettingsDTO.getEmail().equals(loggedUser.getEmail())) {
+                if (userService.existsByEmail(userSettingsDTO.getEmail())) {
+                    model.addAttribute("errorMessage", "Email già registrata");
+                    model.addAttribute("loggedUser", loggedUser);
+                    return "profile";
+                }
+            }
+
+            // Verifica se lo username è già in uso
+            if (!userSettingsDTO.getUsername().equals(loggedUser.getUsername())) {
+                if (userService.existsByUsername(userSettingsDTO.getUsername())) {
+                    model.addAttribute("errorMessage", "Username già in uso");
+                    model.addAttribute("loggedUser", loggedUser);
+                    return "profile";
+                }
+            }
+
+            // Verifica e aggiorna la password
+            if (userSettingsDTO.getPassword() != null && !userSettingsDTO.getPassword().isEmpty()) {
+                if (!userSettingsDTO.getPassword().equals(userSettingsDTO.getConfirmPassword())) {
+                    model.addAttribute("errorMessage", "Le password non corrispondono");
+                    model.addAttribute("loggedUser", loggedUser);
+                    return "profile";
+                }
+                // La codifica della password avviene in updateUser
+                loggedUser.setPassword(userSettingsDTO.getPassword());
             }
 
             // Aggiorna i dati
@@ -137,21 +251,19 @@ public class UserController {
             loggedUser.setEmail(userSettingsDTO.getEmail());
 
             // Salva le modifiche
-            userService.updateUser(loggedUser);
-            logger.info("Utente aggiornato: username={}, email={}", loggedUser.getUsername(), loggedUser.getEmail());
-            session.setAttribute("loggedUser", loggedUser);
-            model.addAttribute("successMessage", "Impostazioni aggiornate con successo!");
-            return "redirect:/settings";
-        } catch (RuntimeException e) {
-            logger.error("Errore durante l'aggiornamento: {}", e.getMessage());
-            model.addAttribute("errorMessage", e.getMessage());
-            return "settings";
-        }
-    }
+            Users updatedUser = userService.updateUser(loggedUser);
+            logger.info("Utente aggiornato: username={}, email={}", updatedUser.getUsername(), updatedUser.getEmail());
 
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/";
+            // Aggiorna la sessione
+            session.setAttribute("loggedUser", updatedUser);
+            model.addAttribute("successMessage", "Impostazioni aggiornate con successo!");
+            model.addAttribute("loggedUser", updatedUser);
+            return "redirect:/profile";
+        } catch (Exception e) {
+            logger.error("Errore durante l'aggiornamento: {}", e.getMessage(), e);
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("loggedUser", loggedUser);
+            return "profile";
+        }
     }
 }

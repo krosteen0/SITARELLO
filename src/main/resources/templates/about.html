@@ -27,10 +27,13 @@
                 Benvenuto, <span th:text="${session.loggedUser.username}">Utente</span>
             </button>
             <div class="dropdown-content">
-                <a href="/settings">Impostazioni</a>
-                <a href="/formNewProduct">Aggiungi Prodotto</a>
-                <a href="/my-products">Vedi i tuoi Prodotti</a>
-                <a href="/logout">Logout</a>
+                <a th:href="@{/settings}">Impostazioni</a>
+                <a th:href="@{/formNewProduct}">Aggiungi Prodotto</a>
+                <a th:href="@{/my-products}">Vedi i tuoi Prodotti</a>
+                <form th:action="@{/logout}" method="POST">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" class="dropdown-item">Logout</button>
+                </form>
             </div>
         </div>
     </div>

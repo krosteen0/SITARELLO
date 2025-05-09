@@ -19,22 +19,6 @@
                 </a>
             </div>
         </div>
-
-        <!-- Controlla se l'utente è loggato -->
-        <div th:if="${session.loggedUser == null}">
-            <a href="/login" class="login-button">Accedi</a>
-        </div>
-        <div th:if="${session.loggedUser != null}" class="dropdown">
-            <button class="dropdown-button">
-                Benvenuto, <span th:text="${session.loggedUser.username}">Utente</span>
-            </button>
-            <div class="dropdown-content">
-                <a href="/settings">Impostazioni</a>
-                <a href="/formNewProduct">Aggiungi Prodotto</a>
-                <a href="/my-products">Vedi i tuoi Prodotti</a>
-                <a href="/logout">Logout</a>
-            </div>
-        </div>
     </div>
     <div class="auth-form-container">
         <form th:action="@{/registration}" method="POST" th:object="${user}" class="auth-form">

@@ -25,6 +25,8 @@ public class SecurityConfig {
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/") // Reindirizza alla homepage dopo il logout
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
                 .permitAll()
             );
 
