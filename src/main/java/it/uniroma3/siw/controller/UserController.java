@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import it.uniroma3.siw.model.ChangePasswordDTO;
 import it.uniroma3.siw.model.LoginDTO;
 import it.uniroma3.siw.model.UserSettingsDTO;
 import it.uniroma3.siw.model.Users;
@@ -101,7 +102,7 @@ public class UserController {
     }
 
     // Mostra il form delle impostazioni
-    @GetMapping("/settings")
+    @GetMapping("/editProfile")
     public String showSettingsForm(Model model, HttpSession session) {
         Users loggedUser = (Users) session.getAttribute("loggedUser");
         if (loggedUser == null) {
@@ -110,15 +111,12 @@ public class UserController {
         }
         UserSettingsDTO userSettingsDTO = new UserSettingsDTO();
         userSettingsDTO.setUsername(loggedUser.getUsername());
-        userSettingsDTO.setEmail(loggedUser.getEmail());
         model.addAttribute("userSettingsDTO", userSettingsDTO);
-        logger.info("Caricato DTO per utente: username={}, email={}", 
-                    userSettingsDTO.getUsername(), userSettingsDTO.getEmail());
-        return "settings";
+        logger.info("Caricato DTO per utente: username={}", userSettingsDTO.getUsername());
+        return "editProfile";
     }
 
-    // Gestisce l'aggiornamento delle impostazioni
-    @PostMapping("/settings")
+    @PostMapping("/editProfile")
     public String updateSettings(@ModelAttribute @Valid UserSettingsDTO userSettingsDTO, BindingResult bindingResult, 
                                 Model model, HttpSession session) {
         Users loggedUser = (Users) session.getAttribute("loggedUser");
@@ -129,54 +127,108 @@ public class UserController {
 
         if (bindingResult.hasErrors()) {
             logger.error("Errori di validazione: {}", bindingResult.getAllErrors());
-            return "settings";
+            return "editProfile";
         }
 
         try {
-            // Verifica se l'email è già in uso
-            if (!userSettingsDTO.getEmail().equals(loggedUser.getEmail())) {
-                if (userService.existsByEmail(userSettingsDTO.getEmail())) {
-                    model.addAttribute("errorMessage", "Email già registrata");
-                    return "settings";
-                }
-            }
-
             // Verifica se lo username è già in uso
             if (!userSettingsDTO.getUsername().equals(loggedUser.getUsername())) {
                 if (userService.existsByUsername(userSettingsDTO.getUsername())) {
                     model.addAttribute("errorMessage", "Username già in uso");
-                    return "settings";
+                    return "editProfile";
                 }
-            }
-
-            // Verifica e aggiorna la password
-            if (userSettingsDTO.getPassword() != null && !userSettingsDTO.getPassword().isEmpty()) {
-                if (!userSettingsDTO.getPassword().equals(userSettingsDTO.getConfirmPassword())) {
-                    model.addAttribute("errorMessage", "Le password non corrispondono");
-                    return "settings";
-                }
-                // La codifica della password avviene in updateUser
-                loggedUser.setPassword(userSettingsDTO.getPassword());
             }
 
             // Aggiorna i dati
             loggedUser.setUsername(userSettingsDTO.getUsername());
-            loggedUser.setEmail(userSettingsDTO.getEmail());
 
             // Salva le modifiche nel database
             Users updatedUser = userService.updateUser(loggedUser);
-            logger.info("Utente aggiornato: username={}, email={}", updatedUser.getUsername(), updatedUser.getEmail());
+            logger.info("Utente aggiornato: username={}", updatedUser.getUsername());
 
             // Aggiorna la sessione
             session.setAttribute("loggedUser", updatedUser);
             model.addAttribute("successMessage", "Impostazioni aggiornate con successo!");
-            return "settings";
+            return "editProfile";
         } catch (Exception e) {
             logger.error("Errore durante l'aggiornamento: {}", e.getMessage(), e);
             model.addAttribute("errorMessage", "Errore durante l'aggiornamento: " + e.getMessage());
-            return "settings";
+            return "editProfile";
         }
     }
+
+    @GetMapping("/editPassword")
+    public String showChangePasswordForm(Model model, HttpSession session) {
+        Users loggedUser = (Users) session.getAttribute("loggedUser");
+        if (loggedUser == null) {
+            logger.warn("Nessun utente loggato, reindirizzamento a /login");
+            return "redirect:/login";
+        }
+        model.addAttribute("changePasswordDTO", new ChangePasswordDTO());
+        logger.info("Caricato form di cambio password per utente: {}", loggedUser.getUsername());
+        return "editPassword";
+    }
+
+    @PostMapping("/editPassword")
+public String changePassword(@ModelAttribute @Valid ChangePasswordDTO changePasswordDTO, BindingResult bindingResult, 
+                            Model model, HttpSession session) {
+    Users loggedUser = (Users) session.getAttribute("loggedUser");
+    if (loggedUser == null) {
+        logger.warn("Nessun utente loggato, reindirizzamento a /login");
+        return "redirect:/login";
+    }
+
+    if (bindingResult.hasErrors()) {
+        logger.error("Errori di validazione: {}", bindingResult.getAllErrors());
+        return "editPassword";
+    }
+
+    try {
+        // Verifica la password attuale
+        logger.debug("Verifica della password attuale per utente: {}", loggedUser.getUsername());
+        logger.debug("Password attuale nel DB: {}, Password inserita: {}", 
+                    loggedUser.getPassword() != null ? "[protected]" : "null", 
+                    changePasswordDTO.getCurrentPassword() != null ? "[provided]" : "null");
+                    
+        if (!userService.checkPassword(loggedUser, changePasswordDTO.getCurrentPassword())) {
+            logger.warn("Password attuale errata per utente: {}", loggedUser.getUsername());
+            model.addAttribute("errorMessage", "Password Attuale Errata");
+            return "editPassword";
+        }
+
+        // Verifica che la nuova password e la conferma corrispondano
+        if (!changePasswordDTO.getNewPassword().equals(changePasswordDTO.getConfirmPassword())) {
+            logger.warn("Le nuove password non corrispondono per utente: {}", loggedUser.getUsername());
+            model.addAttribute("errorMessage", "Le nuove password non corrispondono");
+            return "editPassword";
+        }
+
+        // Verifica che la nuova password sia diversa dalla password attuale
+        if (userService.checkPassword(loggedUser, changePasswordDTO.getNewPassword())) {
+            logger.warn("La nuova password è uguale alla password attuale per utente: {}", loggedUser.getUsername());
+            model.addAttribute("errorMessage", "La nuova password deve essere diversa da quella attuale");
+            return "editPassword";
+        }
+
+        // Esegui l'aggiornamento solo se tutti i controlli sono superati
+        logger.info("Aggiornamento della password per utente: {}", loggedUser.getUsername());
+        logger.debug("Nuova password da impostare: {}", 
+                    changePasswordDTO.getNewPassword() != null ? "[provided]" : "null");
+        loggedUser.setPassword(changePasswordDTO.getNewPassword());
+        Users updatedUser = userService.updateUser(loggedUser);
+        logger.info("Password aggiornata con successo per utente: username={}", updatedUser.getUsername());
+
+        // Aggiorna la sessione
+        session.setAttribute("loggedUser", updatedUser);
+        model.addAttribute("successMessage", "Password aggiornata con successo!");
+        return "editPassword";
+    } catch (Exception e) {
+        logger.error("Errore durante il cambio password per utente {}: {}", 
+                     loggedUser != null ? loggedUser.getUsername() : "null", e.getMessage(), e);
+        model.addAttribute("errorMessage", "Errore durante il cambio password: " + e.getMessage());
+        return "editPassword";
+    }
+}
 
     // Gestisce il logout
     @PostMapping("/logout")
@@ -217,15 +269,6 @@ public class UserController {
         }
 
         try {
-            // Verifica se l'email è già in uso
-            if (!userSettingsDTO.getEmail().equals(loggedUser.getEmail())) {
-                if (userService.existsByEmail(userSettingsDTO.getEmail())) {
-                    model.addAttribute("errorMessage", "Email già registrata");
-                    model.addAttribute("loggedUser", loggedUser);
-                    return "profile";
-                }
-            }
-
             // Verifica se lo username è già in uso
             if (!userSettingsDTO.getUsername().equals(loggedUser.getUsername())) {
                 if (userService.existsByUsername(userSettingsDTO.getUsername())) {
@@ -235,24 +278,12 @@ public class UserController {
                 }
             }
 
-            // Verifica e aggiorna la password
-            if (userSettingsDTO.getPassword() != null && !userSettingsDTO.getPassword().isEmpty()) {
-                if (!userSettingsDTO.getPassword().equals(userSettingsDTO.getConfirmPassword())) {
-                    model.addAttribute("errorMessage", "Le password non corrispondono");
-                    model.addAttribute("loggedUser", loggedUser);
-                    return "profile";
-                }
-                // La codifica della password avviene in updateUser
-                loggedUser.setPassword(userSettingsDTO.getPassword());
-            }
-
             // Aggiorna i dati
             loggedUser.setUsername(userSettingsDTO.getUsername());
-            loggedUser.setEmail(userSettingsDTO.getEmail());
 
             // Salva le modifiche
             Users updatedUser = userService.updateUser(loggedUser);
-            logger.info("Utente aggiornato: username={}, email={}", updatedUser.getUsername(), updatedUser.getEmail());
+            logger.info("Utente aggiornato: username={}", updatedUser.getUsername());
 
             // Aggiorna la sessione
             session.setAttribute("loggedUser", updatedUser);
