@@ -38,7 +38,7 @@
             </div>
             <!-- Navbar -->
             <div class="nav-container">
-            <div class="navbar-search shrink">
+            <div class="navbar-search">
                 <form action="/products" method="GET" class="search-form">
                     <select name="categoria" class="search-select">
                         <option value="" disabled selected>Seleziona una categoria</option>
@@ -121,83 +121,93 @@
                     </div>
                     
                 </div>
-                
-                
             </div>
         </div>
         
         <!-- Script per la navbar dinamica -->
-    <script>
-        window.addEventListener("scroll", function () {
-    const navbar = document.querySelector(".navbar-search");
-    if (window.scrollY > 50) {
-        navbar.classList.add("shrink");
-    } else {
-        navbar.classList.remove("shrink");
-    }
-});
+        <script>
+            // Applica immediatamente la classe expanded
+            document.querySelector('.navbar-search').classList.add('expanded');
 
-document.addEventListener('DOMContentLoaded', () => {
-    const navbar = document.querySelector('.navbar-search');
-    const priceLabel = document.querySelector('.price-label');
-    const ratingLabel = document.querySelector('.rating-label');
+            // Funzione per aggiornare lo stato della navbar
+            const updateNavbar = () => {
+                const navbar = document.querySelector('.navbar-search');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('shrink');
+                    navbar.classList.remove('expanded');
+                } else {
+                    navbar.classList.remove('shrink');
+                    navbar.classList.add('expanded');
+                }
+            };
 
-    // Funzione per espandere la navbar
-    const expandNavbar = () => {
-        navbar.classList.remove('shrink');
-        navbar.classList.add('expanded');
-    };
+            // Esegui l'aggiornamento iniziale
+            updateNavbar();
 
-    // Funzione per ridurre la navbar
-    const shrinkNavbar = () => {
-        navbar.classList.remove('expanded');
-        navbar.classList.add('shrink');
-    };
+            // Aggiungi l'evento di scroll
+            window.addEventListener('scroll', updateNavbar);
 
-    // Aggiungi eventi di click sulle etichette
-    priceLabel.addEventListener('click', expandNavbar);
-    ratingLabel.addEventListener('click', expandNavbar);
+            // Gestione degli eventi di click per espandere/ridurre la navbar
+            document.addEventListener('DOMContentLoaded', () => {
+                const navbar = document.querySelector('.navbar-search');
+                const priceLabel = document.querySelector('.price-label');
+                const ratingLabel = document.querySelector('.rating-label');
 
-    // Riduci la navbar quando si clicca fuori
-    document.addEventListener('click', (event) => {
-        if (!navbar.contains(event.target) && navbar.classList.contains('expanded')) {
-            shrinkNavbar();
-        }
-    });
-});
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const slider = document.querySelector('.categories-slider');
-            const prevBtn = document.querySelector('.prev-btn');
-            const nextBtn = document.querySelector('.next-btn');
-    
-            prevBtn.addEventListener('click', () => {
-                slider.scrollBy({ left: -240, behavior: 'smooth' });
+                // Funzione per espandere la navbar
+                const expandNavbar = () => {
+                    navbar.classList.remove('shrink');
+                    navbar.classList.add('expanded');
+                };
+
+                // Funzione per ridurre la navbar
+                const shrinkNavbar = () => {
+                    navbar.classList.remove('expanded');
+                    navbar.classList.add('shrink');
+                };
+
+                // Aggiungi eventi di click sulle etichette
+                priceLabel.addEventListener('click', expandNavbar);
+                ratingLabel.addEventListener('click', expandNavbar);
+
+                // Riduci la navbar quando si clicca fuori
+                document.addEventListener('click', (event) => {
+                    if (!navbar.contains(event.target) && navbar.classList.contains('expanded')) {
+                        shrinkNavbar();
+                    }
+                });
             });
-    
-            nextBtn.addEventListener('click', () => {
-                slider.scrollBy({ left: 240, behavior: 'smooth' });
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const slider = document.querySelector('.categories-slider');
+                const prevBtn = document.querySelector('.prev-btn');
+                const nextBtn = document.querySelector('.next-btn');
+        
+                prevBtn.addEventListener('click', () => {
+                    slider.scrollBy({ left: -240, behavior: 'smooth' });
+                });
+        
+                nextBtn.addEventListener('click', () => {
+                    slider.scrollBy({ left: 240, behavior: 'smooth' });
+                });
             });
-        });
-    </script>
+        </script>
  
-    <footer class="footer">
-    <div class="footer-content">
-        <div class="footer-section about">
-            <h2>Chi Siamo</h2>
-            <p>Informazioni sull'azienda, la missione e i valori.</p>
-        </div>
-        <div class="footer-section contact">
-            <h2>Contatti</h2>
-            <p>Email: info@example.com</p>
-            <p>Telefono: +39 123 456 789</p>
-        </div>
-    </div>
-    <div class="footer-bottom">
-        &copy; 2025 Sitarello. All rights reserved.
-    </div>
-    </footer>
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section about">
+                    <h2>Chi Siamo</h2>
+                    <p>Informazioni sull'azienda, la missione e i valori.</p>
+                </div>
+                <div class="footer-section contact">
+                    <h2>Contatti</h2>
+                    <p>Email: info@example.com</p>
+                    <p>Telefono: +39 123 456 789</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                © 2025 Sitarello. All rights reserved.
+            </div>
+        </footer>
     </body>
-    
 </html>

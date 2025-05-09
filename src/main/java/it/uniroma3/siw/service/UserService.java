@@ -18,23 +18,35 @@ public class UserService {
 
     @Transactional
     public Users saveUser(Users user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword())); // Crittografa la password
-        return userRepository.save(user); // Salva l'utente nel database
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
     }
 
-    // Verifica se un'email è già registrata
+    @Transactional
+    public Users updateUser(Users user) {
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        return userRepository.save(user);
+    }
+
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
 
-    // Trova un utente tramite email
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
     public Users findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    // Trova un utente tramite username o email
+    public Users findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
     public Users findByUsernameOrEmail(String usernameOrEmail) {
-        // Cerca l'utente per email o username
         Users user = userRepository.findByEmail(usernameOrEmail);
         if (user == null) {
             user = userRepository.findByUsername(usernameOrEmail);
@@ -42,9 +54,7 @@ public class UserService {
         return user;
     }
 
-    // Verifica se la password fornita corrisponde a quella salvata
     public boolean checkPassword(Users user, String rawPassword) {
         return passwordEncoder.matches(rawPassword, user.getPassword());
     }
 }
-

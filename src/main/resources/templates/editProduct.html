@@ -3,14 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modifica Prodotto</title>
     <link rel="stylesheet" href="/css/stile.css">
 </head>
 <body>
-    <header>
-        <h1>Modifica Prodotto</h1>
-    </header>
+    <div class="header">
+        <!-- Logo e titolo -->
+        <div class="start">
+            <div class="logoNome">
+                <a href="/">
+                    <img class="logo" src="/immagini/logoSiw.png" alt="Logo LearnLab" />
+                </a>
+                <a href="/" class="home-link">
+                    <h1>LearnLab</h1>
+                </a>
+            </div>
+        </div>
+
+        <!-- Controlla se l'utente è loggato -->
+        <div th:if="${session.loggedUser == null}">
+            <a href="/login" class="login-button">Accedi</a>
+        </div>
+        <div th:if="${session.loggedUser != null}" class="dropdown">
+            <button class="dropdown-button">
+                Benvenuto, <span th:text="${session.loggedUser.username}">Utente</span>
+            </button>
+            <div class="dropdown-content">
+                <a href="/settings">Impostazioni</a>
+                <a href="/formNewProduct">Aggiungi Prodotto</a>
+                <a href="/my-products">Vedi i tuoi Prodotti</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </div>
+        
     <main>
+        <h1>Modifica Prodotto</h1>
+
         <a th:href="${redirectUrl}" class="back-button">Torna Indietro</a>
         <form th:action="@{/product/update/{id}(id=${product.id})}" method="POST" th:object="${product}">
             <input type="hidden" name="redirectUrl" th:value="${redirectUrl}" />
@@ -33,5 +61,21 @@
             <button type="submit">Salva</button>
         </form>
     </main>
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section about">
+                <h2>Chi Siamo</h2>
+                <p>Informazioni sull'azienda, la missione e i valori.</p>
+            </div>
+            <div class="footer-section contact">
+                <h2>Contatti</h2>
+                <p>Email: info@example.com</p>
+                <p>Telefono: +39 123 456 789</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2025 Sitarello. All rights reserved.
+        </div>
+        </footer>
 </body>
 </html>

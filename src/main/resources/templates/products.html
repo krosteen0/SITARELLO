@@ -4,56 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Risultati Ricerca</title>
-    <link rel="stylesheet" href="/css/products.css">
+    
+    <link rel="stylesheet" href="/css/stile.css">
 </head>
 <body>
-    <div class="mainNav">
-        <div class="header">
-            <!-- Logo e titolo -->
-            <div class="start">
-                <div class="logoNome">
-                    <a href="/">
-                        <img class="logo" src="/immagini/logoSiw.png" alt="Logo LearnLab" />
-                    </a>
-                    <a href="/" class="home-link">
-                        <h1>LearnLab</h1>
-                    </a>
-                </div>
+    <div class="header">
+        <!-- Logo e titolo -->
+        <div class="start">
+            <div class="logoNome">
+                <a href="/">
+                    <img class="logo" src="/immagini/logoSiw.png" alt="Logo LearnLab" />
+                </a>
+                <a href="/" class="home-link">
+                    <h1>LearnLab</h1>
+                </a>
             </div>
         </div>
-        <!-- Navbar -->
-        <div class="nav-container">
-            <div class="navbar-search shrink">
-                <form action="/products" method="GET" class="search-form">
-                    <select name="categoria" class="search-select">
-                        <option value="" disabled selected>Seleziona una categoria</option>
-                        <option value="1">Categoria 1</option>
-                        <option value="2">Categoria 2</option>
-                        <option value="3">Categoria 3</option>
-                        <option value="4">Categoria 4</option>
-                    </select>
-                    <span class="price-label">Prezzo</span>
-                    <div class="price-slider">
-                        <label for="price">Prezzo:</label>
-                        <input type="range" id="price" name="price" min="0" max="100" value="100">
-                    </div>
-                    <span class="rating-label">Rating</span>
-                    <div class="rating-stars">
-                        <div class="stars">
-                            <input type="radio" id="star5" name="rating" value="5">
-                            <label for="star5">★</label>
-                            <input type="radio" id="star4" name="rating" value="4">
-                            <label for="star4">★</label>
-                            <input type="radio" id="star3" name="rating" value="3">
-                            <label for="star3">★</label>
-                            <input type="radio" id="star2" name="rating" value="2">
-                            <label for="star2">★</label>
-                            <input type="radio" id="star1" name="rating" value="1">
-                            <label for="star1">★</label>
-                        </div>
-                    </div>
-                    <button type="submit" class="search-button">Cerca</button>
-                </form>
+
+        <!-- Controlla se l'utente è loggato -->
+        <div th:if="${session.loggedUser == null}">
+            <a href="/login" class="login-button">Accedi</a>
+        </div>
+        <div th:if="${session.loggedUser != null}" class="dropdown">
+            <button class="dropdown-button">
+                Benvenuto, <span th:text="${session.loggedUser.username}">Utente</span>
+            </button>
+            <div class="dropdown-content">
+                <a href="/settings">Impostazioni</a>
+                <a href="/formNewProduct">Aggiungi Prodotto</a>
+                <a href="/my-products">Vedi i tuoi Prodotti</a>
+                <a href="/logout">Logout</a>
             </div>
         </div>
     </div>
@@ -91,9 +71,9 @@
             </div>
         </div>
         <div class="footer-bottom">
-            © 2025 Sitarello. All rights reserved.
+            &copy; 2025 Sitarello. All rights reserved.
         </div>
-    </footer>
+        </footer>
     <script>
         window.addEventListener("scroll", function () {
             const navbar = document.querySelector(".navbar-search");

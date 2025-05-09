@@ -67,10 +67,17 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
+		<!-- Jakarta Bean Validation API -->
+<dependency>
+    <groupId>jakarta.validation</groupId>
+    <artifactId>jakarta.validation-api</artifactId>
+</dependency>
+
+<!-- Hibernate Validator (implementazione di Jakarta Validation) -->
+<dependency>
+    <groupId>org.hibernate.validator</groupId>
+    <artifactId>hibernate-validator</artifactId>
+</dependency>
 	</dependencies>
 
 	<build>

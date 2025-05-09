@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Impostazioni</title>
+        <link rel="stylesheet" href="/css/stile.css" />
+        <link rel="stylesheet" href="https://use.typekit.net/your-font-kit-id.css">
+    </head>
+    <body>
+            <div class="header">
+                <!-- Logo e titolo -->
+                <div class="start">
+                    <div class="logoNome">
+                        <a href="/">
+                            <img class="logo" src="/immagini/logoSiw.png" alt="Logo LearnLab" />
+                        </a>
+                        <a href="/" class="home-link">
+                            <h1>LearnLab</h1>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Controlla se l'utente è loggato -->
+                <div th:if="${session.loggedUser == null}">
+                    <a href="/login" class="login-button">Accedi</a>
+                </div>
+                <div th:if="${session.loggedUser != null}" class="dropdown">
+                    <button class="dropdown-button">
+                        Benvenuto, <span th:text="${session.loggedUser.username}">Utente</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="/settings">Impostazioni</a>
+                        <a href="/formNewProduct">Aggiungi Prodotto</a>
+                        <a href="/my-products">Vedi i tuoi Prodotti</a>
+                        <a href="/logout">Logout</a>
+                    </div>
+                </div>
+            </div>
+
+        <!-- Sezione Impostazioni -->
+        <div class="settings-section">
+            <h2>Impostazioni Account</h2>
+            <div th:if="${session.loggedUser == null}">
+                <p>Devi essere loggato per accedere alle impostazioni. <a href="/login">Accedi</a></p>
+            </div>
+            <div th:if="${session.loggedUser != null}" class="settings-form-container">
+                <form action="/settings" method="POST" class="settings-form">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" th:value="${session.loggedUser.username}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" th:value="${session.loggedUser.email}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Nuova Password (lascia vuoto per non modificare)</label>
+                        <input type="password" id="password" name="password">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Conferma Nuova Password</label>
+                        <input type="password" id="confirm-password" name="confirm-password">
+                    </div>
+                    <button type="submit" class="save-button">Salva Modifiche</button>
+                </form>
+            </div>
+        </div>
+
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section about">
+                    <h2>Chi Siamo</h2>
+                    <p>Informazioni sull'azienda, la missione e i valori.</p>
+                </div>
+                <div class="footer-section contact">
+                    <h2>Contatti</h2>
+                    <p>Email: info@example.com</p>
+                    <p>Telefono: +39 123 456 789</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                © 2025 Sitarello. All rights reserved.
+            </div>
+        </footer>
+    </body>
+</html>

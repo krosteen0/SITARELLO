@@ -9,6 +9,8 @@ import it.uniroma3.siw.model.Users;
 public interface UserRepository extends JpaRepository<Users, Long> {
     boolean existsByEmail(String email);
 
+    boolean existsByUsername(String username);
+
     Users findByEmail(String email);
 
     Users findByUsername(String username);

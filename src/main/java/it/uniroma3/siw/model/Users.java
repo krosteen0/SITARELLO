@@ -5,17 +5,27 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 
 @Entity
-
 public class Users {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @NotBlank(message = "L'email è obbligatoria")
+    @Email(message = "Formato email non valido")
     private String email;
+
+    @NotBlank(message = "Lo username è obbligatorio")
+    @Size(min = 3, max = 20, message = "Lo username deve essere tra 3 e 20 caratteri")
     private String username;
+
+    @NotBlank(message = "La password è obbligatoria")
     private String password;
 
     @Transient // Non salvare nel database

@@ -4,9 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/stile.css" />
-    <title>Login</title>
 </head>
 <body>
+    <div class="header">
+        <!-- Logo e titolo -->
+        <div class="start">
+            <div class="logoNome">
+                <a href="/">
+                    <img class="logo" src="/immagini/logoSiw.png" alt="Logo LearnLab" />
+                </a>
+                <a href="/" class="home-link">
+                    <h1>LearnLab</h1>
+                </a>
+            </div>
+        </div>
+
+        <!-- Controlla se l'utente è loggato -->
+        <div th:if="${session.loggedUser == null}">
+            <a href="/login" class="login-button">Accedi</a>
+        </div>
+        <div th:if="${session.loggedUser != null}" class="dropdown">
+            <button class="dropdown-button">
+                Benvenuto, <span th:text="${session.loggedUser.username}">Utente</span>
+            </button>
+            <div class="dropdown-content">
+                <a href="/settings">Impostazioni</a>
+                <a href="/formNewProduct">Aggiungi Prodotto</a>
+                <a href="/my-products">Vedi i tuoi Prodotti</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </div>
+
     <h1>Login</h1>
 
     <!-- Mostra il messaggio di successo -->
@@ -15,7 +44,6 @@
     </div>
 
     <form th:action="@{/login}" method="POST" th:object="${user}" class="auth-form">
-        <h2>Login</h2>
 
         <label for="usernameOrEmail">Username o Email:</label>
         <input type="text" id="usernameOrEmail" th:field="*{usernameOrEmail}" placeholder="Inserisci il tuo username o email" required>
@@ -27,5 +55,22 @@
     </form>
     <!-- Link per la registrazione -->
     <p>Non hai un account? <a href="/registration">Registrati qui</a></p>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section about">
+                <h2>Chi Siamo</h2>
+                <p>Informazioni sull'azienda, la missione e i valori.</p>
+            </div>
+            <div class="footer-section contact">
+                <h2>Contatti</h2>
+                <p>Email: info@example.com</p>
+                <p>Telefono: +39 123 456 789</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2025 Sitarello. All rights reserved.
+        </div>
+        </footer>
 </body>
 </html>
