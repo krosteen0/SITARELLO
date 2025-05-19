@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/stile.css">
+    <link rel="stylesheet" href="/css/stile.css" />
 </head>
 <body>
     <div class="header">
-        <!-- Logo e titolo -->
         <div class="start">
             <div class="logoNome">
                 <a href="/">
@@ -18,8 +17,6 @@
                 </a>
             </div>
         </div>
-
-        <!-- Controlla se l'utente è loggato -->
         <div th:if="${session.loggedUser == null}">
             <a href="/login" class="login-button">Accedi</a>
         </div>
@@ -37,30 +34,46 @@
             </div>
         </div>
     </div>
-        
     <main>
         <h1>Modifica Prodotto</h1>
-
-        <a th:href="${redirectUrl}" class="back-button">Torna Indietro</a>
-        <form th:action="@{/product/update/{id}(id=${product.id})}" method="POST" th:object="${product}">
+        <div th:if="${successMessage}" class="notification success" id="successNotification">
+            <p th:text="${successMessage}"></p>
+            <button class="close-btn" onclick="closeNotification('successNotification')">×</button>
+        </div>
+        <div th:if="${errorMessage}" class="notification error" id="errorNotification">
+            <p th:text="${errorMessage}"></p>
+            <button class="close-btn" onclick="closeNotification('errorNotification')">×</button>
+        </div>
+        <form th:action="@{/product/update/{id}(id=${productId})}" method="POST" th:object="${productForm}" class="form-container" enctype="multipart/form-data">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <input type="hidden" name="redirectUrl" th:value="${redirectUrl}" />
-    
-            <label for="nome">Nome:</label>
-            <input type="text" id="nome" th:field="*{nome}" required />
-
-            <label for="categoria">Categoria:</label>
-            <input type="text" id="categoria" th:field="*{categoria}" required />
-
-            <label for="prezzo">Prezzo:</label>
-            <input type="number" id="prezzo" th:field="*{prezzo}" step="0.01" required />
-
-            <label for="descrizione">Descrizione:</label>
-            <textarea id="descrizione" th:field="*{descrizione}"></textarea>
-
-            <label for="foto">Foto:</label>
-            <input type="text" id="foto" th:field="*{foto}" />
-
-            <button type="submit">Salva</button>
+            <div class="form-group">
+                <label for="nome">Nome:</label>
+                <input required type="text" id="nome" th:field="*{nome}" placeholder="Nome del prodotto" />
+                <span th:errors="*{nome}" class="error"></span>
+            </div>
+            <div class="form-group">
+                <label for="categoria">Categoria:</label>
+                <input required type="text" id="categoria" th:field="*{categoria}" placeholder="Categoria" />
+                <span th:errors="*{categoria}" class="error"></span>
+            </div>
+            <div class="form-group">
+                <label for="prezzo">Prezzo:</label>
+                <input required type="number" id="prezzo" step="0.01" th:field="*{prezzo}" placeholder="Prezzo" />
+                <span th:errors="*{prezzo}" class="error"></span>
+            </div>
+            <div class="form-group">
+                <label for="descrizione">Descrizione:</label>
+                <textarea id="descrizione" th:field="*{descrizione}" placeholder="Descrizione del prodotto"></textarea>
+                <span th:errors="*{descrizione}" class="error"></span>
+            </div>
+            <div class="form-group">
+                <label for="images">Immagini aggiuntive (max 10 totali):</label>
+                <input type="file" id="images" name="images" multiple accept="image/*" />
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn">Conferma</button>
+            </div>
         </form>
     </main>
     <footer class="footer">
@@ -76,8 +89,32 @@
             </div>
         </div>
         <div class="footer-bottom">
-            &copy; 2025 Sitarello. All rights reserved.
+            © 2025 Sitarello. All rights reserved.
         </div>
-        </footer>
+    </footer>
+    <script>
+        function closeNotification(notificationId) {
+            const notification = document.getElementById(notificationId);
+            if (notification) {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 500);
+            }
+        }
+        setTimeout(() => {
+            const successNotification = document.getElementById('successNotification');
+            if (successNotification) closeNotification('successNotification');
+            const errorNotification = document.getElementById('errorNotification');
+            if (errorNotification) closeNotification('errorNotification');
+        }, 5000);
+
+        document.getElementById('images').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const validFiles = Array.from(files).filter(file => file.size > 0);
+            if (validFiles.length > 10) {
+                alert('Puoi caricare al massimo 10 immagini.');
+                e.target.value = '';
+            }
+        });
+    </script>
 </body>
 </html>

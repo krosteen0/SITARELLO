@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -54,9 +54,16 @@
                     <p th:text="'Prezzo: €' + ${product.prezzo}">Prezzo</p>
                     <p th:text="${product.descrizione}">Descrizione</p>
                     <p th:text="${#numbers.formatDecimal(product.averageRating, 1, 1).replace(',', '.')}+ ' ★'">Rating</p>
-                    <img th:src="${product.foto}" alt="Foto del prodotto" class="product-image" />
+                    <!-- Mostra la prima immagine, se esiste -->
+                    <div th:if="${not product.images.isEmpty()}">
+                        <img th:src="${product.images[0].filePath}" alt="Foto del prodotto" class="product-image" />
+                    </div>
+                    <div th:unless="${not product.images.isEmpty()}">
+                        <p>Nessuna immagine disponibile</p>
+                    </div>
                     <a th:href="@{/product/edit/{id}(id=${product.id}, redirectUrl='/my-products')}" class="edit-button">Modifica</a>
                     <form th:action="@{/product/delete/{id}(id=${product.id})}" method="POST" onsubmit="return confirm('Sei sicuro di voler rimuovere questo prodotto?');">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                         <button type="submit" class="remove-button">Rimuovi</button>
                     </form>
                 </li>
@@ -76,8 +83,8 @@
             </div>
         </div>
         <div class="footer-bottom">
-            &copy; 2025 Sitarello. All rights reserved.
+            © 2025 Sitarello. All rights reserved.
         </div>
-        </footer>
+    </footer>
 </body>
 </html>

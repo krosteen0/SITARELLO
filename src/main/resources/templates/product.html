@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +8,6 @@
 </head>
 <body>
     <div class="header">
-        <!-- Logo e titolo -->
         <div class="start">
             <div class="logoNome">
                 <a href="/">
@@ -19,8 +18,6 @@
                 </a>
             </div>
         </div>
-
-        <!-- Controlla se l'utente è loggato -->
         <div th:if="${session.loggedUser == null}">
             <a href="/login" class="login-button">Accedi</a>
         </div>
@@ -46,26 +43,24 @@
                 <p th:text="'Categoria: ' + ${product.categoria}">Categoria</p>
                 <p th:text="'Prezzo: €' + ${product.prezzo}">Prezzo</p>
                 <p th:text="${product.descrizione}">Descrizione</p>
-                <img th:src="${product.foto}" alt="Foto del prodotto" class="product-image" />
+                <div class="product-images">
+                    <div th:each="image : ${product.images}">
+                        <p th:text="'Debug filePath: ' + ${image.filePath}">Debug</p>
+                        <img th:src="@{${image.filePath}}" th:alt="'Foto del prodotto ' + ${image.id}" class="product-image" 
+                             th:onerror="'this.src=/immagini/placeholder.png'" />
+                    </div>
+                </div>
             </div>
-            <!-- Mostra la media dei voti per tutti gli utenti -->
             <p th:text="${#numbers.formatDecimal(product.averageRating, 1, 1).replace(',', '.')}+ ' ★'">
                 Rating
             </p>
-
-            <!-- Pulsante per modificare il prodotto -->
             <div th:if="${session.loggedUser != null and session.loggedUser.username == product.autore}">
                 <a th:href="@{/product/edit/{id}(id=${product.id}, redirectUrl=${redirectUrl})}" class="edit-button">Modifica</a>
             </div>
-
-            <!-- Mostra un messaggio di errore se presente -->
             <div th:if="${errorMessage}" class="error-message">
                 <p th:text="${errorMessage}"></p>
             </div>
-
-            <!-- Form per votare o modificare il voto -->
             <div th:if="${session.loggedUser != null and session.loggedUser.username != product.autore}">
-                <!-- Caso in cui l'utente non ha ancora votato -->
                 <div th:unless="${hasRated}">
                     <form th:action="@{/product/{id}/rate(id=${product.id})}" method="POST">
                         <label for="rating">Dai un voto:</label>
@@ -73,7 +68,6 @@
                         <button type="submit">Invia</button>
                     </form>
                 </div>
-                <!-- Caso in cui l'utente ha già votato -->
                 <div th:if="${hasRated}">
                     <p th:text="'Il tuo voto attuale: ' + ${userRating} + ' ★'">Il tuo voto</p>
                     <form th:action="@{/product/{id}/updateRating(id=${product.id})}" method="POST">
