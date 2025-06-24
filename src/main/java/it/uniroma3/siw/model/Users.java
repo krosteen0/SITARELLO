@@ -13,8 +13,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-@Entity
-@Table(name = "users") // Explicitly map to 'users' table
+@Entity(name = "Users")
+@Table(name = "users")
 public class Users {
 
     @Id
