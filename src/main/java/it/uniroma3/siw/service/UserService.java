@@ -12,14 +12,14 @@ import it.uniroma3.siw.repository.UserRepository;
 
 @Service
 public class UserService {
-
+    
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
-
+    
     @Autowired
     private UserRepository userRepository;
-
+    
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
+    
     @Transactional
     public Users saveUser(Users user) {
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
@@ -34,12 +34,12 @@ public class UserService {
         logger.info("Utente salvato: username={}", savedUser.getUsername());
         return savedUser;
     }
-
+    
     @Transactional
     public Users updateUser(Users user) {
         // Carica l'entità esistente dal database per mantenere la password attuale
         Users existingUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Utente non trovato: " + user.getUsername()));
+        .orElseThrow(() -> new IllegalArgumentException("Utente non trovato: " + user.getUsername()));
         
         // Aggiorna la password solo se è stata fornita una nuova password valida
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
@@ -55,48 +55,49 @@ public class UserService {
         logger.info("Utente aggiornato: username={}, password: [protected]", savedUser.getUsername());
         return savedUser;
     }
-
+    
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
-
+    
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
     }
-
+    
     public Users findByEmail(String email) {
         Users user = userRepository.findByEmail(email);
         if (user != null) {
             // Calcola la media delle recensioni dei prodotti
-            Double averageRating = userRepository.findAverageRatingByUserId(user.getId());
+            Double averageRating = userRepository.findAverageRatingByAutore(user.getId());
             user.setAverageRating(averageRating != null ? averageRating : 0.0);
         }
         return user;
     }
-
+    
     public Users findByUsername(String username) {
         Users user = userRepository.findByUsername(username);
         if (user != null) {
             // Calcola la media delle recensioni dei prodotti
-            Double averageRating = userRepository.findAverageRatingByUserId(user.getId());
+            Double averageRating = userRepository.findAverageRatingByAutore(user.getId());
             user.setAverageRating(averageRating != null ? averageRating : 0.0);
         }
         return user;
     }
-
+    
     public Users findByUsernameOrEmail(String usernameOrEmail) {
-        Users user = userRepository.findByEmail(usernameOrEmail);
-        if (user == null) {
-            user = userRepository.findByUsername(usernameOrEmail);
+        Users user = userRepository.findByUsernameOrEmail(usernameOrEmail);
+        if (user != null) {
+            Double averageRating = userRepository.findAverageRatingByAutore(user.getId());
+            user.setAverageRating(averageRating != null ? averageRating : 0.0);
         }
-        Double averageRating = userRepository.findAverageRatingByUserId(user.getId());
         return user;
     }
-
+    
+    
     public boolean checkPassword(Users user, String rawPassword) {
         if (user == null || user.getPassword() == null || rawPassword == null) {
             logger.warn("Parametri non validi per checkPassword: user={}, rawPassword={}", 
-                        user != null ? user.getUsername() : "null", rawPassword != null ? "[provided]" : "null");
+            user != null ? user.getUsername() : "null", rawPassword != null ? "[provided]" : "null");
             return false;
         }
         try {
@@ -106,7 +107,7 @@ public class UserService {
             return matches;
         } catch (Exception e) {
             logger.error("Errore durante la verifica della password per utente {}: {}", 
-                         user.getUsername(), e.getMessage(), e);
+            user.getUsername(), e.getMessage(), e);
             return false;
         }
     }
