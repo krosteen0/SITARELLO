@@ -1,5 +1,7 @@
 package it.uniroma3.siw.controller;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,14 +10,17 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import it.uniroma3.siw.model.ChangePasswordDTO;
 import it.uniroma3.siw.model.LoginDTO;
+import it.uniroma3.siw.model.Product;
 import it.uniroma3.siw.model.UserSettingsDTO;
 import it.uniroma3.siw.model.Users;
 import it.uniroma3.siw.service.UserService;
+import it.uniroma3.siw.service.ProductService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
@@ -26,6 +31,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private ProductService productService;
 
     // Mostra il modulo di registrazione
     @GetMapping("/registration")
@@ -296,5 +303,26 @@ public String changePassword(@ModelAttribute @Valid ChangePasswordDTO changePass
             model.addAttribute("loggedUser", loggedUser);
             return "profile";
         }
+    }
+
+    @GetMapping("/publicProfile/{username}")
+    public String showPublicProfile(@PathVariable String username, Model model) {
+        // Cerca l'utente per username
+        Users user = userService.findByUsername(username);
+
+        if (user == null) {
+            // Se l'utente non esiste, aggiungi un attributo per il messaggio di errore
+            model.addAttribute("user", null);
+            return "publicProfile"; // Il template gestirà il caso user == null
+        }
+
+        // Recupera i prodotti dell'utente
+        List<Product> products = productService.findProductsByAutore(user.getUsername());
+
+        // Aggiungi i dati al modello per il template
+        model.addAttribute("user", user);
+        model.addAttribute("products", products);
+
+        return "publicProfile";
     }
 }
