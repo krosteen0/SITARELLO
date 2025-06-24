@@ -1,5 +1,6 @@
 package it.uniroma3.siw.controller;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import it.uniroma3.siw.model.UserSettingsDTO;
 import it.uniroma3.siw.model.Users;
 import it.uniroma3.siw.service.UserService;
 import it.uniroma3.siw.service.ProductService;
+import it.uniroma3.siw.repository.ProductRepository;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
@@ -33,6 +35,9 @@ public class UserController {
     private UserService userService;
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     // Mostra il modulo di registrazione
     @GetMapping("/registration")
@@ -307,22 +312,13 @@ public String changePassword(@ModelAttribute @Valid ChangePasswordDTO changePass
 
     @GetMapping("/publicProfile/{username}")
     public String showPublicProfile(@PathVariable String username, Model model) {
-        // Cerca l'utente per username
         Users user = userService.findByUsername(username);
-
-        if (user == null) {
-            // Se l'utente non esiste, aggiungi un attributo per il messaggio di errore
-            model.addAttribute("user", null);
-            return "publicProfile"; // Il template gestirà il caso user == null
-        }
-
-        // Recupera i prodotti dell'utente
-        List<Product> products = productService.findProductsByAutore(user.getUsername());
-
-        // Aggiungi i dati al modello per il template
         model.addAttribute("user", user);
-        model.addAttribute("products", products);
-
-        return "publicProfile";
+        if (user != null) {
+            model.addAttribute("products", productRepository.findByAutore(user.getUsername()));
+        } else {
+            model.addAttribute("products", Collections.emptyList());
+        }
+        return "publicProfile"; // Nome del template
     }
 }

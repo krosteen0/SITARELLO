@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
@@ -34,12 +35,15 @@ public class Product {
     @Transient
     private Double averageRating;
 
-    private String autore;
+    private String autore; // Retained as String (e.g., for author name)
 
     private String descrizione;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images;
+
+    @ManyToOne
+    private Users users; // New field to reference Users entity
 
     public Product() {
         this.images = new ArrayList<>();
@@ -53,7 +57,7 @@ public class Product {
         return ratings.stream().mapToDouble(Rating::getValue).average().orElse(0.0);
     }
 
-    // Getters e Setters
+    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getNome() { return nome; }
@@ -70,4 +74,6 @@ public class Product {
     public void setDescrizione(String descrizione) { this.descrizione = descrizione; }
     public List<ProductImage> getImages() { return images; }
     public void setImages(List<ProductImage> images) { this.images = images; }
+    public Users getUsers() { return users; }
+    public void setUsers(Users users) { this.users = users; }
 }

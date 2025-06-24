@@ -19,4 +19,8 @@ public interface UserRepository extends JpaRepository<Users, Long> {
 
     @Query("SELECT u FROM Users u WHERE u.username = :usernameOrEmail OR u.email = :usernameOrEmail")
     Users findByUsernameOrEmail(@Param("usernameOrEmail") String usernameOrEmail);
+
+    // Query per calcolare la media delle recensioni dei prodotti di un utente
+    @Query("SELECT AVG(r.value) FROM Rating r JOIN r.product p WHERE p.users.id = :userId AND r.value IS NOT NULL")
+    Double findAverageRatingByUserId(@Param("userId") Long userId);
 }

@@ -65,11 +65,23 @@ public class UserService {
     }
 
     public Users findByEmail(String email) {
-        return userRepository.findByEmail(email);
+        Users user = userRepository.findByEmail(email);
+        if (user != null) {
+            // Calcola la media delle recensioni dei prodotti
+            Double averageRating = userRepository.findAverageRatingByUserId(user.getId());
+            user.setAverageRating(averageRating != null ? averageRating : 0.0);
+        }
+        return user;
     }
 
     public Users findByUsername(String username) {
-        return userRepository.findByUsername(username);
+        Users user = userRepository.findByUsername(username);
+        if (user != null) {
+            // Calcola la media delle recensioni dei prodotti
+            Double averageRating = userRepository.findAverageRatingByUserId(user.getId());
+            user.setAverageRating(averageRating != null ? averageRating : 0.0);
+        }
+        return user;
     }
 
     public Users findByUsernameOrEmail(String usernameOrEmail) {
@@ -77,6 +89,7 @@ public class UserService {
         if (user == null) {
             user = userRepository.findByUsername(usernameOrEmail);
         }
+        Double averageRating = userRepository.findAverageRatingByUserId(user.getId());
         return user;
     }
 

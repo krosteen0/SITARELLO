@@ -46,6 +46,7 @@
             <div class="profile-info">
                 <h3>Informazioni Utente</h3>
                 <p><strong>Username:</strong> <span th:text="${user.username}">N/A</span></p>
+                <p th:text="${user.averageRating != null} ? ${#numbers.formatDecimal(user.averageRating, 1, 1).replace(',', '.')} + ' ★' : 'Nessuna recensione'">Rating Medio</p>
             </div>
             <div class="products-section">
                 <h3>Prodotti</h3>
