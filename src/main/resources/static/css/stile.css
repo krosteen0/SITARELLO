@@ -944,3 +944,49 @@ form button:hover {
 .save-button:hover {
     background-color: #0056b3;
 }
+
+/* Stile per la griglia delle immagini */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 1em;
+}
+
+.image-slot {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: #fafafa;
+    position: relative;
+}
+
+.product-image {
+    max-width: 100px;
+    max-height: 100px;
+    margin-bottom: 8px;
+}
+
+.add-image-label {
+    cursor: pointer;
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.add-btn {
+    font-size: 1.2em;
+}
+
+.remove-btn {
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+}

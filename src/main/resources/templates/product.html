@@ -45,7 +45,6 @@
                 <p th:text="${product.descrizione}">Descrizione</p>
                 <div class="product-images">
                     <div th:each="image : ${product.images}">
-                        <p th:text="'Debug filePath: ' + ${image.filePath}">Debug</p>
                         <img th:src="@{${image.filePath}}" th:alt="'Foto del prodotto ' + ${image.id}" class="product-image" 
                              th:onerror="'this.src=/immagini/placeholder.png'" />
                     </div>

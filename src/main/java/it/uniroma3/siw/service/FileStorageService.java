@@ -50,4 +50,15 @@ public class FileStorageService {
             throw new RuntimeException("Impossibile salvare il file " + fileName, ex);
         }
     }
+
+    public void deleteFile(String filePath) throws Exception {
+        try {
+            Path path = Paths.get(filePath);
+            Files.deleteIfExists(path);
+            logger.info("File {} deleted successfully", filePath);
+        } catch (Exception e) {
+            logger.error("Failed to delete file {}: {}", filePath, e.getMessage());
+            throw e;
+        }
+    }
 }

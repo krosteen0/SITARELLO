@@ -44,7 +44,7 @@
             <p th:text="${errorMessage}"></p>
             <button class="close-btn" onclick="closeNotification('errorNotification')">×</button>
         </div>
-        <form th:action="@{/product}" method="POST" th:object="${productForm}" class="form-container" enctype="multipart/form-data">
+        <form th:action="@{/product/update/{id}(id=${productId})}" method="POST" th:object="${productForm}" class="form-container" enctype="multipart/form-data">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <div class="form-group">
                 <label for="nome">Nome:</label>
@@ -74,6 +74,23 @@
                 <button type="submit" class="btn">Conferma</button>
             </div>
         </form>
+        <div class="image-grid">
+            <div th:each="image : ${productImages}" class="image-slot">
+                <img th:src="@{${image.filePath}}" alt="Immagine Prodotto" />
+                <!-- Form di rimozione FUORI dal form principale -->
+            </div>
+        </div>
+        <!-- Form di rimozione immagini, fuori dal form principale -->
+        <div class="image-grid">
+            <div th:each="image : ${productImages}" class="image-slot">
+                <img th:src="@{${image.filePath}}" alt="Immagine Prodotto" />
+                <form th:action="@{/product/{id}/remove-image(id=${productId})}" method="POST" style="display:inline;">
+                    <input type="hidden" name="imageId" th:value="${image.id}" />
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" class="remove-btn">Rimuovi</button>
+                </form>
+            </div>
+        </div>
     </main>
     <footer class="footer">
         <div class="footer-content">
