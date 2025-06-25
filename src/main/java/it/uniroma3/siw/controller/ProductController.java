@@ -1,6 +1,8 @@
 package it.uniroma3.siw.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,13 +82,13 @@ public class ProductController {
     
     @GetMapping("/formNewProduct")
     public String showNewProductForm(Model model, HttpSession session) {
-        Users loggedUser = (Users) session.getAttribute("loggedUser");
-        if (loggedUser == null) {
-            logger.warn("Utente non loggato, redirect a /login");
-            return "redirect:/login";
+        List<ProductImage> tempImages = (List<ProductImage>) session.getAttribute("tempImages");
+        if (tempImages == null || tempImages.size() != 10) {
+            tempImages = new ArrayList<>(Collections.nCopies(10, null));
+            session.setAttribute("tempImages", tempImages);
         }
         model.addAttribute("productForm", new ProductForm());
-        logger.debug("Form per nuovo prodotto inizializzato");
+        model.addAttribute("tempImages", tempImages);
         return "formNewProduct";
     }
     
@@ -94,7 +96,6 @@ public class ProductController {
     public String addProduct(
     @Valid @ModelAttribute("productForm") ProductForm productForm,
     BindingResult bindingResult,
-    @RequestParam(value = "images", required = false) List<MultipartFile> images,
     HttpSession session,
     Model model) {
         logger.debug("Inizio elaborazione POST /product");
@@ -105,30 +106,36 @@ public class ProductController {
             return "redirect:/login";
         }
         
-        // Validate number of images
-        long validImagesCount = images.stream().filter(image -> !image.isEmpty()).count();
-        logger.debug("Numero di immagini valide: {}", validImagesCount);
+        // Recupera le immagini temporanee dalla sessione
+        Object tempImagesObj = session.getAttribute("tempImages");
+        List<ProductImage> tempImages = null;
+        if (tempImagesObj instanceof List<?> list) {
+            tempImages = list.stream()
+            .filter(ProductImage.class::isInstance)
+            .map(ProductImage.class::cast)
+            .toList();
+        }
+        
+        // *** SOLO QUI controlla il numero di immagini ***
+        // Conta solo le immagini non null
+        long validImagesCount = (tempImages != null)
+            ? tempImages.stream().filter(img -> img != null).count()
+            : 0;
         if (validImagesCount < 2 || validImagesCount > 10) {
-            logger.warn("Numero di immagini non valido: {}", validImagesCount);
             model.addAttribute("errorMessage", "Devi caricare tra 2 e 10 immagini valide.");
             model.addAttribute("productForm", productForm);
+            model.addAttribute("tempImages", tempImages);
             return "formNewProduct";
         }
         
-        // Validate form fields
         if (bindingResult.hasErrors()) {
-            StringBuilder errors = new StringBuilder("Errori di validazione: ");
-            for (ObjectError error : bindingResult.getAllErrors()) {
-                errors.append(error.getDefaultMessage()).append("; ");
-            }
-            logger.warn(errors.toString());
             model.addAttribute("errorMessage", "Errore nei dati inseriti. Controlla i campi.");
             model.addAttribute("productForm", productForm);
+            model.addAttribute("tempImages", tempImages);
             return "formNewProduct";
         }
         
         try {
-            // Create new Product from ProductForm
             Product product = new Product();
             product.setNome(productForm.getNome());
             product.setCategoria(productForm.getCategoria());
@@ -136,24 +143,23 @@ public class ProductController {
             product.setDescrizione(productForm.getDescrizione());
             product.setAutore(loggedUser);
             
-            // Process uploaded images
-            for (MultipartFile image : images) {
-                if (!image.isEmpty()) {
-                    String filePath = fileStorageService.storeFile(image);
-                    ProductImage productImage = new ProductImage();
-                    productImage.setFilePath(filePath);
+            // Associa le immagini temporanee al prodotto
+            if (tempImages != null) {
+                for (ProductImage productImage : tempImages) {
                     productImage.setProduct(product);
                     product.getImages().add(productImage);
                 }
             }
             
             productService.saveProduct(product);
+            session.removeAttribute("tempImages"); // Pulisci la sessione
             logger.info("Prodotto creato con successo: {}", product.getNome());
             return "redirect:/my-products";
         } catch (Exception e) {
             logger.error("Errore durante la creazione del prodotto", e);
             model.addAttribute("errorMessage", "Errore durante la creazione del prodotto: " + e.getMessage());
             model.addAttribute("productForm", productForm);
+            model.addAttribute("tempImages", tempImages);
             return "formNewProduct";
         }
     }
@@ -229,8 +235,8 @@ public class ProductController {
         
         // Validate number of images
         long validImagesCount = (images != null)
-            ? images.stream().filter(image -> !image.isEmpty()).count()
-            : 0;
+        ? images.stream().filter(image -> !image.isEmpty()).count()
+        : 0;
         if (validImagesCount + existingProduct.getImages().size() > 10) {
             logger.warn("Numero di immagini non valido: {} (totale con esistenti: {})", validImagesCount, validImagesCount + existingProduct.getImages().size());
             model.addAttribute("errorMessage", "Il numero totale di immagini non può superare 10.");
@@ -319,7 +325,7 @@ public class ProductController {
         return "product";
     }
     
-    @PostMapping("/product/{id}/add-image")
+    @PostMapping("/product/add-image")
     public String addProductImage(@PathVariable Long id,
     @RequestParam("image") MultipartFile image,
     @RequestParam(required = false) String redirectUrl,
@@ -369,5 +375,58 @@ public class ProductController {
             redirectAttributes.addFlashAttribute("errorMessage", "Errore durante la rimozione dell'immagine.");
         }
         return "redirect:/product/edit/" + id;
+    }
+    
+    @PostMapping("/product/add-image-temp")
+    public String addImageTemp(@RequestParam("image") MultipartFile image,
+                           @RequestParam("slotIndex") int slotIndex,
+                           HttpSession session, Model model) {
+    Users loggedUser = (Users) session.getAttribute("loggedUser");
+    if (loggedUser == null) {
+        return "redirect:/login";
+    }
+    // Recupera o inizializza la lista di 10 slot
+    List<ProductImage> tempImages = (List<ProductImage>) session.getAttribute("tempImages");
+    if (tempImages == null || tempImages.size() != 10) {
+        tempImages = new ArrayList<>(Collections.nCopies(10, null));
+    }
+    if (image != null && !image.isEmpty() && slotIndex >= 0 && slotIndex < 10) {
+        String filePath = fileStorageService.storeFile(image);
+        ProductImage productImage = new ProductImage();
+        productImage.setFilePath(filePath);
+        tempImages.set(slotIndex, productImage);
+        // Dopo aver modificato tempImages
+        while (tempImages.size() < 10) tempImages.add(null);
+        if (tempImages.size() > 10) tempImages = tempImages.subList(0, 10);
+        session.setAttribute("tempImages", tempImages);
+    }
+    return "redirect:/formNewProduct";
+}
+    
+    @PostMapping("/product/remove-image-temp")
+    public String removeImageTemp(@RequestParam("slotIndex") int slotIndex, HttpSession session, Model model) {
+        Users loggedUser = (Users) session.getAttribute("loggedUser");
+        if (loggedUser == null) {
+            logger.warn("Utente non loggato, redirect a /login");
+            return "redirect:/login";
+        }
+        List<ProductImage> tempImages = null;
+        Object tempImagesObj = session.getAttribute("tempImages");
+        if (tempImagesObj instanceof List<?> list) {
+            tempImages = new ArrayList<>();
+            for (Object obj : list) {
+                if (obj instanceof ProductImage pi) {
+                    tempImages.add(pi);
+                } else {
+                    tempImages.add(null);
+                }
+            }
+        }
+        if (tempImages != null && slotIndex >= 0 && slotIndex < tempImages.size()) {
+            tempImages.set(slotIndex, null);
+            session.setAttribute("tempImages", tempImages);
+            logger.info("Immagine temporanea rimossa dallo slot {}", slotIndex);
+        }
+        return "redirect:/formNewProduct";
     }
 }

@@ -59,7 +59,8 @@
             <div th:if="${errorMessage}" class="error-message">
                 <p th:text="${errorMessage}"></p>
             </div>
-            <div th:if="${session.loggedUser != null and session.loggedUser.username != product.autore}">
+            <!-- Mostra il form di rating solo se l'utente NON è l'autore -->
+            <div th:if="${session.loggedUser != null and session.loggedUser.id != product.autore.id}">
                 <div th:unless="${hasRated}">
                     <form th:action="@{/product/{id}/rate(id=${product.id})}" method="POST">
                         <label for="rating">Dai un voto:</label>
@@ -71,10 +72,15 @@
                     <p th:text="'Il tuo voto attuale: ' + ${userRating} + ' ★'">Il tuo voto</p>
                     <form th:action="@{/product/{id}/updateRating(id=${product.id})}" method="POST">
                         <label for="newRating">Modifica il tuo voto:</label>
-                        <input type="number" id="newRating" name="value" step="0.1" min="0" max="5" th:value="${userRating}" required>
+                        <input type="number" id="newRating" name="value" step="0.1" min="1" max="5" th:value="${userRating}" required>
                         <button type="submit">Modifica</button>
                     </form>
                 </div>
+            </div>
+            <div>
+                <span>Autore: </span>
+                <a th:href="@{/publicProfile/{username}(username=${product.autore.username})}"
+                   th:text="${product.autore.username}">Autore</a>
             </div>
         </section>
     </main>
