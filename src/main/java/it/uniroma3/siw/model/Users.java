@@ -41,7 +41,7 @@ public class Users {
     @Transient
     private Double averageRating;
 
-    @OneToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "autore")
     private List<Product> products;
 
     // Getters and Setters

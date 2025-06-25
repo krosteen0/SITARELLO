@@ -34,7 +34,7 @@ public class RatingController {
             return "redirect:/products";
         }
 
-        if (product.getAutore().equals(loggedUser.getUsername())) {
+        if (product.getAutore().equals(loggedUser)) {
             model.addAttribute("errorMessage", "Non puoi votare il tuo prodotto.");
             return "redirect:/product/" + id;
         }
@@ -60,7 +60,7 @@ public class RatingController {
             return "redirect:/products";
         }
 
-        if (product.getAutore().equals(loggedUser.getUsername())) {
+        if (product.getAutore().equals(loggedUser)) {
             model.addAttribute("errorMessage", "Non puoi votare il tuo prodotto.");
             return "redirect:/product/" + id;
         }

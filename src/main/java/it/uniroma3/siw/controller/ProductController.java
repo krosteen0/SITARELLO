@@ -134,7 +134,7 @@ public class ProductController {
             product.setCategoria(productForm.getCategoria());
             product.setPrezzo(productForm.getPrezzo());
             product.setDescrizione(productForm.getDescrizione());
-            product.setAutore(loggedUser.getUsername());
+            product.setAutore(loggedUser);
             
             // Process uploaded images
             for (MultipartFile image : images) {
@@ -165,7 +165,7 @@ public class ProductController {
             return "redirect:/login";
         }
         Product product = productService.findById(id);
-        if (product != null && product.getAutore().equals(loggedUser.getUsername())) {
+        if (product != null && product.getAutore().equals(loggedUser)) {
             productService.deleteProduct(id);
         } else {
             model.addAttribute("errorMessage", "Non puoi rimuovere questo prodotto.");
@@ -179,7 +179,7 @@ public class ProductController {
         if (loggedUser == null) {
             return "redirect:/login";
         }
-        List<Product> myProducts = productService.findProductsByAutore(loggedUser.getUsername());
+        List<Product> myProducts = productService.findProductsByAutore(loggedUser);
         model.addAttribute("products", myProducts);
         model.addAttribute("redirectUrl", request.getRequestURI());
         return "myProducts";
@@ -192,7 +192,7 @@ public class ProductController {
             return "redirect:/login";
         }
         Product product = productService.findById(id);
-        if (product == null || !product.getAutore().equals(loggedUser.getUsername())) {
+        if (product == null || !product.getAutore().equals(loggedUser)) {
             return "redirect:/my-products";
         }
         // Convert Product to ProductForm
@@ -223,7 +223,7 @@ public class ProductController {
         }
         
         Product existingProduct = productService.findById(id);
-        if (existingProduct == null || !existingProduct.getAutore().equals(loggedUser.getUsername())) {
+        if (existingProduct == null || !existingProduct.getAutore().equals(loggedUser)) {
             return "redirect:/my-products";
         }
         
@@ -328,7 +328,7 @@ public class ProductController {
         Users loggedUser = (Users) session.getAttribute("loggedUser");
         if (loggedUser == null) return "redirect:/login";
         Product product = productService.findById(id);
-        if (product == null || !product.getAutore().equals(loggedUser.getUsername())) return "redirect:/my-products";
+        if (product == null || !product.getAutore().equals(loggedUser)) return "redirect:/my-products";
         if (image != null && !image.isEmpty() && product.getImages().size() < 10) {
             String filePath = fileStorageService.storeFile(image);
             ProductImage productImage = new ProductImage();
@@ -350,7 +350,7 @@ public class ProductController {
             return "redirect:/login";
         }
         Product product = productService.findById(id);
-        if (product == null || !product.getAutore().equals(loggedUser.getUsername())) {
+        if (product == null || !product.getAutore().equals(loggedUser)) {
             redirectAttributes.addFlashAttribute("errorMessage", "Prodotto non trovato o non autorizzato.");
             return "redirect:/my-products";
         }

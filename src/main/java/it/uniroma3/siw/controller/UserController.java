@@ -1,7 +1,6 @@
 package it.uniroma3.siw.controller;
 
 import java.util.Collections;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import it.uniroma3.siw.model.ChangePasswordDTO;
 import it.uniroma3.siw.model.LoginDTO;
-import it.uniroma3.siw.model.Product;
 import it.uniroma3.siw.model.UserSettingsDTO;
 import it.uniroma3.siw.model.Users;
 import it.uniroma3.siw.service.UserService;
-import it.uniroma3.siw.service.ProductService;
 import it.uniroma3.siw.repository.ProductRepository;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -33,8 +30,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-    @Autowired
-    private ProductService productService;
 
     @Autowired
     private ProductRepository productRepository;
@@ -236,7 +231,7 @@ public String changePassword(@ModelAttribute @Valid ChangePasswordDTO changePass
         return "editPassword";
     } catch (Exception e) {
         logger.error("Errore durante il cambio password per utente {}: {}", 
-                     loggedUser != null ? loggedUser.getUsername() : "null", e.getMessage(), e);
+                     loggedUser.getUsername(), e.getMessage(), e);
         model.addAttribute("errorMessage", "Errore durante il cambio password: " + e.getMessage());
         return "editPassword";
     }
@@ -315,7 +310,7 @@ public String changePassword(@ModelAttribute @Valid ChangePasswordDTO changePass
         Users user = userService.findByUsername(username);
         model.addAttribute("user", user);
         if (user != null) {
-            model.addAttribute("products", productRepository.findByAutore(user.getUsername()));
+            model.addAttribute("products", productRepository.findByAutore(user));
         } else {
             model.addAttribute("products", Collections.emptyList());
         }

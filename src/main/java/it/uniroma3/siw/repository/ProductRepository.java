@@ -6,9 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import it.uniroma3.siw.model.Product;
+import it.uniroma3.siw.model.Users;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategoria(String categoria);
-    List<Product> findByAutore(String autore);
+    List<Product> findByAutore(Users autore);
 }

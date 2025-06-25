@@ -10,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 
@@ -32,18 +31,13 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Rating> ratings;
 
-    @Transient
-    private Double averageRating;
-
-    private String autore; // Retained as String (e.g., for author name)
+    @ManyToOne
+    private Users autore; // Retained as String (e.g., for author name)
 
     private String descrizione;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images;
-
-    @ManyToOne
-    private Users users; // New field to reference Users entity
 
     public Product() {
         this.images = new ArrayList<>();
@@ -66,14 +60,12 @@ public class Product {
     public void setCategoria(String categoria) { this.categoria = categoria; }
     public Double getPrezzo() { return prezzo; }
     public void setPrezzo(Double prezzo) { this.prezzo = prezzo; }
-    public String getAutore() { return autore; }
-    public void setAutore(String autore) { this.autore = autore; }
+    public Users getAutore() { return autore; }
+    public void setAutore(Users autore) { this.autore = autore; }
     public List<Rating> getRatings() { return ratings; }
     public void setRatings(List<Rating> ratings) { this.ratings = ratings; }
     public String getDescrizione() { return descrizione; }
     public void setDescrizione(String descrizione) { this.descrizione = descrizione; }
     public List<ProductImage> getImages() { return images; }
     public void setImages(List<ProductImage> images) { this.images = images; }
-    public Users getUsers() { return users; }
-    public void setUsers(Users users) { this.users = users; }
 }

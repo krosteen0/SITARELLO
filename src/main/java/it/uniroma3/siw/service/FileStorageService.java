@@ -8,7 +8,6 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +20,6 @@ public class FileStorageService {
 
     private final Path fileStorageLocation;
 
-    @Autowired
     public FileStorageService(FileStorageProperties fileStorageProperties) {
         this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir()).toAbsolutePath().normalize();
         try {
@@ -30,7 +28,7 @@ public class FileStorageService {
                 throw new RuntimeException("La directory " + this.fileStorageLocation + " non è scrivibile.");
             }
             logger.info("Directory di upload configurata: {}", this.fileStorageLocation);
-        } catch (Exception ex) {
+        } catch (IOException | SecurityException ex) {
             throw new RuntimeException("Impossibile creare la directory per i file: " + fileStorageProperties.getUploadDir(), ex);
         }
     }
@@ -51,12 +49,12 @@ public class FileStorageService {
         }
     }
 
-    public void deleteFile(String filePath) throws Exception {
+    public void deleteFile(String filePath) throws IOException, SecurityException {
         try {
             Path path = Paths.get(filePath);
             Files.deleteIfExists(path);
             logger.info("File {} deleted successfully", filePath);
-        } catch (Exception e) {
+        } catch (IOException | SecurityException e) {
             logger.error("Failed to delete file {}: {}", filePath, e.getMessage());
             throw e;
         }

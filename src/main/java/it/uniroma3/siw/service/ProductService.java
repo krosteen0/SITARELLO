@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import it.uniroma3.siw.model.Product;
 import it.uniroma3.siw.model.ProductImage;
+import it.uniroma3.siw.model.Users;
 import it.uniroma3.siw.repository.ProductImageRepository;
 import it.uniroma3.siw.repository.ProductRepository;
 
@@ -109,7 +110,7 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    public List<Product> findProductsByAutore(String autore) {
+    public List<Product> findProductsByAutore(Users autore) {
         logger.debug("Recupero prodotti per autore: {}", autore);
         List<Product> products = productRepository.findByAutore(autore);
         products.forEach(product -> {
