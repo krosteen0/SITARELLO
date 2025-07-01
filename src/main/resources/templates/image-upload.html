@@ -2,7 +2,7 @@
 <html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Login Utente</title>
+    <title>Caricamento Immagini Prodotto</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
 </head>
 <body>
@@ -42,26 +42,50 @@
         </nav>
     </header>
     <main class="container">
-        <h1>Login Utente</h1>
-        <form th:action="@{/login}" method="post">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required />
-            </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required />
-            </div>
-            <div th:if="${param.error}" class="error">
-                Username o password errati.
-            </div>
-            <button type="submit">Accedi</button>
+        <h1>Caricamento Immagini Prodotto</h1>
+        <form id="imageForm" th:action="@{/product/create/images}" method="post" enctype="multipart/form-data">
+            <p class="info">Carica da 2 a 10 immagini per il prodotto.</p>
+            <input type="file" id="images" name="images" accept="image/*" multiple required
+                   onchange="validateImages(this)" />
+            <p id="imageCount">Immagini selezionate: 0</p>
+            <p id="errorMessage" class="error" th:text="${errorMessage}"></p>
+            <div id="imagePreview" class="image-preview"></div>
+            <button type="submit" id="forwardButton" disabled>Avanti</button>
         </form>
-        <p>Non hai un account? <a th:href="@{/users/register}">Registrati</a></p>
     </main>
     <footer class="footer">
         <p>© 2025 Gestione Prodotti. Tutti i diritti riservati.</p>
     </footer>
+
+    <script>
+        function validateImages(input) {
+            const files = input.files;
+            const count = files.length;
+            const errorMessage = document.getElementById('errorMessage');
+            const imageCount = document.getElementById('imageCount');
+            const forwardButton = document.getElementById('forwardButton');
+            const imagePreview = document.getElementById('imagePreview');
+
+            imageCount.textContent = `Immagini selezionate: ${count}`;
+            imagePreview.innerHTML = '';
+
+            if (count < 2) {
+                errorMessage.textContent = 'Seleziona almeno 2 immagini.';
+                forwardButton.disabled = true;
+            } else if (count > 10) {
+                errorMessage.textContent = 'Puoi selezionare un massimo di 10 immagini.';
+                forwardButton.disabled = true;
+            } else {
+                errorMessage.textContent = '';
+                forwardButton.disabled = false;
+            }
+
+            for (let i = 0; i < count; i++) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(files[i]);
+                imagePreview.appendChild(img);
+            }
+        }
+    </script>
 </body>
 </html>

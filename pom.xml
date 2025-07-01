@@ -7,9 +7,11 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.4</version>
+        <version>3.5.3</version>
         <relativePath/>
     </parent>
+
+    
 
     <groupId>it.uniroma3.siw</groupId>
     <artifactId>siw_movie_01</artifactId>
@@ -22,6 +24,7 @@
     </properties>
 
     <dependencies>
+    
         <!-- Dipendenze Spring Boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -61,6 +64,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.thymeleaf.extras</groupId>
+            <artifactId>thymeleaf-extras-springsecurity6</artifactId>
         </dependency>
 
         <!-- Jakarta Bean Validation API -->

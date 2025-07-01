@@ -28,11 +28,8 @@ public class Product {
     @Positive(message = "Il prezzo deve essere positivo")
     private Double prezzo;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Rating> ratings;
-
     @ManyToOne
-    private Users autore; // Retained as String (e.g., for author name)
+    private Users autore;
 
     private String descrizione;
 
@@ -41,14 +38,6 @@ public class Product {
 
     public Product() {
         this.images = new ArrayList<>();
-        this.ratings = new ArrayList<>();
-    }
-
-    public Double getAverageRating() {
-        if (ratings == null || ratings.isEmpty()) {
-            return 0.0;
-        }
-        return ratings.stream().mapToDouble(Rating::getValue).average().orElse(0.0);
     }
 
     // Getters and Setters
@@ -62,10 +51,8 @@ public class Product {
     public void setPrezzo(Double prezzo) { this.prezzo = prezzo; }
     public Users getAutore() { return autore; }
     public void setAutore(Users autore) { this.autore = autore; }
-    public List<Rating> getRatings() { return ratings; }
-    public void setRatings(List<Rating> ratings) { this.ratings = ratings; }
     public String getDescrizione() { return descrizione; }
     public void setDescrizione(String descrizione) { this.descrizione = descrizione; }
     public List<ProductImage> getImages() { return images; }
-    public void setImages(List<ProductImage> images) { this.images = images; }
+    public void setImages(List<ProductImage> images) { this.images = images != null ? images : new ArrayList<>(); }
 }

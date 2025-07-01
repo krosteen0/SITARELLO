@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${product.nome + ' - Dettagli Prodotto - Sitarello'}">Dettagli Prodotto - Sitarello</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+        .product-detail-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 20px;
+        }
+        
+        .product-images {
+            position: sticky;
+            top: 20px;
+        }
+        
+        .main-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .main-image:hover {
+            transform: scale(1.02);
+        }
+        
+        .image-thumbnails {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        
+        .thumbnail:hover,
+        .thumbnail.active {
+            border-color: #007bff;
+        }
+        
+        .product-info {
+            padding: 20px 0;
+        }
+        
+        .product-title {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .product-price {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        
+        .product-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        
+        .meta-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .meta-item:last-child {
+            border-bottom: none;
+        }
+        
+        .meta-label {
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .meta-value {
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .product-description {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 25px;
+        }
+        
+        .description-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        
+        .description-text {
+            line-height: 1.6;
+            color: #555;
+            font-size: 1.1em;
+        }
+        
+        .seller-info {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        
+        .seller-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+            transform: translateY(-1px);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: #007bff;
+            border: 2px solid #007bff;
+        }
+        
+        .btn-outline:hover {
+            background: #007bff;
+            color: white;
+        }
+        
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb a {
+            color: #007bff;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .breadcrumb span {
+            color: #6c757d;
+            margin: 0 5px;
+        }
+        
+        .no-images {
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            color: #666;
+        }
+        
+        /* Modal per immagini a schermo intero */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+        }
+        
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            max-height: 90%;
+            object-fit: contain;
+        }
+        
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #bbb;
+        }
+        
+        @media (max-width: 968px) {
+            .product-detail-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .product-images {
+                position: static;
+            }
+            
+            .product-title {
+                font-size: 1.8em;
+            }
+            
+            .product-price {
+                font-size: 2em;
+            }
+            
+            .action-buttons {
+                justify-content: stretch;
+            }
+            
+            .btn {
+                flex: 1;
+                min-width: 150px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .product-title {
+                font-size: 1.5em;
+            }
+            
+            .product-price {
+                font-size: 1.8em;
+            }
+            
+            .btn {
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-brand">
+                <a th:href="@{/}">Sitarello</a>
+            </div>
+            <div class="nav-search">
+                <form th:action="@{/products/quick-search}" method="get">
+                    <input type="text" name="q" placeholder="Ricerca rapida..." />
+                    <button type="submit">🔍</button>
+                </form>
+            </div>
+            <div class="nav-links">
+                <!-- Link per utenti autenticati -->
+                <div th:if="${isAuthenticated}">
+                    <a th:href="@{/products}">🛍️ Tutti i Prodotti</a>
+                    <a th:href="@{/users/products}">📦 I Miei Prodotti</a>
+                    <a th:href="@{/product/create/images}">➕ Aggiungi Prodotto</a>
+                    
+                    <!-- Dropdown per utente loggato -->
+                    <div class="dropdown">
+                        <span class="dropdown-toggle">Ciao, <span th:text="${username}">Utente</span></span>
+                        <div class="dropdown-menu">
+                            <a th:href="@{/users/profile}">👤 Profilo</a>
+                            <form th:action="@{/logout}" method="post" class="nav-logout">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit">🚪 Logout</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Link per utenti non autenticati -->
+                <div th:unless="${isAuthenticated}">
+                    <a th:href="@{/products}">🛍️ Esplora Prodotti</a>
+                    <a th:href="@{/users/login}">🔑 Accedi</a>
+                    <a th:href="@{/users/register}">📝 Registrati</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a th:href="@{/}">🏠 Home</a>
+            <span>></span>
+            <a th:href="@{/products}">🛍️ Prodotti</a>
+            <span>></span>
+            <strong th:text="${product.nome}">Prodotto</strong>
+        </div>
+
+        <div class="product-detail-container">
+            <!-- Sezione Immagini -->
+            <div class="product-images">
+                <div th:if="${product.images != null and not #lists.isEmpty(product.images)}">
+                    <!-- Immagine principale -->
+                    <img id="mainImage" 
+                         th:src="@{'/product/image/' + ${product.images[0].id}}" 
+                         th:alt="${product.nome}"
+                         class="main-image"
+                         onclick="openModal(this.src)" />
+                    
+                    <!-- Thumbnails -->
+                    <div class="image-thumbnails" th:if="${#lists.size(product.images) > 1}">
+                        <img th:each="image, iterStat : ${product.images}"
+                             th:src="@{'/product/image/' + ${image.id}}"
+                             th:alt="${product.nome}"
+                             th:class="${iterStat.index == 0} ? 'thumbnail active' : 'thumbnail'"
+                             th:onclick="'changeMainImage(this.src, this)'" />
+                    </div>
+                </div>
+                
+                <div th:if="${product.images == null or #lists.isEmpty(product.images)}" class="no-images">
+                    <h3>📷 Nessuna immagine disponibile</h3>
+                    <p>Il venditore non ha ancora caricato immagini per questo prodotto.</p>
+                </div>
+            </div>
+
+            <!-- Sezione Informazioni -->
+            <div class="product-info">
+                <h1 class="product-title" th:text="${product.nome}">Nome Prodotto</h1>
+                
+                <div class="product-price">
+                    €<span th:text="${#numbers.formatDecimal(product.prezzo, 1, 2)}">0.00</span>
+                </div>
+
+                <!-- Meta informazioni -->
+                <div class="product-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">📂 Categoria:</span>
+                        <span class="meta-value" th:text="${product.categoria}">Categoria</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">🏪 Venditore:</span>
+                        <span class="meta-value" th:text="${product.autore.username}">Venditore</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">🆔 Codice Prodotto:</span>
+                        <span class="meta-value" th:text="${product.id}">#12345</span>
+                    </div>
+                </div>
+
+                <!-- Descrizione -->
+                <div class="product-description" th:if="${product.descrizione != null and not #strings.isEmpty(product.descrizione)}">
+                    <h3 class="description-title">📝 Descrizione</h3>
+                    <div class="description-text" th:text="${product.descrizione}">
+                        Descrizione dettagliata del prodotto...
+                    </div>
+                </div>
+
+                <!-- Informazioni venditore -->
+                <div class="seller-info">
+                    <h3 class="seller-title">
+                        👤 Informazioni Venditore
+                    </h3>
+                    <p><strong>Nome utente:</strong> <span th:text="${product.autore.username}">venditore123</span></p>
+                    <p><strong>Email:</strong> <span th:text="${product.autore.email}">email@example.com</span></p>
+                </div>
+
+                <!-- Pulsanti di azione -->
+                <div class="action-buttons">
+                    <!-- Pulsanti per il proprietario -->
+                    <div th:if="${isOwner}">
+                        <a th:href="@{'/product/edit/' + ${product.id}}" class="btn btn-warning">
+                            ✏️ Modifica Prodotto
+                        </a>
+                        <button onclick="confirmDelete()" class="btn btn-outline" style="color: #dc3545; border-color: #dc3545;">
+                            🗑️ Elimina
+                        </button>
+                    </div>
+                    
+                    <!-- Pulsanti per altri utenti -->
+                    <div th:unless="${isOwner}">
+                        <button class="btn btn-success" onclick="contactSeller()">
+                            💬 Contatta Venditore
+                        </button>
+                        <button class="btn btn-primary" onclick="shareProduct()">
+                            📤 Condividi
+                        </button>
+                    </div>
+                    
+                    <!-- Pulsante sempre disponibile -->
+                    <a th:href="@{/products}" class="btn btn-outline">
+                        ← Torna ai Prodotti
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal per visualizzazione immagini a schermo intero -->
+    <div id="imageModal" class="image-modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <footer class="footer">
+        <p>© 2025 Sitarello. La tua piattaforma di fiducia per il commercio online.</p>
+    </footer>
+
+    <script>
+        // Funzione per cambiare l'immagine principale
+        function changeMainImage(src, thumbnail) {
+            document.getElementById('mainImage').src = src;
+            
+            // Rimuovi la classe active da tutte le thumbnails
+            document.querySelectorAll('.thumbnail').forEach(thumb => {
+                thumb.classList.remove('active');
+            });
+            
+            // Aggiungi la classe active alla thumbnail cliccata
+            thumbnail.classList.add('active');
+        }
+        
+        // Funzione per aprire il modal dell'immagine
+        function openModal(src) {
+            document.getElementById('imageModal').style.display = 'block';
+            document.getElementById('modalImage').src = src;
+        }
+        
+        // Funzione per chiudere il modal
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+        
+        // Chiudi il modal cliccando fuori dall'immagine
+        window.onclick = function(event) {
+            const modal = document.getElementById('imageModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+        
+        // Funzione per contattare il venditore
+        function contactSeller() {
+            const email = /*[[${product.autore.email}]]*/ 'email@example.com';
+            const productName = /*[[${product.nome}]]*/ 'Prodotto';
+            const subject = 'Interesse per: ' + productName;
+            const body = 'Ciao,\n\nSono interessato al tuo prodotto "' + productName + '" su Sitarello.\n\nPotresti fornirmi maggiori informazioni?\n\nGrazie!';
+            
+            window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+        
+        // Funzione per condividere il prodotto
+        function shareProduct() {
+            const productName = /*[[${product.nome}]]*/ 'Prodotto';
+            if (navigator.share) {
+                navigator.share({
+                    title: productName,
+                    text: 'Guarda questo prodotto su Sitarello!',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback per browser che non supportano Web Share API
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    alert('Link copiato negli appunti!');
+                });
+            }
+        }
+        
+        // Funzione per confermare l'eliminazione
+        function confirmDelete() {
+            if (confirm('Sei sicuro di voler eliminare questo prodotto? Questa azione non può essere annullata.')) {
+                // Qui dovresti implementare la logica di eliminazione
+                alert('Funzionalità di eliminazione da implementare');
+            }
+        }
+        
+        // Gestione keyboard per il modal
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

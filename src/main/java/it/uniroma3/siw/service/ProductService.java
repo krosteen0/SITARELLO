@@ -1,161 +1,138 @@
 package it.uniroma3.siw.service;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import it.uniroma3.siw.dto.ProductFormDTO;
 import it.uniroma3.siw.model.Product;
 import it.uniroma3.siw.model.ProductImage;
 import it.uniroma3.siw.model.Users;
 import it.uniroma3.siw.repository.ProductImageRepository;
 import it.uniroma3.siw.repository.ProductRepository;
+import jakarta.servlet.http.HttpSession;
 
 @Service
 public class ProductService {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
-
     @Autowired
     private ProductRepository productRepository;
 
     @Autowired
     private ProductImageRepository productImageRepository;
 
-    @Autowired
-    private FileStorageService fileStorageService;
-
-    public Product findById(Long id) {
-        logger.debug("Ricerca prodotto con ID: {}", id);
-        return productRepository.findById(id)
-                .map(product -> {
-                    // Forza il caricamento delle liste ratings e images
-                    if (product.getRatings() != null) {
-                        product.getRatings().size();
-                    }
-                    if (product.getImages() != null) {
-                        product.getImages().size();
-                    }
-                    logger.debug("Prodotto trovato con ID: {}", id);
-                    return product;
-                })
-                .orElse(null);
-    }
-
-    public void deleteProduct(Long id) {
-        logger.info("Eliminazione prodotto con ID: {}", id);
-        productRepository.deleteById(id);
-        logger.debug("Prodotto con ID {} eliminato con successo", id);
-    }
-
-    public Iterable<Product> getAllProducts() {
-        logger.debug("Recupero di tutti i prodotti");
-        return productRepository.findAll().stream()
-                .peek(product -> {
-                    if (product.getRatings() != null) {
-                        product.getRatings().size();
-                    }
-                    if (product.getImages() != null) {
-                        product.getImages().size();
-                    }
-                })
-                .collect(Collectors.toList());
-    }
-
-    public void saveProduct(Product product) {
-        logger.info("Salvataggio prodotto: {}", product.getNome());
-        productRepository.save(product);
-        logger.debug("Prodotto {} salvato con successo", product.getNome());
-    }
-
-    public List<Product> getProductsByCategoria(String categoria) {
-        logger.debug("Recupero prodotti per categoria: {}", categoria);
-        List<Product> products;
-        if (categoria != null && !categoria.isEmpty()) {
-            products = productRepository.findByCategoria(categoria);
-        } else {
-            products = productRepository.findAll();
+    public void saveImagesToSession(List<MultipartFile> images, HttpSession session) throws IOException {
+        List<byte[]> imageDataList = new ArrayList<>();
+        for (MultipartFile image : images) {
+            if (!image.isEmpty()) {
+                imageDataList.add(image.getBytes());
+            }
         }
-        products.forEach(product -> {
-            if (product.getRatings() != null) {
-                product.getRatings().size();
-            }
-            if (product.getImages() != null) {
-                product.getImages().size();
-            }
-        });
-        logger.debug("Trovati {} prodotti per categoria: {}", products.size(), categoria);
-        return products;
+        session.setAttribute("productImages", imageDataList);
     }
 
-    public List<Product> filterProducts(String categoria, Integer price, Integer rating) {
-        logger.debug("Filtraggio prodotti con categoria: {}, prezzo: {}, rating: {}", categoria, price, rating);
-        List<Product> allProducts = productRepository.findAll();
-        return allProducts.stream()
-                .filter(product -> categoria == null || product.getCategoria().equalsIgnoreCase(categoria))
-                .filter(product -> price == null || product.getPrezzo() <= price)
-                .filter(product -> rating == null || product.getAverageRating() >= rating)
-                .peek(product -> {
-                    if (product.getRatings() != null) {
-                        product.getRatings().size();
-                    }
-                    if (product.getImages() != null) {
-                        product.getImages().size();
-                    }
-                })
-                .collect(Collectors.toList());
-    }
-
-    public List<Product> findProductsByAutore(Users autore) {
-        logger.debug("Recupero prodotti per autore: {}", autore);
-        List<Product> products = productRepository.findByAutore(autore);
-        products.forEach(product -> {
-            if (product.getRatings() != null) {
-                product.getRatings().size();
-            }
-            if (product.getImages() != null) {
-                product.getImages().size();
-            }
-        });
-        logger.debug("Trovati {} prodotti per autore: {}", products.size(), autore);
-        return products;
+    public void saveDetailsToSession(ProductFormDTO productFormDTO, HttpSession session) {
+        session.setAttribute("productDetails", productFormDTO);
     }
 
     @Transactional
-    public void removeImageFromProduct(Product product, Long imageId) {
-        if (product == null || product.getImages() == null) {
-            logger.error("Prodotto o lista immagini nulli per productId: {}", product != null ? product.getId() : null);
-            throw new IllegalArgumentException("Prodotto o immagini non validi");
+    public Product saveProduct(ProductFormDTO productFormDTO, List<byte[]> imageDataList, Users autore) {
+        Product product = new Product();
+        product.setNome(productFormDTO.getNome());
+        product.setCategoria(productFormDTO.getCategoria());
+        product.setDescrizione(productFormDTO.getDescrizione());
+        product.setPrezzo(productFormDTO.getPrezzo());
+        product.setAutore(autore);
+        
+        // Ensure images list is initialized
+        if (product.getImages() == null) {
+            product.setImages(new ArrayList<>());
         }
+        
+        product = productRepository.save(product);
 
-        ProductImage imageToRemove = product.getImages().stream()
-                .filter(img -> img != null && img.getId().equals(imageId))
-                .findFirst()
-                .orElseThrow(() -> {
-                    logger.warn("Immagine con ID {} non trovata per il prodotto {}", imageId, product.getId());
-                    return new IllegalArgumentException("Immagine non trovata");
-                });
-
-        product.getImages().remove(imageToRemove);
-
-        // Elimina eventuali null residui dalla lista
-        product.getImages().removeIf(img -> img == null);
-
-        try {
-            fileStorageService.deleteFile(imageToRemove.getFilePath());
-            logger.info("File fisico {} eliminato con successo", imageToRemove.getFilePath());
-        } catch (Exception e) {
-            logger.warn("Errore durante l'eliminazione del file fisico {}: {}", imageToRemove.getFilePath(), e.getMessage());
+        for (byte[] imageData : imageDataList) {
+            ProductImage image = new ProductImage();
+            image.setImageData(imageData);
+            image.setContentType("image/jpeg"); // Default content type
+            image.setProduct(product);
+            productImageRepository.save(image);
+            product.getImages().add(image);
         }
+        return productRepository.save(product);
+    }
+    
+    @Transactional
+    public Product createProductWithImages(ProductFormDTO productFormDTO, List<String> imagePaths, Users autore) throws IOException {
+        Product product = new Product();
+        product.setNome(productFormDTO.getNome());
+        product.setCategoria(productFormDTO.getCategoria());
+        product.setDescrizione(productFormDTO.getDescrizione());
+        product.setPrezzo(productFormDTO.getPrezzo());
+        product.setAutore(autore);
+        
+        // Ensure images list is initialized
+        if (product.getImages() == null) {
+            product.setImages(new ArrayList<>());
+        }
+        
+        product = productRepository.save(product);
 
-        productImageRepository.delete(imageToRemove);
-        logger.info("Immagine con ID {} eliminata dal database", imageId);
-
+        // Create ProductImage entities from image paths
+        for (String imagePath : imagePaths) {
+            // For this implementation, we'll assume imagePaths contains base64 data or file paths
+            // In a real implementation, you'd load the image data from the file system
+            ProductImage image = new ProductImage();
+            // This is a simplified implementation - in reality you'd load from files
+            image.setImageData(imagePath.getBytes()); // Placeholder
+            image.setContentType("image/jpeg"); // Default content type
+            image.setProduct(product);
+            productImageRepository.save(image);
+            product.getImages().add(image);
+        }
+        return productRepository.save(product);
+    }
+    
+    @Transactional
+    public void updateProductImages(Product product, List<MultipartFile> images) throws IOException {
+        // Remove existing images
+        for (ProductImage image : product.getImages()) {
+            productImageRepository.delete(image);
+        }
+        product.getImages().clear();
+        
+        // Add new images
+        for (MultipartFile image : images) {
+            if (!image.isEmpty()) {
+                ProductImage productImage = new ProductImage();
+                productImage.setImageData(image.getBytes());
+                productImage.setContentType(image.getContentType());
+                productImage.setProduct(product);
+                productImageRepository.save(productImage);
+                product.getImages().add(productImage);
+            }
+        }
         productRepository.save(product);
-        logger.info("Prodotto con ID {} aggiornato dopo la rimozione dell'immagine", product.getId());
+    }
+    
+    public void updateProductDetails(Product product, ProductFormDTO productFormDTO) {
+        product.setNome(productFormDTO.getNome());
+        product.setCategoria(productFormDTO.getCategoria());
+        product.setDescrizione(productFormDTO.getDescrizione());
+        product.setPrezzo(productFormDTO.getPrezzo());
+        productRepository.save(product);
+    }
+    
+    @Transactional
+    public void deleteProduct(Product product) {
+        // Delete associated images first
+        for (ProductImage image : product.getImages()) {
+            productImageRepository.delete(image);
+        }
+        productRepository.delete(product);
     }
 }

@@ -1,5 +1,6 @@
 package it.uniroma3.siw.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,16 +13,21 @@ public class ProductImage {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String filePath;
+    @Column(columnDefinition = "BYTEA")
+    private byte[] imageData;
+    
+    private String contentType;
 
     @ManyToOne
     private Product product;
 
-    // Getters e Setters
+    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public String getFilePath() { return filePath; }
-    public void setFilePath(String filePath) { this.filePath = filePath; }
+    public byte[] getImageData() { return imageData; }
+    public void setImageData(byte[] imageData) { this.imageData = imageData; }
+    public String getContentType() { return contentType; }
+    public void setContentType(String contentType) { this.contentType = contentType; }
     public Product getProduct() { return product; }
     public void setProduct(Product product) { this.product = product; }
 }

@@ -1,432 +1,593 @@
 package it.uniroma3.siw.controller;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Collections;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import it.uniroma3.siw.dto.ProductFormDTO;
 import it.uniroma3.siw.model.Product;
-import it.uniroma3.siw.model.ProductForm;
 import it.uniroma3.siw.model.ProductImage;
 import it.uniroma3.siw.model.Users;
-import it.uniroma3.siw.service.FileStorageService;
+import it.uniroma3.siw.repository.ProductImageRepository;
+import it.uniroma3.siw.repository.ProductRepository;
+import it.uniroma3.siw.repository.UsersRepository;
 import it.uniroma3.siw.service.ProductService;
-import it.uniroma3.siw.service.RatingService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
+@RequestMapping("/product")
 public class ProductController {
-    
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
-    
+
     @Autowired
     private ProductService productService;
-    
+
     @Autowired
-    private RatingService ratingService;
-    
+    private ProductImageRepository productImageRepository;
+
     @Autowired
-    private FileStorageService fileStorageService;
-    
-    @GetMapping("/products/categoria")
-    public String getProductsByCategoria(
-    @RequestParam(required = false) String categoria,
-    Model model) {
-        List<Product> prodotti = productService.getProductsByCategoria(categoria);
-        model.addAttribute("products", prodotti);
-        model.addAttribute("categoria", categoria);
-        model.addAttribute("redirectUrl", categoria != null ? "/products/categoria?categoria=" + categoria : "/products");
-        return "products";
+    private ProductRepository productRepository;
+
+    @Autowired
+    private UsersRepository usersRepository;
+
+    private void addAuthenticationAttributes(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAuthenticated = auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser");
+        
+        model.addAttribute("isAuthenticated", isAuthenticated);
+        if (isAuthenticated && auth != null) {
+            model.addAttribute("username", auth.getName());
+        }
     }
-    
-    @GetMapping("/products")
-    public String searchProducts(
-    @RequestParam(required = false) String categoria,
-    @RequestParam(required = false) Integer price,
-    @RequestParam(required = false) Integer rating,
-    Model model) {
-        List<Product> filteredProducts = productService.filterProducts(categoria, price, rating);
-        model.addAttribute("products", filteredProducts);
-        StringBuilder redirectUrl = new StringBuilder("/products");
-        boolean hasParams = false;
-        if (categoria != null) {
-            redirectUrl.append(hasParams ? "&" : "?").append("categoria=").append(categoria);
-            hasParams = true;
-        }
-        if (price != null) {
-            redirectUrl.append(hasParams ? "&" : "?").append("price=").append(price);
-            hasParams = true;
-        }
-        if (rating != null) {
-            redirectUrl.append(hasParams ? "&" : "?").append("rating=").append(rating);
-        }
-        model.addAttribute("redirectUrl", redirectUrl.toString());
-        return "products";
-    }
-    
-    @GetMapping("/formNewProduct")
-    public String showNewProductForm(Model model, HttpSession session) {
-        List<ProductImage> tempImages = (List<ProductImage>) session.getAttribute("tempImages");
-        if (tempImages == null || tempImages.size() != 10) {
-            tempImages = new ArrayList<>(Collections.nCopies(10, null));
-            session.setAttribute("tempImages", tempImages);
-        }
-        model.addAttribute("productForm", new ProductForm());
-        model.addAttribute("tempImages", tempImages);
-        return "formNewProduct";
-    }
-    
-    @PostMapping("/product")
-    public String addProduct(
-    @Valid @ModelAttribute("productForm") ProductForm productForm,
-    BindingResult bindingResult,
-    HttpSession session,
-    Model model) {
-        logger.debug("Inizio elaborazione POST /product");
-        
-        Users loggedUser = (Users) session.getAttribute("loggedUser");
-        if (loggedUser == null) {
-            logger.warn("Utente non loggato, redirect a /login");
-            return "redirect:/login";
-        }
-        
-        // Recupera le immagini temporanee dalla sessione
-        Object tempImagesObj = session.getAttribute("tempImages");
-        List<ProductImage> tempImages = null;
-        if (tempImagesObj instanceof List<?> list) {
-            tempImages = list.stream()
-            .filter(ProductImage.class::isInstance)
-            .map(ProductImage.class::cast)
-            .toList();
-        }
-        
-        // *** SOLO QUI controlla il numero di immagini ***
-        // Conta solo le immagini non null
-        long validImagesCount = (tempImages != null)
-            ? tempImages.stream().filter(img -> img != null).count()
-            : 0;
-        if (validImagesCount < 2 || validImagesCount > 10) {
-            model.addAttribute("errorMessage", "Devi caricare tra 2 e 10 immagini valide.");
-            model.addAttribute("productForm", productForm);
-            model.addAttribute("tempImages", tempImages);
-            return "formNewProduct";
-        }
-        
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("errorMessage", "Errore nei dati inseriti. Controlla i campi.");
-            model.addAttribute("productForm", productForm);
-            model.addAttribute("tempImages", tempImages);
-            return "formNewProduct";
-        }
-        
-        try {
-            Product product = new Product();
-            product.setNome(productForm.getNome());
-            product.setCategoria(productForm.getCategoria());
-            product.setPrezzo(productForm.getPrezzo());
-            product.setDescrizione(productForm.getDescrizione());
-            product.setAutore(loggedUser);
-            
-            // Associa le immagini temporanee al prodotto
-            if (tempImages != null) {
-                for (ProductImage productImage : tempImages) {
-                    productImage.setProduct(product);
-                    product.getImages().add(productImage);
+
+    private Users getAuthenticatedUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser")) {
+            try {
+                // Prova prima il cast diretto
+                if (auth.getPrincipal() instanceof Users) {
+                    return (Users) auth.getPrincipal();
                 }
+                // Se non funziona, cerca per username nel database
+                String username = auth.getName();
+                return usersRepository.findByUsername(username).orElse(null);
+            } catch (ClassCastException e) {
+                logger.error("Error casting principal to Users: {}", e.getMessage());
+                // Fallback: cerca per username
+                String username = auth.getName();
+                return usersRepository.findByUsername(username).orElse(null);
             }
-            
-            productService.saveProduct(product);
-            session.removeAttribute("tempImages"); // Pulisci la sessione
-            logger.info("Prodotto creato con successo: {}", product.getNome());
-            return "redirect:/my-products";
+        }
+        return null;
+    }
+
+    @GetMapping("/create/images")
+    public String showImageUploadPage(Model model) {
+        addAuthenticationAttributes(model);
+        model.addAttribute("productFormDTO", new ProductFormDTO());
+        logger.debug("Displaying image upload page");
+        return "image-upload";
+    }
+
+    @PostMapping("/create/images")
+    public String handleImageUpload(@RequestParam("images") List<MultipartFile> images,
+                                    HttpSession session, Model model) {
+        try {
+            addAuthenticationAttributes(model);
+            if (images.size() < 2 || images.size() > 10) {
+                model.addAttribute("errorMessage", "Seleziona da 2 a 10 immagini.");
+                return "image-upload";
+            }
+            productService.saveImagesToSession(images, session);
+            logger.debug("Images saved to session successfully");
+            return "redirect:/product/create/details";
+        } catch (IOException e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.error("Error uploading images: {}", sw.toString());
+            model.addAttribute("errorMessage", "Errore durante il caricamento delle immagini: " + e.getMessage());
+            return "image-upload";
+        }
+    }
+
+    @GetMapping("/create/details")
+    public String showCreateDetailsPage(Model model, HttpSession session) {
+        addAuthenticationAttributes(model);
+        List<byte[]> imageDataList = (List<byte[]>) session.getAttribute("productImages");
+        if (imageDataList == null || imageDataList.isEmpty()) {
+            return "redirect:/product/create/images";
+        }
+        model.addAttribute("productFormDTO", new ProductFormDTO());
+        model.addAttribute("imageCount", imageDataList.size());
+        logger.debug("Displaying create details page with {} images", imageDataList.size());
+        return "product-details";
+    }
+
+    @PostMapping("/create/details")
+    public String handleCreateDetails(@Valid @ModelAttribute ProductFormDTO productFormDTO,
+                                      BindingResult result, HttpSession session, Model model) {
+        try {
+            addAuthenticationAttributes(model);
+            List<byte[]> imageDataList = (List<byte[]>) session.getAttribute("productImages");
+            if (imageDataList == null || imageDataList.isEmpty()) {
+                model.addAttribute("errorMessage", "Nessuna immagine trovata. Ricarica le immagini.");
+                return "redirect:/product/create/images";
+            }
+
+            if (result.hasErrors()) {
+                model.addAttribute("imageCount", imageDataList.size());
+                return "product-details";
+            }
+
+            // Passa i dati inseriti e le immagini al riepilogo
+            session.setAttribute("productFormDTO", productFormDTO);
+            model.addAttribute("productFormDTO", productFormDTO);
+            // Crea lista di indici per le immagini temporanee
+            List<Integer> imageIndices = new ArrayList<>();
+            for (int i = 0; i < imageDataList.size(); i++) {
+                imageIndices.add(i);
+            }
+            model.addAttribute("imageIndices", imageIndices);
+            return "summary";
         } catch (Exception e) {
-            logger.error("Errore durante la creazione del prodotto", e);
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.error("Error creating product: {}", sw.toString());
             model.addAttribute("errorMessage", "Errore durante la creazione del prodotto: " + e.getMessage());
-            model.addAttribute("productForm", productForm);
-            model.addAttribute("tempImages", tempImages);
-            return "formNewProduct";
+            return "error";
         }
     }
-    
-    @PostMapping("/product/delete/{id}")
-    public String deleteProduct(@PathVariable Long id, HttpSession session, Model model) {
-        Users loggedUser = (Users) session.getAttribute("loggedUser");
-        if (loggedUser == null) {
-            return "redirect:/login";
-        }
-        Product product = productService.findById(id);
-        if (product != null && product.getAutore().equals(loggedUser)) {
-            productService.deleteProduct(id);
-        } else {
-            model.addAttribute("errorMessage", "Non puoi rimuovere questo prodotto.");
-        }
-        return "redirect:/my-products";
-    }
-    
-    @GetMapping("/my-products")
-    public String getMyProducts(HttpSession session, Model model, HttpServletRequest request) {
-        Users loggedUser = (Users) session.getAttribute("loggedUser");
-        if (loggedUser == null) {
-            return "redirect:/login";
-        }
-        List<Product> myProducts = productService.findProductsByAutore(loggedUser);
-        model.addAttribute("products", myProducts);
-        model.addAttribute("redirectUrl", request.getRequestURI());
-        return "myProducts";
-    }
-    
-    @GetMapping("/product/edit/{id}")
-    public String editProduct(@PathVariable Long id, HttpSession session, Model model, @RequestParam(required = false) String redirectUrl) {
-        Users loggedUser = (Users) session.getAttribute("loggedUser");
-        if (loggedUser == null) {
-            return "redirect:/login";
-        }
-        Product product = productService.findById(id);
-        if (product == null || !product.getAutore().equals(loggedUser)) {
-            return "redirect:/my-products";
-        }
-        // Convert Product to ProductForm
-        ProductForm productForm = new ProductForm();
-        productForm.setNome(product.getNome());
-        productForm.setCategoria(product.getCategoria());
-        productForm.setPrezzo(product.getPrezzo());
-        productForm.setDescrizione(product.getDescrizione());
-        model.addAttribute("productForm", productForm);
-        model.addAttribute("productId", id);
-        model.addAttribute("redirectUrl", redirectUrl);
-        model.addAttribute("productImages", product.getImages() != null ? product.getImages() : List.of()); // AGGIUNGI QUESTA RIGA
-        return "editProduct";
-    }
-    
-    @PostMapping("/product/update/{id}")
-    public String updateProduct(
-    @PathVariable Long id,
-    @Valid @ModelAttribute("productForm") ProductForm productForm,
-    BindingResult bindingResult,
-    @RequestParam(value = "images", required = false) List<MultipartFile> images,
-    @RequestParam(required = false) String redirectUrl,
-    HttpSession session,
-    Model model) {
-        Users loggedUser = (Users) session.getAttribute("loggedUser");
-        if (loggedUser == null) {
-            return "redirect:/login";
-        }
-        
-        Product existingProduct = productService.findById(id);
-        if (existingProduct == null || !existingProduct.getAutore().equals(loggedUser)) {
-            return "redirect:/my-products";
-        }
-        
-        // Validate number of images
-        long validImagesCount = (images != null)
-        ? images.stream().filter(image -> !image.isEmpty()).count()
-        : 0;
-        if (validImagesCount + existingProduct.getImages().size() > 10) {
-            logger.warn("Numero di immagini non valido: {} (totale con esistenti: {})", validImagesCount, validImagesCount + existingProduct.getImages().size());
-            model.addAttribute("errorMessage", "Il numero totale di immagini non può superare 10.");
-            model.addAttribute("productForm", productForm);
-            model.addAttribute("productId", id);
-            model.addAttribute("redirectUrl", redirectUrl);
-            return "editProduct";
-        }
-        
-        // Validate form fields
-        if (bindingResult.hasErrors()) {
-            StringBuilder errors = new StringBuilder("Errori di validazione: ");
-            for (ObjectError error : bindingResult.getAllErrors()) {
-                errors.append(error.getDefaultMessage()).append("; ");
-            }
-            logger.warn(errors.toString());
-            model.addAttribute("errorMessage", "Errore nei dati inseriti. Controlla i campi.");
-            model.addAttribute("productForm", productForm);
-            model.addAttribute("productId", id);
-            model.addAttribute("redirectUrl", redirectUrl);
-            return "editProduct";
-        }
-        
+
+    @PostMapping("/create/confirm")
+    public String confirmCreateProduct(HttpSession session, Model model) {
         try {
-            // Update existing product
-            existingProduct.setNome(productForm.getNome());
-            existingProduct.setCategoria(productForm.getCategoria());
-            existingProduct.setPrezzo(productForm.getPrezzo());
-            existingProduct.setDescrizione(productForm.getDescrizione());
+            addAuthenticationAttributes(model);
+            // Recupera i dati del prodotto e le immagini dalla sessione
+            ProductFormDTO productFormDTO = (ProductFormDTO) session.getAttribute("productFormDTO");
+            List<byte[]> imageDataList = (List<byte[]>) session.getAttribute("productImages");
+            Users authenticatedUser = getAuthenticatedUser();
+            if (productFormDTO == null || imageDataList == null || imageDataList.isEmpty() || authenticatedUser == null) {
+                model.addAttribute("errorMessage", "Dati mancanti o sessione scaduta. Riprova la creazione del prodotto.");
+                return "error";
+            }
+            // Salva il prodotto
+            Product savedProduct = productService.saveProduct(productFormDTO, imageDataList, authenticatedUser);
+            // Pulisci la sessione
+            session.removeAttribute("productFormDTO");
+            session.removeAttribute("productImages");
+            session.removeAttribute("imageIds");
+            // Redirect alla pagina di dettaglio del prodotto
+            return "redirect:/product/" + savedProduct.getId();
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.error("Error confirming product creation: {}", sw.toString());
+            model.addAttribute("errorMessage", "Errore durante la conferma del prodotto: " + e.getMessage());
+            return "error";
+        }
+    }
+
+    @GetMapping("/{id}")
+    @Transactional(readOnly = true)
+    public String showProduct(@PathVariable Long id, Model model) {
+        try {
+            addAuthenticationAttributes(model);
+            Optional<Product> productOpt = productRepository.findByIdWithImages(id);
+            if (productOpt.isEmpty()) {
+                model.addAttribute("errorMessage", "Prodotto non trovato.");
+                return "error";
+            }
+            model.addAttribute("product", productOpt.get());
+            logger.debug("Displaying product with ID: {}", id);
+            return "product-view";
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.error("Error loading product: {}", sw.toString());
+            model.addAttribute("errorMessage", "Errore durante il caricamento del prodotto: " + e.getMessage());
+            return "error";
+        }
+    }
+
+    @GetMapping("/image/{imageId}")
+    @ResponseBody
+    @Transactional(readOnly = true)
+    public org.springframework.http.ResponseEntity<byte[]> getImage(@PathVariable Long imageId) {
+        try {
+            Optional<ProductImage> imageOpt = productImageRepository.findById(imageId);
+            if (imageOpt.isEmpty()) {
+                return org.springframework.http.ResponseEntity.notFound().build();
+            }
+            ProductImage image = imageOpt.get();
             
-            // Process new images
-            if (images != null) {
-                for (MultipartFile image : images) {
-                    if (!image.isEmpty()) {
-                        String filePath = fileStorageService.storeFile(image);
-                        ProductImage productImage = new ProductImage();
-                        productImage.setFilePath(filePath);
-                        productImage.setProduct(existingProduct);
-                        existingProduct.getImages().add(productImage);
-                    }
-                }
+            // Se contentType è null, usa un valore di default
+            String contentType = image.getContentType();
+            if (contentType == null || contentType.isEmpty()) {
+                contentType = "image/jpeg"; // Default content type
             }
             
-            productService.saveProduct(existingProduct);
-            logger.info("Prodotto aggiornato con successo: {}", existingProduct.getNome());
-            return (redirectUrl != null && !redirectUrl.isEmpty()) ? "redirect:" + redirectUrl : "redirect:/my-products";
+            return org.springframework.http.ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(image.getImageData());
         } catch (Exception e) {
-            logger.error("Errore durante l'aggiornamento del prodotto", e);
-            model.addAttribute("errorMessage", "Errore durante l'aggiornamento del prodotto: " + e.getMessage());
-            model.addAttribute("productForm", productForm);
-            model.addAttribute("productId", id);
-            model.addAttribute("redirectUrl", redirectUrl);
-            return "editProduct";
+            logger.error("Error loading image with ID: {}", imageId, e);
+            return org.springframework.http.ResponseEntity.internalServerError().build();
         }
     }
-    
-    @GetMapping("/product/{id}")
-    public String getProduct(
-    @PathVariable Long id,
-    @RequestParam(required = false) String redirectUrl,
-    HttpSession session,
-    HttpServletRequest request,
-    Model model) {
-        Product product = productService.findById(id);
-        if (product == null) {
-            return "redirect:/products";
-        }
-        
-        Users loggedUser = (Users) session.getAttribute("loggedUser");
-        boolean hasRated = loggedUser != null && ratingService.hasUserRatedProduct(loggedUser, product);
-        Double userRating = null;
-        if (hasRated) {
-            userRating = ratingService.getUserRating(loggedUser, product);
-        }
-        
-        String finalRedirectUrl = redirectUrl != null && !redirectUrl.isEmpty() ? redirectUrl : request.getHeader("Referer");
-        if (finalRedirectUrl == null || finalRedirectUrl.contains("/product/" + id)) {
-            finalRedirectUrl = "/products";
-        }
-        
-        model.addAttribute("product", product);
-        model.addAttribute("hasRated", hasRated);
-        model.addAttribute("userRating", userRating);
-        model.addAttribute("redirectUrl", finalRedirectUrl);
-        
-        return "product";
-    }
-    
-    @PostMapping("/product/add-image")
-    public String addProductImage(@PathVariable Long id,
-    @RequestParam("image") MultipartFile image,
-    @RequestParam(required = false) String redirectUrl,
-    HttpSession session,
-    Model model) {
-        Users loggedUser = (Users) session.getAttribute("loggedUser");
-        if (loggedUser == null) return "redirect:/login";
-        Product product = productService.findById(id);
-        if (product == null || !product.getAutore().equals(loggedUser)) return "redirect:/my-products";
-        if (image != null && !image.isEmpty() && product.getImages().size() < 10) {
-            String filePath = fileStorageService.storeFile(image);
-            ProductImage productImage = new ProductImage();
-            productImage.setFilePath(filePath);
-            productImage.setProduct(product);
-            product.getImages().add(productImage);
-            productService.saveProduct(product);
-        }
-        return "redirect:/product/edit/" + id + (redirectUrl != null ? "?redirectUrl=" + redirectUrl : "");
-    }
-    
-    @PostMapping("/product/{id}/remove-image")
-    public String removeProductImage(@PathVariable Long id,
-    @RequestParam("imageId") Long imageId,
-    HttpSession session,
-    RedirectAttributes redirectAttributes) {
-        Users loggedUser = (Users) session.getAttribute("loggedUser");
-        if (loggedUser == null) {
-            return "redirect:/login";
-        }
-        Product product = productService.findById(id);
-        if (product == null || !product.getAutore().equals(loggedUser)) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Prodotto non trovato o non autorizzato.");
-            return "redirect:/my-products";
-        }
-        if (product.getImages().size() <= 2) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Un prodotto deve avere almeno due immagini.");
-            return "redirect:/product/edit/" + id;
-        }
+
+    // Endpoint per pagina di scelta modifica prodotto
+    @GetMapping("/edit/{id}")
+    @Transactional(readOnly = true)
+    public String showEditProductPage(@PathVariable Long id, Model model) {
         try {
-            productService.removeImageFromProduct(product, imageId);
-            redirectAttributes.addFlashAttribute("successMessage", "Immagine rimossa con successo.");
-        } catch (IllegalArgumentException e) {
-            logger.error("Errore durante la rimozione dell'immagine con ID {} per il prodotto {}: {}", imageId, id, e.getMessage());
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-        } catch (Exception e) {
-            logger.error("Errore imprevisto durante la rimozione dell'immagine con ID {} per il prodotto {}", imageId, id, e);
-            redirectAttributes.addFlashAttribute("errorMessage", "Errore durante la rimozione dell'immagine.");
-        }
-        return "redirect:/product/edit/" + id;
-    }
-    
-    @PostMapping("/product/add-image-temp")
-    public String addImageTemp(@RequestParam("image") MultipartFile image,
-                           @RequestParam("slotIndex") int slotIndex,
-                           HttpSession session, Model model) {
-    Users loggedUser = (Users) session.getAttribute("loggedUser");
-    if (loggedUser == null) {
-        return "redirect:/login";
-    }
-    // Recupera o inizializza la lista di 10 slot
-    List<ProductImage> tempImages = (List<ProductImage>) session.getAttribute("tempImages");
-    if (tempImages == null || tempImages.size() != 10) {
-        tempImages = new ArrayList<>(Collections.nCopies(10, null));
-    }
-    if (image != null && !image.isEmpty() && slotIndex >= 0 && slotIndex < 10) {
-        String filePath = fileStorageService.storeFile(image);
-        ProductImage productImage = new ProductImage();
-        productImage.setFilePath(filePath);
-        tempImages.set(slotIndex, productImage);
-        // Dopo aver modificato tempImages
-        while (tempImages.size() < 10) tempImages.add(null);
-        if (tempImages.size() > 10) tempImages = tempImages.subList(0, 10);
-        session.setAttribute("tempImages", tempImages);
-    }
-    return "redirect:/formNewProduct";
-}
-    
-    @PostMapping("/product/remove-image-temp")
-    public String removeImageTemp(@RequestParam("slotIndex") int slotIndex, HttpSession session, Model model) {
-        Users loggedUser = (Users) session.getAttribute("loggedUser");
-        if (loggedUser == null) {
-            logger.warn("Utente non loggato, redirect a /login");
-            return "redirect:/login";
-        }
-        List<ProductImage> tempImages = null;
-        Object tempImagesObj = session.getAttribute("tempImages");
-        if (tempImagesObj instanceof List<?> list) {
-            tempImages = new ArrayList<>();
-            for (Object obj : list) {
-                if (obj instanceof ProductImage pi) {
-                    tempImages.add(pi);
-                } else {
-                    tempImages.add(null);
-                }
+            addAuthenticationAttributes(model);
+            Users authenticatedUser = getAuthenticatedUser();
+            if (authenticatedUser == null) {
+                model.addAttribute("errorMessage", "Devi essere autenticato per modificare un prodotto.");
+                return "error";
             }
+            
+            Optional<Product> productOpt = productRepository.findByIdWithAutore(id);
+            if (productOpt.isEmpty()) {
+                model.addAttribute("errorMessage", "Prodotto non trovato.");
+                return "error";
+            }
+            
+            Product product = productOpt.get();
+            
+            // Verifica che l'autore del prodotto non sia null
+            if (product.getAutore() == null) {
+                logger.error("Product with ID {} has null author", id);
+                model.addAttribute("errorMessage", "Errore: prodotto senza autore.");
+                return "error";
+            }
+            
+            // Verifica che l'utente sia il proprietario del prodotto
+            if (!product.getAutore().getId().equals(authenticatedUser.getId())) {
+                model.addAttribute("errorMessage", "Non hai i permessi per modificare questo prodotto.");
+                return "error";
+            }
+            
+            model.addAttribute("product", product);
+            return "edit-product";
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.error("Error loading edit page: {}", sw.toString());
+            model.addAttribute("errorMessage", "Errore durante il caricamento della pagina di modifica: " + e.getMessage());
+            return "error";
         }
-        if (tempImages != null && slotIndex >= 0 && slotIndex < tempImages.size()) {
-            tempImages.set(slotIndex, null);
-            session.setAttribute("tempImages", tempImages);
-            logger.info("Immagine temporanea rimossa dallo slot {}", slotIndex);
+    }
+
+    // Endpoint per modificare le immagini di un prodotto
+    @GetMapping("/edit/{id}/images")
+    @Transactional(readOnly = true)
+    public String showEditImages(@PathVariable Long id, Model model, HttpSession session) {
+        try {
+            addAuthenticationAttributes(model);
+            Users authenticatedUser = getAuthenticatedUser();
+            if (authenticatedUser == null) {
+                model.addAttribute("errorMessage", "Devi essere autenticato per modificare un prodotto.");
+                return "error";
+            }
+            
+            Optional<Product> productOpt = productRepository.findByIdWithImages(id);
+            if (productOpt.isEmpty()) {
+                model.addAttribute("errorMessage", "Prodotto non trovato.");
+                return "error";
+            }
+            
+            Product product = productOpt.get();
+            
+            // Verifica che l'utente sia il proprietario del prodotto
+            if (!product.getAutore().getId().equals(authenticatedUser.getId())) {
+                model.addAttribute("errorMessage", "Non hai i permessi per modificare questo prodotto.");
+                return "error";
+            }
+            
+            // Salva l'ID del prodotto in sessione per i passaggi successivi
+            session.setAttribute("editingProductId", id);
+            model.addAttribute("product", product);
+            return "edit-images";
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.error("Error loading images for edit: {}", sw.toString());
+            model.addAttribute("errorMessage", "Errore durante il caricamento delle immagini: " + e.getMessage());
+            return "error";
         }
-        return "redirect:/formNewProduct";
+    }
+
+    // Endpoint per modificare i dettagli di un prodotto
+    @GetMapping("/edit/{id}/details")
+    public String showEditDetails(@PathVariable Long id, Model model, HttpSession session) {
+        try {
+            addAuthenticationAttributes(model);
+            Users authenticatedUser = getAuthenticatedUser();
+            if (authenticatedUser == null) {
+                model.addAttribute("errorMessage", "Devi essere autenticato per modificare un prodotto.");
+                return "error";
+            }
+            
+            Optional<Product> productOpt = productRepository.findByIdWithAutore(id);
+            if (productOpt.isEmpty()) {
+                model.addAttribute("errorMessage", "Prodotto non trovato.");
+                return "error";
+            }
+            
+            Product product = productOpt.get();
+            
+            // Verifica che l'autore del prodotto non sia null
+            if (product.getAutore() == null) {
+                logger.error("Product with ID {} has null author", id);
+                model.addAttribute("errorMessage", "Errore: prodotto senza autore.");
+                return "error";
+            }
+            
+            // Verifica che l'utente sia il proprietario del prodotto
+            if (!product.getAutore().getId().equals(authenticatedUser.getId())) {
+                model.addAttribute("errorMessage", "Non hai i permessi per modificare questo prodotto.");
+                return "error";
+            }
+            
+            // Crea un DTO dal prodotto esistente
+            ProductFormDTO productFormDTO = new ProductFormDTO();
+            productFormDTO.setNome(product.getNome());
+            productFormDTO.setCategoria(product.getCategoria());
+            productFormDTO.setDescrizione(product.getDescrizione());
+            productFormDTO.setPrezzo(product.getPrezzo());
+            
+            // Salva l'ID del prodotto in sessione per i passaggi successivi
+            session.setAttribute("editingProductId", id);
+            model.addAttribute("productFormDTO", productFormDTO);
+            model.addAttribute("product", product);
+            return "edit-details";
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.error("Error loading details for edit: {}", sw.toString());
+            model.addAttribute("errorMessage", "Errore durante il caricamento dei dettagli: " + e.getMessage());
+            return "error";
+        }
+    }
+
+    // Endpoint per salvare le modifiche alle immagini
+    @PostMapping("/edit/images")
+    @Transactional
+    public String handleEditImages(@RequestParam("images") List<MultipartFile> images,
+                                   HttpSession session, Model model) {
+        try {
+            addAuthenticationAttributes(model);
+            Long productId = (Long) session.getAttribute("editingProductId");
+            if (productId == null) {
+                model.addAttribute("errorMessage", "Sessione scaduta. Riprova.");
+                return "error";
+            }
+
+            Users authenticatedUser = getAuthenticatedUser();
+            if (authenticatedUser == null) {
+                model.addAttribute("errorMessage", "Devi essere autenticato per modificare un prodotto.");
+                return "error";
+            }
+            
+            Optional<Product> productOpt = productRepository.findByIdWithImages(productId);
+            if (productOpt.isEmpty()) {
+                model.addAttribute("errorMessage", "Prodotto non trovato.");
+                return "error";
+            }
+            
+            Product product = productOpt.get();
+            
+            // Verifica che l'utente sia il proprietario del prodotto
+            if (!product.getAutore().getId().equals(authenticatedUser.getId())) {
+                model.addAttribute("errorMessage", "Non hai i permessi per modificare questo prodotto.");
+                return "error";
+            }
+
+            if (images.size() < 2 || images.size() > 10) {
+                model.addAttribute("errorMessage", "Seleziona da 2 a 10 immagini.");
+                model.addAttribute("product", product);
+                return "edit-images";
+            }
+            
+            // Aggiorna le immagini del prodotto
+            productService.updateProductImages(product, images);
+            session.removeAttribute("editingProductId");
+            
+            logger.debug("Product images updated successfully for ID: {}", productId);
+            return "redirect:/product/" + productId;
+        } catch (IOException e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.error("Error updating images: {}", sw.toString());
+            model.addAttribute("errorMessage", "Errore durante l'aggiornamento delle immagini: " + e.getMessage());
+            return "error";
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.error("Error updating images: {}", sw.toString());
+            model.addAttribute("errorMessage", "Errore durante l'aggiornamento delle immagini: " + e.getMessage());
+            return "error";
+        }
+    }
+
+    // Endpoint per salvare le modifiche ai dettagli
+    @PostMapping("/edit/details")
+    public String handleEditDetails(@Valid @ModelAttribute ProductFormDTO productFormDTO,
+                                    BindingResult result, HttpSession session, Model model) {
+        try {
+            addAuthenticationAttributes(model);
+            Long productId = (Long) session.getAttribute("editingProductId");
+            if (productId == null) {
+                model.addAttribute("errorMessage", "Sessione scaduta. Riprova.");
+                return "error";
+            }
+
+            Users authenticatedUser = getAuthenticatedUser();
+            if (authenticatedUser == null) {
+                model.addAttribute("errorMessage", "Devi essere autenticato per modificare un prodotto.");
+                return "error";
+            }
+            
+            Optional<Product> productOpt = productRepository.findByIdWithAutore(productId);
+            if (productOpt.isEmpty()) {
+                model.addAttribute("errorMessage", "Prodotto non trovato.");
+                return "error";
+            }
+            
+            Product product = productOpt.get();
+            
+            // Verifica che l'autore del prodotto non sia null
+            if (product.getAutore() == null) {
+                logger.error("Product with ID {} has null author", productId);
+                model.addAttribute("errorMessage", "Errore: prodotto senza autore.");
+                return "error";
+            }
+            
+            // Verifica che l'utente sia il proprietario del prodotto
+            if (!product.getAutore().getId().equals(authenticatedUser.getId())) {
+                model.addAttribute("errorMessage", "Non hai i permessi per modificare questo prodotto.");
+                return "error";
+            }
+
+            if (result.hasErrors()) {
+                model.addAttribute("product", product);
+                return "edit-details";
+            }
+            
+            // Aggiorna i dettagli del prodotto
+            productService.updateProductDetails(product, productFormDTO);
+            session.removeAttribute("editingProductId");
+            
+            logger.debug("Product details updated successfully for ID: {}", productId);
+            return "redirect:/product/" + productId;
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.error("Error updating details: {}", sw.toString());
+            model.addAttribute("errorMessage", "Errore durante l'aggiornamento dei dettagli: " + e.getMessage());
+            return "error";
+        }
+    }
+
+    // Endpoint per eliminare un prodotto
+    @PostMapping("/delete/{id}")
+    @Transactional
+    public String deleteProduct(@PathVariable Long id, Model model) {
+        try {
+            addAuthenticationAttributes(model);
+            Users authenticatedUser = getAuthenticatedUser();
+            if (authenticatedUser == null) {
+                model.addAttribute("errorMessage", "Devi essere autenticato per eliminare un prodotto.");
+                return "error";
+            }
+            
+            Optional<Product> productOpt = productRepository.findByIdWithAutore(id);
+            if (productOpt.isEmpty()) {
+                model.addAttribute("errorMessage", "Prodotto non trovato.");
+                return "error";
+            }
+            
+            Product product = productOpt.get();
+            
+            // Verifica che l'autore del prodotto non sia null
+            if (product.getAutore() == null) {
+                logger.error("Product with ID {} has null author", id);
+                model.addAttribute("errorMessage", "Errore: prodotto senza autore.");
+                return "error";
+            }
+            
+            // Verifica che l'utente sia il proprietario del prodotto
+            if (!product.getAutore().getId().equals(authenticatedUser.getId())) {
+                model.addAttribute("errorMessage", "Non hai i permessi per eliminare questo prodotto.");
+                return "error";
+            }
+            
+            productService.deleteProduct(product);
+            logger.debug("Product deleted successfully with ID: {}", id);
+            return "redirect:/users/products";
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.error("Error deleting product: {}", sw.toString());
+            model.addAttribute("errorMessage", "Errore durante l'eliminazione del prodotto: " + e.getMessage());
+            return "error";
+        }
+    }
+
+    @GetMapping("/create/image/{index}")
+    @ResponseBody
+    public org.springframework.http.ResponseEntity<byte[]> getTemporaryImage(@PathVariable int index, HttpSession session) {
+        try {
+            @SuppressWarnings("unchecked")
+            List<byte[]> imageDataList = (List<byte[]>) session.getAttribute("productImages");
+            if (imageDataList == null || index < 0 || index >= imageDataList.size()) {
+                return org.springframework.http.ResponseEntity.notFound().build();
+            }
+            
+            byte[] imageData = imageDataList.get(index);
+            return org.springframework.http.ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(imageData);
+        } catch (Exception e) {
+            logger.error("Error loading temporary image with index: {}", index, e);
+            return org.springframework.http.ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/details/{id}")
+    @Transactional(readOnly = true)
+    public String showProductDetails(@PathVariable Long id, Model model) {
+        try {
+            addAuthenticationAttributes(model);
+            Optional<Product> productOpt = productRepository.findByIdWithImages(id);
+            if (productOpt.isEmpty()) {
+                model.addAttribute("errorMessage", "Prodotto non trovato.");
+                return "error";
+            }
+            
+            Product product = productOpt.get();
+            model.addAttribute("product", product);
+            
+            // Controlla se l'utente corrente è il proprietario del prodotto
+            Users authenticatedUser = getAuthenticatedUser();
+            boolean isOwner = authenticatedUser != null && 
+                            product.getAutore() != null && 
+                            product.getAutore().getId().equals(authenticatedUser.getId());
+            model.addAttribute("isOwner", isOwner);
+            
+            logger.debug("Displaying product details for ID: {}", id);
+            return "product-details-view";
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.error("Error loading product details: {}", sw.toString());
+            model.addAttribute("errorMessage", "Errore durante il caricamento dei dettagli del prodotto: " + e.getMessage());
+            return "error";
+        }
     }
 }
