@@ -44,14 +44,70 @@
     <main class="container">
         <h1>Errore</h1>
         <div class="error">
-            <p><strong>Errore:</strong> <span th:text="${error}" th:if="${error}">Errore sconosciuto</span></p>
-            <p th:if="${status}"><strong>Status:</strong> <span th:text="${status}">500</span></p>
-            <p th:if="${message}"><strong>Messaggio:</strong> <span th:text="${message}">Si è verificato un errore imprevisto.</span></p>
-            <div th:if="${trace}">
-                <p><strong>Dettagli:</strong></p>
-                <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; overflow-x: auto; white-space: pre-wrap;" th:text="${trace}"></pre>
+            <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                <h3 style="margin-top: 0; color: #856404;">🚨 Errore nell'applicazione</h3>
+                
+                <div style="margin-bottom: 10px;">
+                    <strong>Errore:</strong> 
+                    <span th:if="${error}" th:text="${error}">Errore sconosciuto</span>
+                    <span th:unless="${error}" style="color: #dc3545;">Nessun tipo di errore specificato</span>
+                </div>
+                
+                <div style="margin-bottom: 10px;" th:if="${status}">
+                    <strong>Codice Status HTTP:</strong> <span th:text="${status}">500</span>
+                </div>
+                
+                <div style="margin-bottom: 10px;">
+                    <strong>Messaggio:</strong> 
+                    <span th:if="${message}" th:text="${message}">Si è verificato un errore imprevisto.</span>
+                    <span th:unless="${message}" style="color: #dc3545;">Nessun messaggio di errore disponibile</span>
+                </div>
+                
+                <div style="margin-bottom: 10px;" th:if="${path}">
+                    <strong>Percorso richiesto:</strong> <span th:text="${path}">N/A</span>
+                </div>
+                
+                <div style="margin-bottom: 10px;" th:if="${exception}">
+                    <strong>Tipo Eccezione:</strong> <span th:text="${exception}">N/A</span>
+                </div>
+                
+                <!-- Mostra sempre timestamp e informazioni di debug -->
+                <div style="margin-bottom: 10px; color: #6c757d; font-size: 0.9em;">
+                    <strong>Timestamp:</strong> <span th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy HH:mm:ss')}">N/A</span>
+                </div>
+                
+                <!-- Informazioni sulla richiesta -->
+                <div style="margin-bottom: 10px; color: #6c757d; font-size: 0.9em;" th:if="${method}">
+                    <strong>Metodo HTTP:</strong> <span th:text="${method}">N/A</span>
+                </div>
+                
+                <div style="margin-bottom: 10px; color: #6c757d; font-size: 0.9em;" th:if="${queryString}">
+                    <strong>Parametri Query:</strong> <span th:text="${queryString}">N/A</span>
+                </div>
             </div>
-            <p th:unless="${message}">Si è verificato un errore imprevisto.</p>
+            
+            <!-- Dettagli tecnici solo in modalità sviluppo -->
+            <div th:if="${trace}" style="margin-top: 20px;">
+                <details>
+                    <summary style="cursor: pointer; font-weight: bold; color: #d73527;">🔍 Dettagli Tecnici (Clicca per espandere)</summary>
+                    <div style="margin-top: 10px;">
+                        <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px; overflow-x: auto; white-space: pre-wrap; font-size: 12px; border-left: 4px solid #d73527;" th:text="${trace}"></pre>
+                    </div>
+                </details>
+            </div>
+            
+            <!-- Debug info quando non c'è trace -->
+            <div th:unless="${trace}" style="margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 5px; border-left: 4px solid #6c757d;">
+                <h4 style="margin-top: 0;">🔧 Informazioni di Debug</h4>
+                <p><strong>Stato della richiesta:</strong> Errore rilevato ma stack trace non disponibile</p>
+                <p><strong>Possibili cause:</strong></p>
+                <ul style="margin-bottom: 0;">
+                    <li>Errore di validazione dei dati</li>
+                    <li>Problema di connessione al database</li>
+                    <li>Errore nella logica di business</li>
+                    <li>Problema di configurazione</li>
+                </ul>
+            </div>
         </div>
         
         <div class="navigation-buttons">

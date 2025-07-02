@@ -74,14 +74,37 @@ public class ProductSearchController {
             
             logger.info("Searching products with filters: {}", searchDTO);
             
-            // Esegue la ricerca con i filtri
-            List<Product> products = productRepository.findProductsWithFiltersAndSort(
-                searchDTO.hasSearchTerm() ? searchDTO.getSearchTerm() : null,
-                searchDTO.hasCategoria() ? searchDTO.getCategoria() : null,
-                searchDTO.hasPrezzoMin() ? searchDTO.getPrezzoMin() : null,
-                searchDTO.hasPrezzoMax() ? searchDTO.getPrezzoMax() : null,
-                searchDTO.getSortBy()
-            );
+            // Parametri per la ricerca
+            String searchTerm = searchDTO.hasSearchTerm() ? searchDTO.getSearchTerm() : null;
+            String categoria = searchDTO.hasCategoria() ? searchDTO.getCategoria() : null;
+            Double prezzoMin = searchDTO.hasPrezzoMin() ? searchDTO.getPrezzoMin() : null;
+            Double prezzoMax = searchDTO.hasPrezzoMax() ? searchDTO.getPrezzoMax() : null;
+            String sortBy = searchDTO.getSortBy() != null ? searchDTO.getSortBy() : "id";
+            
+            // Esegue la ricerca con i filtri usando il metodo appropriato
+            List<Product> products;
+            switch (sortBy) {
+                case "nome":
+                    products = productRepository.findProductsWithFiltersOrderByNome(
+                        searchTerm, categoria, prezzoMin, prezzoMax);
+                    break;
+                case "prezzo":
+                    products = productRepository.findProductsWithFiltersOrderByPrezzo(
+                        searchTerm, categoria, prezzoMin, prezzoMax);
+                    break;
+                case "prezzo_desc":
+                    products = productRepository.findProductsWithFiltersOrderByPrezzoDesc(
+                        searchTerm, categoria, prezzoMin, prezzoMax);
+                    break;
+                case "categoria":
+                    products = productRepository.findProductsWithFiltersOrderByCategoria(
+                        searchTerm, categoria, prezzoMin, prezzoMax);
+                    break;
+                default: // "id" o qualsiasi altro valore
+                    products = productRepository.findProductsWithFiltersOrderById(
+                        searchTerm, categoria, prezzoMin, prezzoMax);
+                    break;
+            }
             
             // Carica le categorie per il dropdown
             List<String> categories = productRepository.findDistinctCategories();
@@ -97,7 +120,7 @@ public class ProductSearchController {
             
         } catch (Exception e) {
             logger.error("Error searching products: {}", e.getMessage(), e);
-            model.addAttribute("errorMessage", "Errore nella ricerca dei prodotti.");
+            model.addAttribute("errorMessage", "Errore nella ricerca dei prodotti: " + e.getMessage());
             return "error";
         }
     }
@@ -112,7 +135,7 @@ public class ProductSearchController {
             
             List<Product> products;
             if (q != null && !q.trim().isEmpty()) {
-                products = productRepository.findProductsWithFiltersAndSort(q, null, null, null, "nome");
+                products = productRepository.findProductsWithFiltersOrderByNome(q, null, null, null);
             } else {
                 products = productRepository.findAllWithImages();
             }
@@ -120,6 +143,7 @@ public class ProductSearchController {
             List<String> categories = productRepository.findDistinctCategories();
             ProductSearchDTO searchDTO = new ProductSearchDTO();
             searchDTO.setSearchTerm(q);
+            searchDTO.setSortBy("nome");
             
             model.addAttribute("products", products);
             model.addAttribute("categories", categories);
@@ -130,7 +154,7 @@ public class ProductSearchController {
             
         } catch (Exception e) {
             logger.error("Error in quick search: {}", e.getMessage(), e);
-            model.addAttribute("errorMessage", "Errore nella ricerca rapida.");
+            model.addAttribute("errorMessage", "Errore nella ricerca rapida: " + e.getMessage());
             return "error";
         }
     }

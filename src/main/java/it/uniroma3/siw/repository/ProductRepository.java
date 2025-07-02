@@ -28,7 +28,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByAutore(Users autore);
     
     // Query per ricerca e filtri
-    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images " +
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN p.images " +
            "WHERE (:searchTerm IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
            "OR LOWER(p.descrizione) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
            "AND (:categoria IS NULL OR p.categoria = :categoria) " +
@@ -57,21 +57,64 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                                  Pageable pageable);
     
     // Query per ordinamento specifico
+    // Metodi separati per ogni tipo di ordinamento
     @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images " +
            "WHERE (:searchTerm IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
            "OR LOWER(p.descrizione) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
            "AND (:categoria IS NULL OR p.categoria = :categoria) " +
            "AND (:prezzoMin IS NULL OR p.prezzo >= :prezzoMin) " +
            "AND (:prezzoMax IS NULL OR p.prezzo <= :prezzoMax) " +
-           "ORDER BY " +
-           "CASE WHEN :sortBy = 'nome' THEN p.nome END ASC, " +
-           "CASE WHEN :sortBy = 'prezzo' THEN p.prezzo END ASC, " +
-           "CASE WHEN :sortBy = 'prezzo_desc' THEN p.prezzo END DESC, " +
-           "CASE WHEN :sortBy = 'categoria' THEN p.categoria END ASC, " +
-           "p.id DESC")
-    List<Product> findProductsWithFiltersAndSort(@Param("searchTerm") String searchTerm,
-                                                 @Param("categoria") String categoria,
-                                                 @Param("prezzoMin") Double prezzoMin,
-                                                 @Param("prezzoMax") Double prezzoMax,
-                                                 @Param("sortBy") String sortBy);
+           "ORDER BY p.nome ASC")
+    List<Product> findProductsWithFiltersOrderByNome(@Param("searchTerm") String searchTerm,
+                                                     @Param("categoria") String categoria,
+                                                     @Param("prezzoMin") Double prezzoMin,
+                                                     @Param("prezzoMax") Double prezzoMax);
+    
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images " +
+           "WHERE (:searchTerm IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "OR LOWER(p.descrizione) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
+           "AND (:categoria IS NULL OR p.categoria = :categoria) " +
+           "AND (:prezzoMin IS NULL OR p.prezzo >= :prezzoMin) " +
+           "AND (:prezzoMax IS NULL OR p.prezzo <= :prezzoMax) " +
+           "ORDER BY p.prezzo ASC")
+    List<Product> findProductsWithFiltersOrderByPrezzo(@Param("searchTerm") String searchTerm,
+                                                       @Param("categoria") String categoria,
+                                                       @Param("prezzoMin") Double prezzoMin,
+                                                       @Param("prezzoMax") Double prezzoMax);
+    
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images " +
+           "WHERE (:searchTerm IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "OR LOWER(p.descrizione) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
+           "AND (:categoria IS NULL OR p.categoria = :categoria) " +
+           "AND (:prezzoMin IS NULL OR p.prezzo >= :prezzoMin) " +
+           "AND (:prezzoMax IS NULL OR p.prezzo <= :prezzoMax) " +
+           "ORDER BY p.prezzo DESC")
+    List<Product> findProductsWithFiltersOrderByPrezzoDesc(@Param("searchTerm") String searchTerm,
+                                                           @Param("categoria") String categoria,
+                                                           @Param("prezzoMin") Double prezzoMin,
+                                                           @Param("prezzoMax") Double prezzoMax);
+    
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images " +
+           "WHERE (:searchTerm IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "OR LOWER(p.descrizione) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
+           "AND (:categoria IS NULL OR p.categoria = :categoria) " +
+           "AND (:prezzoMin IS NULL OR p.prezzo >= :prezzoMin) " +
+           "AND (:prezzoMax IS NULL OR p.prezzo <= :prezzoMax) " +
+           "ORDER BY p.categoria ASC, p.nome ASC")
+    List<Product> findProductsWithFiltersOrderByCategoria(@Param("searchTerm") String searchTerm,
+                                                          @Param("categoria") String categoria,
+                                                          @Param("prezzoMin") Double prezzoMin,
+                                                          @Param("prezzoMax") Double prezzoMax);
+    
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images " +
+           "WHERE (:searchTerm IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "OR LOWER(p.descrizione) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
+           "AND (:categoria IS NULL OR p.categoria = :categoria) " +
+           "AND (:prezzoMin IS NULL OR p.prezzo >= :prezzoMin) " +
+           "AND (:prezzoMax IS NULL OR p.prezzo <= :prezzoMax) " +
+           "ORDER BY p.id DESC")
+    List<Product> findProductsWithFiltersOrderById(@Param("searchTerm") String searchTerm,
+                                                   @Param("categoria") String categoria,
+                                                   @Param("prezzoMin") Double prezzoMin,
+                                                   @Param("prezzoMax") Double prezzoMax);
 }

@@ -343,6 +343,17 @@
                         <input type="number" id="prezzoMax" th:field="*{prezzoMax}" 
                                min="0" step="0.01" placeholder="1000.00" />
                     </div>
+                    
+                    <div class="form-group">
+                        <label for="sortBy">Ordina per:</label>
+                        <select id="sortBy" th:field="*{sortBy}">
+                            <option value="id">Più recenti</option>
+                            <option value="nome">Nome A-Z</option>
+                            <option value="prezzo">Prezzo crescente</option>
+                            <option value="prezzo_desc">Prezzo decrescente</option>
+                            <option value="categoria">Categoria</option>
+                        </select>
+                    </div>
                 </div>
                 
                 <div class="search-actions">
@@ -370,21 +381,10 @@
             </span>
         </div>
         
-        <!-- Header Risultati con Ordinamento -->
+        <!-- Header Risultati -->
         <div class="results-header">
             <div class="results-count">
                 <strong th:text="${totalProducts}">0</strong> prodotti trovati
-            </div>
-            
-            <div class="sort-controls">
-                <label for="sortBy">Ordina per:</label>
-                <select id="sortBy" onchange="updateSort(this.value)">
-                    <option value="id" th:selected="${searchDTO.sortBy == 'id'}">Più recenti</option>
-                    <option value="nome" th:selected="${searchDTO.sortBy == 'nome'}">Nome A-Z</option>
-                    <option value="prezzo" th:selected="${searchDTO.sortBy == 'prezzo'}">Prezzo crescente</option>
-                    <option value="prezzo_desc" th:selected="${searchDTO.sortBy == 'prezzo_desc'}">Prezzo decrescente</option>
-                    <option value="categoria" th:selected="${searchDTO.sortBy == 'categoria'}">Categoria</option>
-                </select>
             </div>
         </div>
         
@@ -445,64 +445,10 @@
     </footer>
 
     <script>
-        function updateSort(sortValue) {
-            const form = document.createElement('form');
-            form.method = 'GET';
-            form.action = '/products/search';
-            
-            // Mantieni tutti i filtri esistenti
-            const searchTerm = document.getElementById('searchTerm').value;
-            const categoria = document.getElementById('categoria').value;
-            const prezzoMin = document.getElementById('prezzoMin').value;
-            const prezzoMax = document.getElementById('prezzoMax').value;
-            
-            if (searchTerm) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'searchTerm';
-                input.value = searchTerm;
-                form.appendChild(input);
-            }
-            
-            if (categoria) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'categoria';
-                input.value = categoria;
-                form.appendChild(input);
-            }
-            
-            if (prezzoMin) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'prezzoMin';
-                input.value = prezzoMin;
-                form.appendChild(input);
-            }
-            
-            if (prezzoMax) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'prezzoMax';
-                input.value = prezzoMax;
-                form.appendChild(input);
-            }
-            
-            // Aggiungi il nuovo ordinamento
-            const sortInput = document.createElement('input');
-            sortInput.type = 'hidden';
-            sortInput.name = 'sortBy';
-            sortInput.value = sortValue;
-            form.appendChild(sortInput);
-            
-            document.body.appendChild(form);
-            form.submit();
-        }
-        
-        // Auto-submit del form quando si cambia categoria o altri filtri (opzionale)
-        // document.getElementById('categoria').addEventListener('change', function() {
-        //     document.querySelector('.search-form').submit();
-        // });
+        // Auto-submit del form quando si cambia ordinamento o altri filtri (opzionale)
+        document.getElementById('sortBy').addEventListener('change', function() {
+            document.querySelector('.search-form').submit();
+        });
     </script>
 </body>
 </html>
