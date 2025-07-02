@@ -33,4 +33,13 @@ public class UsersService implements UserDetailsService {
         return usersRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Utente non trovato: " + username));
     }
+    
+    /**
+     * Trova un utente dal suo username
+     * @param username username dell'utente da cercare
+     * @return l'oggetto Users o null se non trovato
+     */
+    public Users findByUsername(String username) {
+        return usersRepository.findByUsername(username).orElse(null);
+    }
 }

@@ -100,29 +100,18 @@ public class ProductSearchController {
             String sortBy = searchDTO.getSortBy() != null ? searchDTO.getSortBy() : "id";
             
             // Esegue la ricerca con i filtri usando il metodo appropriato
-            List<Product> products;
-            switch (sortBy) {
-                case "nome":
-                    products = productRepository.findProductsWithFiltersOrderByNome(
+            List<Product> products = switch (sortBy) {
+                case "nome" -> productRepository.findProductsWithFiltersOrderByNome(
                         searchTerm, categoria, prezzoMin, prezzoMax);
-                    break;
-                case "prezzo":
-                    products = productRepository.findProductsWithFiltersOrderByPrezzo(
+                case "prezzo" -> productRepository.findProductsWithFiltersOrderByPrezzo(
                         searchTerm, categoria, prezzoMin, prezzoMax);
-                    break;
-                case "prezzo_desc":
-                    products = productRepository.findProductsWithFiltersOrderByPrezzoDesc(
+                case "prezzo_desc" -> productRepository.findProductsWithFiltersOrderByPrezzoDesc(
                         searchTerm, categoria, prezzoMin, prezzoMax);
-                    break;
-                case "categoria":
-                    products = productRepository.findProductsWithFiltersOrderByCategoria(
+                case "categoria" -> productRepository.findProductsWithFiltersOrderByCategoria(
                         searchTerm, categoria, prezzoMin, prezzoMax);
-                    break;
-                default: // "id" o qualsiasi altro valore
-                    products = productRepository.findProductsWithFiltersOrderById(
+                default -> productRepository.findProductsWithFiltersOrderById(
                         searchTerm, categoria, prezzoMin, prezzoMax);
-                    break;
-            }
+            };
             
             // Carica manualmente le immagini per tutti i prodotti
             loadImagesForProducts(products);

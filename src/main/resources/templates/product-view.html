@@ -16,7 +16,13 @@
                 <p><strong>Categoria:</strong> <span th:text="${product.categoria}">Categoria</span></p>
                 <p><strong>Descrizione:</strong> <span th:text="${product.descrizione}">Descrizione</span></p>
                 <p><strong>Prezzo:</strong> <span th:text="${product.prezzo}">0.00</span> €</p>
-                <p th:if="${product.autore != null}"><strong>Venditore:</strong> <span th:text="${product.autore.username}">Username</span></p>
+                <p th:if="${product.autore != null}">
+                    <strong>Venditore:</strong> 
+                    <a th:href="@{'/users/seller/' + ${product.autore.username}}" style="color: #007bff; text-decoration: none; font-weight: bold;">
+                        <span th:text="${product.autore.username}">Username</span>
+                        <span style="font-size: 0.9em;">👤</span>
+                    </a>
+                </p>
             </div>
             
             <div class="product-images">

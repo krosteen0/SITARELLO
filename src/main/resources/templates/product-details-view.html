@@ -389,8 +389,18 @@
                     <h3 class="seller-title">
                         👤 Informazioni Venditore
                     </h3>
-                    <p><strong>Nome utente:</strong> <span th:text="${product.autore.username}">venditore123</span></p>
+                    <p>
+                        <strong>Nome utente:</strong> 
+                        <a th:href="@{'/users/seller/' + ${product.autore.username}}" class="seller-link" 
+                           style="color: #007bff; text-decoration: none; font-weight: bold;">
+                            <span th:text="${product.autore.username}">venditore123</span>
+                            <span style="font-size: 0.9em;">👤</span>
+                        </a>
+                    </p>
                     <p><strong>Email:</strong> <span th:text="${product.autore.email}">email@example.com</span></p>
+                    <a th:href="@{'/users/seller/' + ${product.autore.username}}" class="btn btn-outline" style="margin-top: 10px;">
+                        🏪 Visita Profilo Venditore
+                    </a>
                 </div>
 
                 <!-- Pulsanti di azione -->
