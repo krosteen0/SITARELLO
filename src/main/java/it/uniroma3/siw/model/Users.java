@@ -32,7 +32,7 @@ public class Users implements UserDetails {
 
     private String role = "USER"; // Default role
 
-    @OneToMany(mappedBy = "autore")
+    @OneToMany(mappedBy = "seller")
     private List<Product> authoredProducts;
 
     public Users() {

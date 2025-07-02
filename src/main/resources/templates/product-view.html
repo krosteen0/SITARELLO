@@ -1,8 +1,13 @@
-<!DOCTYPE html>
-<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<!DOCTYPE ht        <h1 th:text="${product.name}">Nome Prodotto</h1>
+        
+        <div class="product-info">
+            <div class="product-details">
+                <p><strong>Categoria:</strong> <span th:text="${product.category?.name ?: 'Categoria non specificata'}">Categoria</span></p>
+                <p><strong>Descrizione:</strong> <span th:text="${product.description}">Descrizione</span></p>
+                <p><strong>Prezzo:</strong> <span th:text="${product.price}">0.00</span> €</p>tml lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${product.nome} + ' - Dettagli Prodotto'">Dettagli Prodotto</title>
+    <title th:text="${product.name} + ' - Dettagli Prodotto'">Dettagli Prodotto</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
     <link rel="stylesheet" th:href="@{/css/rating-stars.css}" />
 </head>
@@ -24,15 +29,15 @@
                     </span>
                     <span th:unless="${product.getAverageRating() > 0}">
                         Nessuna recensione
-                        <a th:if="${isAuthenticated and username != product.autore.username}" 
+                        <a th:if="${isAuthenticated and username != product.seller.username}" 
                            th:href="@{'/ratings/product/' + ${product.id}}" 
                            style="margin-left: 5px; font-size: 0.9em; color: #007bff;">Scrivi la prima</a>
                     </span>
                 </p>
-                <p th:if="${product.autore != null}">
+                <p th:if="${product.seller != null}">
                     <strong>Venditore:</strong> 
-                    <a th:href="@{'/users/seller/' + ${product.autore.username}}" style="color: #007bff; text-decoration: none; font-weight: bold;">
-                        <span th:text="${product.autore.username}">Username</span>
+                    <a th:href="@{'/users/seller/' + ${product.seller.username}}" style="color: #007bff; text-decoration: none; font-weight: bold;">
+                        <span th:text="${product.seller.username}">Username</span>
                         <span style="font-size: 0.9em;">👤</span>
                     </a>
                 </p>
@@ -41,13 +46,13 @@
             <div class="product-images">
                 <h3>Immagini del prodotto:</h3>
                 <div class="image-gallery">
-                    <img th:each="image : ${product.images}" th:src="@{'/product/image/' + ${image.id}}" th:alt="${product.nome}" />
+                    <img th:each="image : ${product.images}" th:src="@{'/product/image/' + ${image.id}}" th:alt="${product.name}" />
                 </div>
             </div>
         </div>
         
         <!-- Pulsanti di azione se l'utente è il proprietario -->
-        <div th:if="${isAuthenticated and product.autore != null and product.autore.username == username}" class="action-buttons">
+        <div th:if="${isAuthenticated and product.seller != null and product.seller.username == username}" class="action-buttons">
             <a th:href="@{'/product/edit/' + ${product.id}}" class="button">Modifica Prodotto</a>
         </div>
         

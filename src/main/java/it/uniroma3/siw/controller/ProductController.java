@@ -27,9 +27,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import it.uniroma3.siw.dto.ProductFormDTO;
+import it.uniroma3.siw.model.Category;
 import it.uniroma3.siw.model.Product;
 import it.uniroma3.siw.model.ProductImage;
 import it.uniroma3.siw.model.Users;
+import it.uniroma3.siw.repository.CategoryRepository;
 import it.uniroma3.siw.repository.ProductImageRepository;
 import it.uniroma3.siw.repository.ProductRepository;
 import it.uniroma3.siw.repository.UsersRepository;
@@ -54,6 +56,9 @@ public class ProductController {
     @Autowired
     private UsersRepository usersRepository;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     private void addAuthenticationAttributes(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAuthenticated = auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser");
@@ -69,8 +74,8 @@ public class ProductController {
         if (auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser")) {
             try {
                 // Prova prima il cast diretto
-                if (auth.getPrincipal() instanceof Users) {
-                    return (Users) auth.getPrincipal();
+                if (auth.getPrincipal() instanceof Users users) {
+                    return users;
                 }
                 // Se non funziona, cerca per username nel database
                 String username = auth.getName();
@@ -117,12 +122,18 @@ public class ProductController {
     @GetMapping("/create/details")
     public String showCreateDetailsPage(Model model, HttpSession session) {
         addAuthenticationAttributes(model);
+        @SuppressWarnings("unchecked")
         List<byte[]> imageDataList = (List<byte[]>) session.getAttribute("productImages");
         if (imageDataList == null || imageDataList.isEmpty()) {
             return "redirect:/product/create/images";
         }
         model.addAttribute("productFormDTO", new ProductFormDTO());
         model.addAttribute("imageCount", imageDataList.size());
+        
+        // Aggiungi le categorie al modello
+        List<Category> categories = (List<Category>) categoryRepository.findAll();
+        model.addAttribute("categories", categories);
+        
         logger.debug("Displaying create details page with {} images", imageDataList.size());
         return "product-details";
     }
@@ -132,6 +143,7 @@ public class ProductController {
                                       BindingResult result, HttpSession session, Model model) {
         try {
             addAuthenticationAttributes(model);
+            @SuppressWarnings("unchecked")
             List<byte[]> imageDataList = (List<byte[]>) session.getAttribute("productImages");
             if (imageDataList == null || imageDataList.isEmpty()) {
                 model.addAttribute("errorMessage", "Nessuna immagine trovata. Ricarica le immagini.");
@@ -140,6 +152,9 @@ public class ProductController {
 
             if (result.hasErrors()) {
                 model.addAttribute("imageCount", imageDataList.size());
+                // Aggiungi le categorie quando ci sono errori
+                List<Category> categories = (List<Category>) categoryRepository.findAll();
+                model.addAttribute("categories", categories);
                 return "product-details";
             }
 
@@ -168,6 +183,7 @@ public class ProductController {
             addAuthenticationAttributes(model);
             // Recupera i dati del prodotto e le immagini dalla sessione
             ProductFormDTO productFormDTO = (ProductFormDTO) session.getAttribute("productFormDTO");
+            @SuppressWarnings("unchecked")
             List<byte[]> imageDataList = (List<byte[]>) session.getAttribute("productImages");
             Users authenticatedUser = getAuthenticatedUser();
             if (productFormDTO == null || imageDataList == null || imageDataList.isEmpty() || authenticatedUser == null) {
@@ -251,7 +267,7 @@ public class ProductController {
                 return "error";
             }
             
-            Optional<Product> productOpt = productRepository.findByIdWithAutore(id);
+            Optional<Product> productOpt = productRepository.findByIdWithSeller(id);
             if (productOpt.isEmpty()) {
                 model.addAttribute("errorMessage", "Prodotto non trovato.");
                 return "error";
@@ -260,14 +276,14 @@ public class ProductController {
             Product product = productOpt.get();
             
             // Verifica che l'autore del prodotto non sia null
-            if (product.getAutore() == null) {
+            if (product.getSeller() == null) {
                 logger.error("Product with ID {} has null author", id);
                 model.addAttribute("errorMessage", "Errore: prodotto senza autore.");
                 return "error";
             }
             
             // Verifica che l'utente sia il proprietario del prodotto
-            if (!product.getAutore().getId().equals(authenticatedUser.getId())) {
+            if (!product.getSeller().getId().equals(authenticatedUser.getId())) {
                 model.addAttribute("errorMessage", "Non hai i permessi per modificare questo prodotto.");
                 return "error";
             }
@@ -304,7 +320,7 @@ public class ProductController {
             Product product = productOpt.get();
             
             // Verifica che l'utente sia il proprietario del prodotto
-            if (!product.getAutore().getId().equals(authenticatedUser.getId())) {
+            if (!product.getSeller().getId().equals(authenticatedUser.getId())) {
                 model.addAttribute("errorMessage", "Non hai i permessi per modificare questo prodotto.");
                 return "error";
             }
@@ -333,7 +349,7 @@ public class ProductController {
                 return "error";
             }
             
-            Optional<Product> productOpt = productRepository.findByIdWithAutore(id);
+            Optional<Product> productOpt = productRepository.findByIdWithSeller(id);
             if (productOpt.isEmpty()) {
                 model.addAttribute("errorMessage", "Prodotto non trovato.");
                 return "error";
@@ -342,29 +358,34 @@ public class ProductController {
             Product product = productOpt.get();
             
             // Verifica che l'autore del prodotto non sia null
-            if (product.getAutore() == null) {
+            if (product.getSeller() == null) {
                 logger.error("Product with ID {} has null author", id);
                 model.addAttribute("errorMessage", "Errore: prodotto senza autore.");
                 return "error";
             }
             
             // Verifica che l'utente sia il proprietario del prodotto
-            if (!product.getAutore().getId().equals(authenticatedUser.getId())) {
+            if (!product.getSeller().getId().equals(authenticatedUser.getId())) {
                 model.addAttribute("errorMessage", "Non hai i permessi per modificare questo prodotto.");
                 return "error";
             }
             
             // Crea un DTO dal prodotto esistente
             ProductFormDTO productFormDTO = new ProductFormDTO();
-            productFormDTO.setNome(product.getNome());
-            productFormDTO.setCategoria(product.getCategoria());
-            productFormDTO.setDescrizione(product.getDescrizione());
-            productFormDTO.setPrezzo(product.getPrezzo());
+            productFormDTO.setNome(product.getName());
+            productFormDTO.setCategoria(product.getCategory() != null ? product.getCategory().getName() : "");
+            productFormDTO.setDescrizione(product.getDescription());
+            productFormDTO.setPrezzo(product.getPrice());
             
             // Salva l'ID del prodotto in sessione per i passaggi successivi
             session.setAttribute("editingProductId", id);
             model.addAttribute("productFormDTO", productFormDTO);
             model.addAttribute("product", product);
+            
+            // Aggiungi le categorie al modello
+            List<Category> categories = (List<Category>) categoryRepository.findAll();
+            model.addAttribute("categories", categories);
+            
             return "edit-details";
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
@@ -403,7 +424,7 @@ public class ProductController {
             Product product = productOpt.get();
             
             // Verifica che l'utente sia il proprietario del prodotto
-            if (!product.getAutore().getId().equals(authenticatedUser.getId())) {
+            if (!product.getSeller().getId().equals(authenticatedUser.getId())) {
                 model.addAttribute("errorMessage", "Non hai i permessi per modificare questo prodotto.");
                 return "error";
             }
@@ -453,7 +474,7 @@ public class ProductController {
                 return "error";
             }
             
-            Optional<Product> productOpt = productRepository.findByIdWithAutore(productId);
+            Optional<Product> productOpt = productRepository.findByIdWithSeller(productId);
             if (productOpt.isEmpty()) {
                 model.addAttribute("errorMessage", "Prodotto non trovato.");
                 return "error";
@@ -462,20 +483,23 @@ public class ProductController {
             Product product = productOpt.get();
             
             // Verifica che l'autore del prodotto non sia null
-            if (product.getAutore() == null) {
+            if (product.getSeller() == null) {
                 logger.error("Product with ID {} has null author", productId);
                 model.addAttribute("errorMessage", "Errore: prodotto senza autore.");
                 return "error";
             }
             
             // Verifica che l'utente sia il proprietario del prodotto
-            if (!product.getAutore().getId().equals(authenticatedUser.getId())) {
+            if (!product.getSeller().getId().equals(authenticatedUser.getId())) {
                 model.addAttribute("errorMessage", "Non hai i permessi per modificare questo prodotto.");
                 return "error";
             }
 
             if (result.hasErrors()) {
                 model.addAttribute("product", product);
+                // Aggiungi le categorie quando ci sono errori
+                List<Category> categories = (List<Category>) categoryRepository.findAll();
+                model.addAttribute("categories", categories);
                 return "edit-details";
             }
             
@@ -506,7 +530,7 @@ public class ProductController {
                 return "error";
             }
             
-            Optional<Product> productOpt = productRepository.findByIdWithAutore(id);
+            Optional<Product> productOpt = productRepository.findByIdWithSeller(id);
             if (productOpt.isEmpty()) {
                 model.addAttribute("errorMessage", "Prodotto non trovato.");
                 return "error";
@@ -515,14 +539,14 @@ public class ProductController {
             Product product = productOpt.get();
             
             // Verifica che l'autore del prodotto non sia null
-            if (product.getAutore() == null) {
+            if (product.getSeller() == null) {
                 logger.error("Product with ID {} has null author", id);
                 model.addAttribute("errorMessage", "Errore: prodotto senza autore.");
                 return "error";
             }
             
             // Verifica che l'utente sia il proprietario del prodotto
-            if (!product.getAutore().getId().equals(authenticatedUser.getId())) {
+            if (!product.getSeller().getId().equals(authenticatedUser.getId())) {
                 model.addAttribute("errorMessage", "Non hai i permessi per eliminare questo prodotto.");
                 return "error";
             }
@@ -576,8 +600,8 @@ public class ProductController {
             // Controlla se l'utente corrente è il proprietario del prodotto
             Users authenticatedUser = getAuthenticatedUser();
             boolean isOwner = authenticatedUser != null && 
-                            product.getAutore() != null && 
-                            product.getAutore().getId().equals(authenticatedUser.getId());
+                            product.getSeller() != null && 
+                            product.getSeller().getId().equals(authenticatedUser.getId());
             model.addAttribute("isOwner", isOwner);
             
             // Aggiungi informazioni sui rating tramite il servizio dedicato

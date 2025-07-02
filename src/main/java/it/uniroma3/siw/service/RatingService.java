@@ -81,7 +81,7 @@ public class RatingService {
         Product product = productOpt.get();
         
         // Verifica che l'utente non stia valutando un proprio prodotto
-        if (product.getAutore() != null && product.getAutore().getId().equals(user.getId())) {
+        if (product.getSeller() != null && product.getSeller().getId().equals(user.getId())) {
             throw new IllegalArgumentException("Non puoi valutare i tuoi prodotti");
         }
         

@@ -10,9 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import it.uniroma3.siw.dto.ProductFormDTO;
+import it.uniroma3.siw.model.Category;
 import it.uniroma3.siw.model.Product;
 import it.uniroma3.siw.model.ProductImage;
 import it.uniroma3.siw.model.Users;
+import it.uniroma3.siw.repository.CategoryRepository;
 import it.uniroma3.siw.repository.ProductImageRepository;
 import it.uniroma3.siw.repository.ProductRepository;
 import jakarta.servlet.http.HttpSession;
@@ -24,6 +26,9 @@ public class ProductService {
 
     @Autowired
     private ProductImageRepository productImageRepository;
+    
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     public void saveImagesToSession(List<MultipartFile> images, HttpSession session) throws IOException {
         List<byte[]> imageDataList = new ArrayList<>();
@@ -40,13 +45,20 @@ public class ProductService {
     }
 
     @Transactional
-    public Product saveProduct(ProductFormDTO productFormDTO, List<byte[]> imageDataList, Users autore) {
+    public Product saveProduct(ProductFormDTO productFormDTO, List<byte[]> imageDataList, Users seller) {
         Product product = new Product();
-        product.setNome(productFormDTO.getNome());
-        product.setCategoria(productFormDTO.getCategoria());
-        product.setDescrizione(productFormDTO.getDescrizione());
-        product.setPrezzo(productFormDTO.getPrezzo());
-        product.setAutore(autore);
+        product.setName(productFormDTO.getNome());
+        
+        // Convert categoria string to Category entity
+        if (productFormDTO.getCategoria() != null && !productFormDTO.getCategoria().trim().isEmpty()) {
+            Category category = categoryRepository.findByName(productFormDTO.getCategoria())
+                .orElse(null);
+            product.setCategory(category);
+        }
+        
+        product.setDescription(productFormDTO.getDescrizione());
+        product.setPrice(productFormDTO.getPrezzo());
+        product.setSeller(seller);
         
         // Ensure images list is initialized
         if (product.getImages() == null) {
@@ -67,13 +79,20 @@ public class ProductService {
     }
     
     @Transactional
-    public Product createProductWithImages(ProductFormDTO productFormDTO, List<String> imagePaths, Users autore) throws IOException {
+    public Product createProductWithImages(ProductFormDTO productFormDTO, List<String> imagePaths, Users seller) throws IOException {
         Product product = new Product();
-        product.setNome(productFormDTO.getNome());
-        product.setCategoria(productFormDTO.getCategoria());
-        product.setDescrizione(productFormDTO.getDescrizione());
-        product.setPrezzo(productFormDTO.getPrezzo());
-        product.setAutore(autore);
+        product.setName(productFormDTO.getNome());
+        
+        // Convert categoria string to Category entity
+        if (productFormDTO.getCategoria() != null && !productFormDTO.getCategoria().trim().isEmpty()) {
+            Category category = categoryRepository.findByName(productFormDTO.getCategoria())
+                .orElse(null);
+            product.setCategory(category);
+        }
+        
+        product.setDescription(productFormDTO.getDescrizione());
+        product.setPrice(productFormDTO.getPrezzo());
+        product.setSeller(seller);
         
         // Ensure images list is initialized
         if (product.getImages() == null) {
@@ -120,10 +139,17 @@ public class ProductService {
     }
     
     public void updateProductDetails(Product product, ProductFormDTO productFormDTO) {
-        product.setNome(productFormDTO.getNome());
-        product.setCategoria(productFormDTO.getCategoria());
-        product.setDescrizione(productFormDTO.getDescrizione());
-        product.setPrezzo(productFormDTO.getPrezzo());
+        product.setName(productFormDTO.getNome());
+        
+        // Convert categoria string to Category entity
+        if (productFormDTO.getCategoria() != null && !productFormDTO.getCategoria().trim().isEmpty()) {
+            Category category = categoryRepository.findByName(productFormDTO.getCategoria())
+                .orElse(null);
+            product.setCategory(category);
+        }
+        
+        product.setDescription(productFormDTO.getDescrizione());
+        product.setPrice(productFormDTO.getPrezzo());
         productRepository.save(product);
     }
     

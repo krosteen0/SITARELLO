@@ -2,232 +2,153 @@
 <html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - Sitarello</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <style>
-        .hero-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 60px 20px;
-            text-align: center;
-            margin: -20px -20px 40px -20px;
-        }
-        
-        .hero-title {
-            font-size: 3em;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-        
-        .hero-subtitle {
-            font-size: 1.3em;
-            margin-bottom: 30px;
-            opacity: 0.9;
-        }
-        
-        .hero-search {
-            max-width: 600px;
-            margin: 0 auto 30px auto;
-        }
-        
-        .hero-search form {
-            display: flex;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        
-        .hero-search input {
-            flex: 1;
-            padding: 15px 20px;
-            border: none;
-            font-size: 16px;
-            outline: none;
-        }
-        
-        .hero-search button {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        
-        .hero-search button:hover {
-            background: #218838;
-        }
-        
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 40px;
-        }
-        
-        .action-card {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-        
-        .action-card:hover {
-            transform: translateY(-2px);
-        }
-        
-        .action-card h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-        
-        .action-card p {
-            color: #666;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-        
-        .action-card .btn {
-            display: inline-block;
-            padding: 12px 24px;
-            background: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-        
-        .action-card .btn:hover {
-            background: #0056b3;
-        }
-        
-        .action-card .btn-success {
-            background: #28a745;
-        }
-        
-        .action-card .btn-success:hover {
-            background: #218838;
-        }
-        
-        .stats-section {
-            background: #f8f9fa;
-            padding: 30px;
-            border-radius: 8px;
-            margin-top: 40px;
-            text-align: center;
-        }
-        
-        @media (max-width: 768px) {
-            .hero-title {
-                font-size: 2.2em;
-            }
-            
-            .hero-subtitle {
-                font-size: 1.1em;
-            }
-            
-            .hero-search form {
-                flex-direction: column;
-            }
-            
-            .hero-search button {
-                border-radius: 0 0 8px 8px;
-            }
-            
-            .quick-actions {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/homepage.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <!-- Include navbar fragment -->
     <div th:insert="~{fragments/navbar :: navbar}"></div>
-    
+
     <div class="hero-section">
-        <h1 class="hero-title">Benvenuto su Sitarello</h1>
-        <p class="hero-subtitle">Il marketplace per comprare e vendere prodotti in modo semplice e sicuro</p>
-        
-        <div class="hero-search">
-            <form th:action="@{/products/search}" method="get">
-                <input type="text" name="searchTerm" placeholder="Cosa stai cercando? (es. libro, smartphone, scarpe...)" />
-                <button type="submit">🔍 Cerca</button>
-            </form>
+        <div class="hero-content">
+            <h1 class="hero-title">Benvenuto su Sitarello</h1>
+            <p class="hero-subtitle">Il marketplace per comprare e vendere prodotti in modo semplice e sicuro.</p>
+            
+            <div class="hero-search">
+                <form th:action="@{/products/search}" method="get" class="search-form">
+                    <div class="search-input-group">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" name="searchTerm" class="search-input" placeholder="Cerca prodotti, categorie...">
+                        <button type="submit" class="search-btn">Cerca</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="hero-actions">
+                <a th:href="@{/products}" class="btn btn-primary">Esplora Prodotti</a>
+                <a sec:authorize="!isAuthenticated()" th:href="@{/register}" class="btn btn-outline">Registrati Ora</a>
+                <a sec:authorize="isAuthenticated()" th:href="@{/product/create/images}" class="btn btn-success">Vendi un Prodotto</a>
+            </div>
         </div>
-        
-        <p>Oppure <a th:href="@{/products}" style="color: #fff; text-decoration: underline;">esplora tutti i prodotti</a></p>
     </div>
-    
+
     <main class="container">
-        <!-- Messaggio personalizzato per utenti autenticati -->
-        <div th:if="${isAuthenticated}" style="background: #e8f5e8; padding: 20px; border-radius: 8px; margin-bottom: 30px; text-align: center;">
-            <h2>👋 Benvenuto, <span th:text="${username}">Utente</span>!</h2>
-            <p>Gestisci i tuoi prodotti, esplora il marketplace e inizia a vendere subito.</p>
-        </div>
-        
-        <!-- Azioni Rapide -->
-        <div class="quick-actions">
-            <!-- Card per tutti gli utenti -->
-            <div class="action-card">
-                <h3>🛍️ Esplora Prodotti</h3>
-                <p>Naviga tra migliaia di prodotti, usa filtri avanzati e trova esattamente quello che cerchi.</p>
-                <a th:href="@{/products}" class="btn">Inizia l'Esplorazione</a>
-            </div>
-            
-            <!-- Card per utenti non autenticati -->
-            <div th:unless="${isAuthenticated}" class="action-card">
-                <h3>🔑 Accedi o Registrati</h3>
-                <p>Unisciti alla community per vendere i tuoi prodotti e accedere a funzionalità esclusive.</p>
-                <a th:href="@{/users/login}" class="btn">Accedi</a>
-                <a th:href="@{/users/register}" class="btn btn-success" style="margin-left: 10px;">Registrati</a>
-            </div>
-            
-            <!-- Card per utenti autenticati -->
-            <div th:if="${isAuthenticated}" class="action-card">
-                <h3>➕ Vendi un Prodotto</h3>
-                <p>Aggiungi un nuovo prodotto al marketplace e raggiungi migliaia di potenziali acquirenti.</p>
-                <a th:href="@{/product/create/images}" class="btn btn-success">Aggiungi Prodotto</a>
-            </div>
-            
-            <div th:if="${isAuthenticated}" class="action-card">
-                <h3>📦 I Tuoi Prodotti</h3>
-                <p>Gestisci i prodotti che hai messo in vendita, modifica dettagli e monitora le visualizzazioni.</p>
-                <a th:href="@{/users/products}" class="btn">Gestisci Prodotti</a>
+        <!-- Messaggio di benvenuto per utenti autenticati -->
+        <div sec:authorize="isAuthenticated()" class="welcome-section">
+            <div class="welcome-card">
+                <i class="fas fa-hand-sparkles welcome-icon"></i>
+                <div class="welcome-text">
+                    <h2>Ciao, <span sec:authentication="name">Utente</span>!</h2>
+                    <p>Siamo felici di rivederti. Esplora le ultime novità o gestisci i tuoi prodotti.</p>
+                </div>
+                <div class="welcome-actions">
+                    <a th:href="@{/profile}" class="btn btn-sm">Mio Profilo</a>
+                    <button onclick="SitarelloHomepage.closeWelcomeMessage()" class="btn btn-sm btn-outline">Chiudi</button>
+                </div>
             </div>
         </div>
-        
-        <!-- Sezione Statistiche/Informazioni -->
-        <div class="stats-section">
-            <h3>🚀 Perché scegliere Sitarello?</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-top: 20px;">
-                <div>
-                    <h4>🔍 Ricerca Avanzata</h4>
-                    <p>Filtri intelligenti per trovare esattamente quello che cerchi</p>
-                </div>
-                <div>
-                    <h4>🛡️ Sicuro e Affidabile</h4>
-                    <p>Sistema di autenticazione e protezione dei dati</p>
-                </div>
-                <div>
-                    <h4>💡 Facile da Usare</h4>
-                    <p>Interfaccia intuitiva per compratori e venditori</p>
-                </div>
-                <div>
-                    <h4>🌟 Community Attiva</h4>
-                    <p>Unisciti a migliaia di utenti soddisfatti</p>
+
+        <!-- Prodotti Recenti -->
+        <section class="product-section" th:if="${recentProducts != null && !recentProducts.isEmpty()}">
+            <div class="section-header">
+                <h2>Aggiunti di Recente</h2>
+                <p>Scopri gli ultimi articoli messi in vendita dalla nostra community.</p>
+            </div>
+            <div class="products-scroll">
+                <div th:each="product : ${recentProducts}" class="product-card-small">
+                    <a th:href="@{'/product/' + ${product.id}}">
+                        <div class="product-image-small">
+                            <img th:src="@{${product.base64Image != null ? 'data:image/jpeg;base64,' + product.base64Image : '/immagini/placeholder.png'}}" alt="Immagine prodotto" />
+                        </div>
+                    </a>
+                    <div class="product-info-small">
+                        <h3 class="product-title-small"><a th:href="@{'/product/' + ${product.id}}" th:text="${product.name}">Nome Prodotto</a></h3>
+                        <p class="product-price-small" th:text="${product.price} + ' €'">€0.00</p>
+                    </div>
                 </div>
             </div>
+        </section>
+
+        <!-- Prodotti in Evidenza -->
+        <section class="product-section" th:if="${featuredProducts != null && !featuredProducts.isEmpty()}">
+            <div class="section-header">
+                <h2>Prodotti in Evidenza</h2>
+                <p>I prodotti più popolari e apprezzati del momento.</p>
+            </div>
+            <div class="products-grid">
+                <div th:each="product : ${featuredProducts}" class="product-card">
+                    <a th:href="@{'/product/' + ${product.id}}" class="product-image">
+                        <img th:src="@{${product.base64Image != null ? 'data:image/jpeg;base64,' + product.base64Image : '/immagini/placeholder.png'}}" alt="Immagine prodotto" />
+                    </a>
+                    <div class="product-info">
+                        <p class="product-category" th:text="${product.category != null ? product.category.name : 'N/A'}">Categoria</p>
+                        <h3 class="product-title"><a th:href="@{'/product/' + ${product.id}}" th:text="${product.name}">Nome Prodotto</a></h3>
+                        <p class="product-price" th:text="${product.price} + ' €'">€0.00</p>
+                        <p class="product-seller">Venduto da: <a th:href="@{'/seller/' + ${product.seller.id}}" th:text="${product.seller.user.username}">Nome Venditore</a></p>
+                    </div>
+                </div>
+            </div>
+            <div class="section-footer">
+                <a th:href="@{/products}" class="btn">Vedi tutti i prodotti</a>
+            </div>
+        </section>
+        
+        <!-- Esplora per Categoria -->
+        <section class="category-section" th:if="${categories != null && !categories.isEmpty()}">
+            <div class="section-header">
+                <h2>Esplora per Categoria</h2>
+                <p>Trova i prodotti che ti interessano navigando tra le nostre categorie.</p>
+            </div>
+            <div class="categories-grid">
+                <a th:each="category : ${categories}" th:href="@{/products(category=${category.id})}" class="category-card">
+                    <div class="category-icon"><i th:class="${category.iconClass != null ? category.iconClass : 'fas fa-tag'}"></i></div>
+                    <h3 th:text="${category.name}">Nome Categoria</h3>
+                    <span class="category-count" th:text="${category.productCount} + ' prodotti'">0 prodotti</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Perchè Scegliere Noi -->
+        <section class="features-section">
+            <div class="section-header">
+                <h2>Perché Scegliere Sitarello</h2>
+                <p>La nostra piattaforma è costruita per offrirti la migliore esperienza di acquisto e vendita.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3>Sicuro e Affidabile</h3>
+                    <p>Transazioni protette e un team di supporto sempre a tua disposizione.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-rocket"></i></div>
+                    <h3>Veloce e Intuitivo</h3>
+                    <p>Un'interfaccia moderna e semplice da usare per vendere e comprare senza stress.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-users"></i></div>
+                    <h3>Community Forte</h3>
+                    <p>Unisciti a migliaia di utenti che si fidano di noi per i loro affari online.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Messaggio per chi non ha prodotti -->
+        <div th:if="${(recentProducts == null || recentProducts.isEmpty()) && (featuredProducts == null || featuredProducts.isEmpty())}" class="empty-state">
+            <div class="empty-state-icon"><i class="fas fa-store-slash"></i></div>
+            <h3>Il marketplace è ancora vuoto!</h3>
+            <p>Non ci sono prodotti da mostrare al momento. Sii il primo a metterne uno in vendita!</p>
+            <a sec:authorize="isAuthenticated()" th:href="@{/product/create/images}" class="btn btn-success">Vendi il tuo primo prodotto</a>
+            <a sec:authorize="!isAuthenticated()" th:href="@{/register}" class="btn">Registrati per iniziare a vendere</a>
         </div>
     </main>
+
+    <!-- Include footer fragment -->
+    <div th:insert="~{fragments/footer :: footer}"></div>
     
-    <footer class="footer">
-        <p>© 2025 Sitarello. La tua piattaforma di fiducia per il commercio online.</p>
-    </footer>
+    <script th:src="@{/js/homepage.js}"></script>
 </body>
 </html>

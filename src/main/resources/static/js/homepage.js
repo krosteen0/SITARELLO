@@ -25,7 +25,7 @@ function initHorizontalScroll() {
         container.addEventListener('wheel', function(e) {
             if (e.deltaY !== 0) {
                 e.preventDefault();
-                this.scrollLeft += e.deltaY;
+                container.scrollLeft += e.deltaY;
             }
         });
         
@@ -83,12 +83,9 @@ function initImageErrorHandling() {
             const imageObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        const img = entry.target;
-                        if (img.dataset.src) {
-                            img.src = img.dataset.src;
-                            img.removeAttribute('data-src');
-                        }
-                        observer.unobserve(img);
+                        const lazyImage = entry.target;
+                        lazyImage.src = lazyImage.dataset.src;
+                        observer.unobserve(lazyImage);
                     }
                 });
             });
@@ -125,7 +122,7 @@ function initScrollAnimations() {
         animateElements.forEach(el => {
             el.style.opacity = '0';
             el.style.transform = 'translateY(20px)';
-            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
             observer.observe(el);
         });
     }
@@ -160,22 +157,24 @@ function initSearchEnhancements() {
         
         // Gestione focus
         searchInput.addEventListener('focus', function() {
-            this.placeholder = 'Inizia a digitare...';
-            this.parentElement.classList.add('search-focused');
+            this.placeholder = 'Cerca...';
         });
         
         searchInput.addEventListener('blur', function() {
-            this.placeholder = placeholders[0];
-            this.parentElement.classList.remove('search-focused');
+            if (this.value === '') {
+                this.placeholder = placeholders[currentPlaceholder];
+            }
         });
         
         // Validazione form
         searchForm.addEventListener('submit', function(e) {
-            const searchTerm = searchInput.value.trim();
-            if (searchTerm.length < 2) {
+            if (searchInput.value.trim() === '') {
                 e.preventDefault();
-                alert('Inserisci almeno 2 caratteri per la ricerca');
                 searchInput.focus();
+                searchInput.style.border = '1px solid #ef4444';
+                setTimeout(() => {
+                    searchInput.style.border = 'none';
+                }, 2000);
             }
         });
     }

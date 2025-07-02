@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import it.uniroma3.siw.dto.ProductSearchDTO;
+import it.uniroma3.siw.model.Category;
 import it.uniroma3.siw.model.Product;
 import it.uniroma3.siw.model.ProductImage;
+import it.uniroma3.siw.repository.CategoryRepository;
 import it.uniroma3.siw.repository.ProductImageRepository;
 import it.uniroma3.siw.repository.ProductRepository;
 
@@ -31,6 +33,9 @@ public class ProductSearchController {
     
     @Autowired
     private ProductImageRepository productImageRepository;
+    
+    @Autowired
+    private CategoryRepository categoryRepository;
     
     private void addAuthenticationAttributes(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -61,11 +66,11 @@ public class ProductSearchController {
             addAuthenticationAttributes(model);
             
             // Carica tutti i prodotti senza filtri
-            List<Product> products = productRepository.findAllWithImages();
+            List<Product> products = productRepository.findAll();
             // Carica manualmente le immagini per tutti i prodotti
             loadImagesForProducts(products);
             
-            List<String> categories = productRepository.findDistinctCategories();
+            List<Category> categories = (List<Category>) categoryRepository.findAll();
             
             model.addAttribute("products", products);
             model.addAttribute("categories", categories);
@@ -94,74 +99,46 @@ public class ProductSearchController {
             
             // Parametri per la ricerca - gestisce gli elementi vuoti
             String searchTerm = searchDTO.hasSearchTerm() ? searchDTO.getSearchTerm() : "";
-            String categoria = searchDTO.hasCategoria() ? searchDTO.getCategoria() : null;
-            Double prezzoMin = searchDTO.hasPrezzoMin() ? searchDTO.getPrezzoMin() : null;
-            Double prezzoMax = searchDTO.hasPrezzoMax() ? searchDTO.getPrezzoMax() : null;
-            Integer ratingMin = searchDTO.hasRatingMin() ? searchDTO.getRatingMin() : null;
+            Category category = null;
+            if (searchDTO.hasCategoria()) {
+                // Convert string categoria to Category entity
+                List<Category> allCategories = (List<Category>) categoryRepository.findAll();
+                category = allCategories.stream()
+                    .filter(c -> c.getName().equals(searchDTO.getCategoria()))
+                    .findFirst()
+                    .orElse(null);
+            }
+            Double priceMin = searchDTO.hasPrezzoMin() ? searchDTO.getPrezzoMin() : null;
+            Double priceMax = searchDTO.hasPrezzoMax() ? searchDTO.getPrezzoMax() : null;
+            
+            // Esegue la ricerca con i filtri
+            List<Product> products = productRepository.findProductsWithFilters(
+                searchTerm, category, priceMin, priceMax);
+            
+            // Carica manualmente le immagini per tutti i prodotti
+            loadImagesForProducts(products);
+            
+            // Carica manualmente i ratings per ogni prodotto
+            for (Product product : products) {
+                product.setRatings(productRepository.findRatingsForProduct(product.getId()));
+            }
+            
+            // Ordinamento manuale
             String sortBy = searchDTO.getSortBy() != null ? searchDTO.getSortBy() : "id";
-            
-            // Esegue la ricerca con i filtri usando il metodo appropriato
-            List<Product> products;
-            
-            try {
-                // Per l'ordinamento per rating, non usiamo la query diretta perché è problematica
-                // Invece recuperiamo i prodotti con filtri e poi li ordiniamo manualmente
-                boolean sortByRating = "rating".equals(sortBy);
-                String effectiveSortBy = sortByRating ? "id" : sortBy; // Se l'ordinamento è per rating, usiamo id come default
-                
-                if (ratingMin != null && ratingMin > 0) {
-                    // Se c'è un filtro di rating, usa la query con filtro rating
-                    products = switch (effectiveSortBy) {
-                        case "nome" -> productRepository.findProductsWithRatingFilterOrderByNome(
-                                searchTerm, categoria, prezzoMin, prezzoMax, ratingMin);
-                        case "prezzo" -> productRepository.findProductsWithRatingFilterOrderByPrezzo(
-                                searchTerm, categoria, prezzoMin, prezzoMax, ratingMin);
-                        case "prezzo_desc" -> productRepository.findProductsWithRatingFilterOrderByPrezzoDesc(
-                                searchTerm, categoria, prezzoMin, prezzoMax, ratingMin);
-                        case "categoria" -> productRepository.findProductsWithRatingFilterOrderByCategoria(
-                                searchTerm, categoria, prezzoMin, prezzoMax, ratingMin);
-                        default -> productRepository.findProductsWithRatingFilterOrderById(
-                                searchTerm, categoria, prezzoMin, prezzoMax, ratingMin);
-                    };
-                } else {
-                    // Altrimenti usa le query normali
-                    products = switch (effectiveSortBy) {
-                        case "nome" -> productRepository.findProductsWithFiltersOrderByNome(
-                                searchTerm, categoria, prezzoMin, prezzoMax);
-                        case "prezzo" -> productRepository.findProductsWithFiltersOrderByPrezzo(
-                                searchTerm, categoria, prezzoMin, prezzoMax);
-                        case "prezzo_desc" -> productRepository.findProductsWithFiltersOrderByPrezzoDesc(
-                                searchTerm, categoria, prezzoMin, prezzoMax);
-                        case "categoria" -> productRepository.findProductsWithFiltersOrderByCategoria(
-                                searchTerm, categoria, prezzoMin, prezzoMax);
-                        default -> productRepository.findProductsWithFiltersOrderById(
-                                searchTerm, categoria, prezzoMin, prezzoMax);
-                    };
-                }
-                
-                // Carica manualmente le immagini per tutti i prodotti
-                loadImagesForProducts(products);
-                
-                // Carica manualmente i ratings per ogni prodotto
-                for (Product product : products) {
-                    product.setRatings(productRepository.findRatingsForProduct(product.getId()));
-                }
-                
-                // Se l'ordinamento è per rating, ordina i prodotti a livello di applicazione
-                if (sortByRating) {
-                    products.sort((p1, p2) -> Double.compare(p2.getAverageRating(), p1.getAverageRating()));
-                }
-                
-            } catch (Exception e) {
-                logger.error("Error in product search: {}", e.getMessage(), e);
-                throw e; // Ripropaga l'eccezione per il gestione dell'errore generale
+            switch (sortBy) {
+                case "name" -> products.sort((p1, p2) -> p1.getName().compareToIgnoreCase(p2.getName()));
+                case "price" -> products.sort((p1, p2) -> Double.compare(p1.getPrice(), p2.getPrice()));
+                case "price_desc" -> products.sort((p1, p2) -> Double.compare(p2.getPrice(), p1.getPrice()));
+                case "rating" -> products.sort((p1, p2) -> Double.compare(p2.getAverageRating(), p1.getAverageRating()));
+                default -> products.sort((p1, p2) -> Long.compare(p2.getId(), p1.getId()));
             }
             
             // Carica le categorie per il dropdown
-            List<String> categories = productRepository.findDistinctCategories();
+            List<Category> categories = (List<Category>) categoryRepository.findAll();
+            List<String> categoryNames = categories.stream().map(Category::getName).toList();
             
             model.addAttribute("products", products);
-            model.addAttribute("categories", categories);
+            model.addAttribute("categories", categoryNames);
             model.addAttribute("searchDTO", searchDTO);
             model.addAttribute("totalProducts", products.size());
             model.addAttribute("hasFilters", searchDTO.hasFilters());
@@ -186,18 +163,18 @@ public class ProductSearchController {
             
             List<Product> products;
             if (q != null && !q.trim().isEmpty()) {
-                products = productRepository.findProductsWithFiltersOrderByNome(q, null, null, null);
+                products = productRepository.findProductsWithFilters(q, null, null, null);
             } else {
-                products = productRepository.findAllWithImages();
+                products = productRepository.findAll();
             }
             
             // Carica manualmente le immagini per tutti i prodotti
             loadImagesForProducts(products);
             
-            List<String> categories = productRepository.findDistinctCategories();
+            List<Category> categories = (List<Category>) categoryRepository.findAll();
             ProductSearchDTO searchDTO = new ProductSearchDTO();
             searchDTO.setSearchTerm(q);
-            searchDTO.setSortBy("nome");
+            searchDTO.setSortBy("name");
             searchDTO.setRatingMin(null);
             
             model.addAttribute("products", products);

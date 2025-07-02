@@ -2,7 +2,7 @@
 <html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${product.nome + ' - Dettagli Prodotto - Sitarello'}">Dettagli Prodotto - Sitarello</title>
+    <title th:text="${product.name + ' - Dettagli Prodotto - Sitarello'}">Dettagli Prodotto - Sitarello</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
     <link rel="stylesheet" th:href="@{/css/rating-stars.css}" />
     <style>
@@ -355,21 +355,21 @@
 
             <!-- Sezione Informazioni -->
             <div class="product-info">
-                <h1 class="product-title" th:text="${product.nome}">Nome Prodotto</h1>
+                <h1 class="product-title" th:text="${product.name}">Nome Prodotto</h1>
                 
                 <div class="product-price">
-                    €<span th:text="${#numbers.formatDecimal(product.prezzo, 1, 2)}">0.00</span>
+                    €<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span>
                 </div>
 
                 <!-- Meta informazioni -->
                 <div class="product-meta">
                     <div class="meta-item">
                         <span class="meta-label">📂 Categoria:</span>
-                        <span class="meta-value" th:text="${product.categoria}">Categoria</span>
+                        <span class="meta-value" th:text="${product.category?.name ?: 'Categoria non specificata'}">Categoria</span>
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">🏪 Venditore:</span>
-                        <span class="meta-value" th:text="${product.autore.username}">Venditore</span>
+                        <span class="meta-value" th:text="${product.seller.username}">Venditore</span>
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">🆔 Codice Prodotto:</span>
@@ -384,7 +384,7 @@
                             </span>
                             <span th:unless="${ratingCount > 0}">
                                 Nessuna recensione
-                                <a th:if="${isAuthenticated and (product.autore == null or username != product.autore.username)}" 
+                                <a th:if="${isAuthenticated and (product.seller == null or username != product.seller.username)}" 
                                    th:href="@{'/ratings/product/' + ${product.id}}" 
                                    style="margin-left: 5px; font-size: 0.9em; color: #007bff;">Scrivi la prima</a>
                             </span>
@@ -393,9 +393,9 @@
                 </div>
 
                 <!-- Descrizione -->
-                <div class="product-description" th:if="${product.descrizione != null and not #strings.isEmpty(product.descrizione)}">
+                <div class="product-description" th:if="${product.description != null and not #strings.isEmpty(product.description)}">
                     <h3 class="description-title">📝 Descrizione</h3>
-                    <div class="description-text" th:text="${product.descrizione}">
+                    <div class="description-text" th:text="${product.description}">
                         Descrizione dettagliata del prodotto...
                     </div>
                 </div>
@@ -407,14 +407,14 @@
                     </h3>
                     <p>
                         <strong>Nome utente:</strong> 
-                        <a th:href="@{'/users/seller/' + ${product.autore.username}}" class="seller-link" 
+                        <a th:href="@{'/users/seller/' + ${product.seller.username}}" class="seller-link" 
                            style="color: #007bff; text-decoration: none; font-weight: bold;">
-                            <span th:text="${product.autore.username}">venditore123</span>
+                            <span th:text="${product.seller.username}">venditore123</span>
                             <span style="font-size: 0.9em;">👤</span>
                         </a>
                     </p>
-                    <p><strong>Email:</strong> <span th:text="${product.autore.email}">email@example.com</span></p>
-                    <a th:href="@{'/users/seller/' + ${product.autore.username}}" class="btn btn-outline" style="margin-top: 10px;">
+                    <p><strong>Email:</strong> <span th:text="${product.seller.email}">email@example.com</span></p>
+                    <a th:href="@{'/users/seller/' + ${product.seller.username}}" class="btn btn-outline" style="margin-top: 10px;">
                         🏪 Visita Profilo Venditore
                     </a>
                 </div>
@@ -497,8 +497,8 @@
         
         // Funzione per contattare il venditore
         function contactSeller() {
-            const email = /*[[${product.autore.email}]]*/ 'email@example.com';
-            const productName = /*[[${product.nome}]]*/ 'Prodotto';
+            const email = /*[[${product.seller.email}]]*/ 'email@example.com';
+            const productName = /*[[${product.name}]]*/ 'Prodotto';
             const subject = 'Interesse per: ' + productName;
             const body = 'Ciao,\n\nSono interessato al tuo prodotto "' + productName + '" su Sitarello.\n\nPotresti fornirmi maggiori informazioni?\n\nGrazie!';
             
@@ -507,7 +507,7 @@
         
         // Funzione per condividere il prodotto
         function shareProduct() {
-            const productName = /*[[${product.nome}]]*/ 'Prodotto';
+            const productName = /*[[${product.name}]]*/ 'Prodotto';
             if (navigator.share) {
                 navigator.share({
                     title: productName,

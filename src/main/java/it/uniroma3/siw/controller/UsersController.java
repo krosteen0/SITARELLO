@@ -146,7 +146,7 @@ public class UsersController {
                 Users user = usersService.findByUsername(username);
                 
                 if (user != null) {
-                    model.addAttribute("products", productRepository.findByAutoreWithImages(user));
+                    model.addAttribute("products", productRepository.findBySellerWithImages(user));
                     model.addAttribute("user", user);
                     return "products";
                 }
@@ -177,7 +177,7 @@ public class UsersController {
             }
             
             // Carica i prodotti dell'utente
-            List<Product> sellerProducts = productRepository.findByAutoreWithImages(seller);
+            List<Product> sellerProducts = productRepository.findBySellerWithImages(seller);
             
             // Calcola il rating medio del venditore basato sui rating dei suoi prodotti
             double averageSellerRating = 0.0;

@@ -52,8 +52,8 @@ public class RatingController {
         if (auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser")) {
             try {
                 // Prova prima il cast diretto
-                if (auth.getPrincipal() instanceof Users) {
-                    return (Users) auth.getPrincipal();
+                if (auth.getPrincipal() instanceof Users users) {
+                    return users;
                 }
                 // Se non funziona, cerca per username nel database
                 String username = auth.getName();
@@ -162,7 +162,7 @@ public class RatingController {
         Product product = productOpt.get();
         
         // Verifica che l'utente non stia valutando un proprio prodotto
-        if (product.getAutore() != null && product.getAutore().getId().equals(authenticatedUser.getId())) {
+        if (product.getSeller() != null && product.getSeller().getId().equals(authenticatedUser.getId())) {
             model.addAttribute("errorMessage", "Non puoi valutare i tuoi prodotti.");
             return "error";
         }

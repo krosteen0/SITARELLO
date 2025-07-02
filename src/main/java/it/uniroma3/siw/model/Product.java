@@ -10,7 +10,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 @Entity
@@ -20,24 +22,28 @@ public class Product {
     private Long id;
 
     @NotBlank(message = "Il nome è obbligatorio")
-    private String nome;
+    private String name;
 
-    @NotBlank(message = "La categoria è obbligatoria")
-    private String categoria;
+    @NotNull(message = "La categoria è obbligatoria")
+    @ManyToOne
+    private Category category;
 
     @Positive(message = "Il prezzo deve essere positivo")
-    private Double prezzo;
+    private Double price;
 
     @ManyToOne
-    private Users autore;
+    private Users seller;
 
-    private String descrizione;
+    private String description;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images;
     
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Rating> ratings;
+    
+    @Transient
+    private String base64Image;
 
     public Product() {
         this.images = new ArrayList<>();
@@ -47,20 +53,23 @@ public class Product {
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
-    public String getCategoria() { return categoria; }
-    public void setCategoria(String categoria) { this.categoria = categoria; }
-    public Double getPrezzo() { return prezzo; }
-    public void setPrezzo(Double prezzo) { this.prezzo = prezzo; }
-    public Users getAutore() { return autore; }
-    public void setAutore(Users autore) { this.autore = autore; }
-    public String getDescrizione() { return descrizione; }
-    public void setDescrizione(String descrizione) { this.descrizione = descrizione; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public Category getCategory() { return category; }
+    public void setCategory(Category category) { this.category = category; }
+    public Double getPrice() { return price; }
+    public void setPrice(Double price) { this.price = price; }
+    public Users getSeller() { return seller; }
+    public void setSeller(Users seller) { this.seller = seller; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
     public List<ProductImage> getImages() { return images; }
     public void setImages(List<ProductImage> images) { this.images = images != null ? images : new ArrayList<>(); }
     public List<Rating> getRatings() { return ratings; }
     public void setRatings(List<Rating> ratings) { this.ratings = ratings != null ? ratings : new ArrayList<>(); }
+    
+    public String getBase64Image() { return base64Image; }
+    public void setBase64Image(String base64Image) { this.base64Image = base64Image; }
     
     // Metodi utility per i rating
     public Double getAverageRating() {
