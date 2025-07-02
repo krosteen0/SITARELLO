@@ -6,41 +6,7 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
 </head>
 <body>
-    <header>
-        <nav class="navbar">
-            <div class="nav-brand">Gestione Prodotti</div>
-            <div class="nav-search">
-                <form th:action="@{/products/search}" method="get">
-                    <input type="text" name="query" placeholder="Cerca prodotti..." />
-                    <button type="submit">Cerca</button>
-                </form>
-            </div>
-            <div class="nav-links">
-                <!-- Link per utenti autenticati -->
-                <div th:if="${isAuthenticated}">
-                    <a th:href="@{/users/products}">Prodotti</a>
-                    <a th:href="@{/product/create/images}">Crea Prodotto</a>
-                    
-                    <!-- Dropdown per utente loggato -->
-                    <div class="dropdown">
-                        <span class="dropdown-toggle">Ciao, <span th:text="${username}">Utente</span></span>
-                        <div class="dropdown-menu">
-                            <a th:href="@{/users/profile}">Profilo</a>
-                            <form th:action="@{/logout}" method="post" class="nav-logout">
-                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                                <button type="submit">Logout</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Link per utenti non autenticati -->
-                <div th:unless="${isAuthenticated}">
-                    <a th:href="@{/users/login}">Accedi</a>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <div th:insert="~{fragments/navbar :: navbar}"></div>
     <main class="container">
         <h1>Riepilogo Prodotto</h1>
         <h2>Dettagli Prodotto</h2>

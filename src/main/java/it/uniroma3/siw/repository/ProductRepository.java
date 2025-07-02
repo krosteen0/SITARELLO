@@ -13,13 +13,13 @@ import it.uniroma3.siw.model.Product;
 import it.uniroma3.siw.model.Users;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images WHERE p.autore = :autore")
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN p.images WHERE p.autore = :autore")
     List<Product> findByAutoreWithImages(@Param("autore") Users autore);
     
-    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images")
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN p.images")
     List<Product> findAllWithImages();
     
-    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images WHERE p.id = :id")
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN p.images WHERE p.id = :id")
     Optional<Product> findByIdWithImages(@Param("id") Long id);
     
     @Query("SELECT p FROM Product p LEFT JOIN FETCH p.autore WHERE p.id = :id")
@@ -29,7 +29,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     
     // Query per ricerca e filtri
     @Query("SELECT DISTINCT p FROM Product p LEFT JOIN p.images " +
-           "WHERE (:searchTerm IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "WHERE (:searchTerm = '' OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
            "OR LOWER(p.descrizione) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
            "AND (:categoria IS NULL OR p.categoria = :categoria) " +
            "AND (:prezzoMin IS NULL OR p.prezzo >= :prezzoMin) " +
@@ -45,7 +45,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     
     // Query per ricerca con paginazione
     @Query("SELECT p FROM Product p LEFT JOIN p.images " +
-           "WHERE (:searchTerm IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "WHERE (:searchTerm = '' OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
            "OR LOWER(p.descrizione) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
            "AND (:categoria IS NULL OR p.categoria = :categoria) " +
            "AND (:prezzoMin IS NULL OR p.prezzo >= :prezzoMin) " +
@@ -58,8 +58,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     
     // Query per ordinamento specifico
     // Metodi separati per ogni tipo di ordinamento
-    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images " +
-           "WHERE (:searchTerm IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN p.images " +
+           "WHERE (:searchTerm = '' OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
            "OR LOWER(p.descrizione) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
            "AND (:categoria IS NULL OR p.categoria = :categoria) " +
            "AND (:prezzoMin IS NULL OR p.prezzo >= :prezzoMin) " +
@@ -70,8 +70,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                                      @Param("prezzoMin") Double prezzoMin,
                                                      @Param("prezzoMax") Double prezzoMax);
     
-    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images " +
-           "WHERE (:searchTerm IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN p.images " +
+           "WHERE (:searchTerm = '' OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
            "OR LOWER(p.descrizione) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
            "AND (:categoria IS NULL OR p.categoria = :categoria) " +
            "AND (:prezzoMin IS NULL OR p.prezzo >= :prezzoMin) " +
@@ -82,8 +82,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                                        @Param("prezzoMin") Double prezzoMin,
                                                        @Param("prezzoMax") Double prezzoMax);
     
-    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images " +
-           "WHERE (:searchTerm IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN p.images " +
+           "WHERE (:searchTerm = '' OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
            "OR LOWER(p.descrizione) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
            "AND (:categoria IS NULL OR p.categoria = :categoria) " +
            "AND (:prezzoMin IS NULL OR p.prezzo >= :prezzoMin) " +
@@ -94,8 +94,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                                            @Param("prezzoMin") Double prezzoMin,
                                                            @Param("prezzoMax") Double prezzoMax);
     
-    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images " +
-           "WHERE (:searchTerm IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN p.images " +
+           "WHERE (:searchTerm = '' OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
            "OR LOWER(p.descrizione) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
            "AND (:categoria IS NULL OR p.categoria = :categoria) " +
            "AND (:prezzoMin IS NULL OR p.prezzo >= :prezzoMin) " +
@@ -106,8 +106,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                                           @Param("prezzoMin") Double prezzoMin,
                                                           @Param("prezzoMax") Double prezzoMax);
     
-    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images " +
-           "WHERE (:searchTerm IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN p.images " +
+           "WHERE (:searchTerm = '' OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
            "OR LOWER(p.descrizione) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
            "AND (:categoria IS NULL OR p.categoria = :categoria) " +
            "AND (:prezzoMin IS NULL OR p.prezzo >= :prezzoMin) " +

@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import it.uniroma3.siw.dto.ProductSearchDTO;
 import it.uniroma3.siw.model.Product;
+import it.uniroma3.siw.model.ProductImage;
+import it.uniroma3.siw.repository.ProductImageRepository;
 import it.uniroma3.siw.repository.ProductRepository;
 
 @Controller
@@ -27,6 +29,9 @@ public class ProductSearchController {
     @Autowired
     private ProductRepository productRepository;
     
+    @Autowired
+    private ProductImageRepository productImageRepository;
+    
     private void addAuthenticationAttributes(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAuthenticated = auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser");
@@ -34,6 +39,16 @@ public class ProductSearchController {
         model.addAttribute("isAuthenticated", isAuthenticated);
         if (isAuthenticated && auth != null) {
             model.addAttribute("username", auth.getName());
+        }
+    }
+    
+    /**
+     * Carica manualmente le immagini per ogni prodotto per evitare problemi con FETCH JOIN
+     */
+    private void loadImagesForProducts(List<Product> products) {
+        for (Product product : products) {
+            List<ProductImage> images = productImageRepository.findByProductId(product.getId());
+            product.setImages(images);
         }
     }
     
@@ -47,6 +62,9 @@ public class ProductSearchController {
             
             // Carica tutti i prodotti senza filtri
             List<Product> products = productRepository.findAllWithImages();
+            // Carica manualmente le immagini per tutti i prodotti
+            loadImagesForProducts(products);
+            
             List<String> categories = productRepository.findDistinctCategories();
             
             model.addAttribute("products", products);
@@ -74,8 +92,8 @@ public class ProductSearchController {
             
             logger.info("Searching products with filters: {}", searchDTO);
             
-            // Parametri per la ricerca
-            String searchTerm = searchDTO.hasSearchTerm() ? searchDTO.getSearchTerm() : null;
+            // Parametri per la ricerca - gestisce gli elementi vuoti
+            String searchTerm = searchDTO.hasSearchTerm() ? searchDTO.getSearchTerm() : "";
             String categoria = searchDTO.hasCategoria() ? searchDTO.getCategoria() : null;
             Double prezzoMin = searchDTO.hasPrezzoMin() ? searchDTO.getPrezzoMin() : null;
             Double prezzoMax = searchDTO.hasPrezzoMax() ? searchDTO.getPrezzoMax() : null;
@@ -105,6 +123,9 @@ public class ProductSearchController {
                         searchTerm, categoria, prezzoMin, prezzoMax);
                     break;
             }
+            
+            // Carica manualmente le immagini per tutti i prodotti
+            loadImagesForProducts(products);
             
             // Carica le categorie per il dropdown
             List<String> categories = productRepository.findDistinctCategories();
@@ -139,6 +160,9 @@ public class ProductSearchController {
             } else {
                 products = productRepository.findAllWithImages();
             }
+            
+            // Carica manualmente le immagini per tutti i prodotti
+            loadImagesForProducts(products);
             
             List<String> categories = productRepository.findDistinctCategories();
             ProductSearchDTO searchDTO = new ProductSearchDTO();
