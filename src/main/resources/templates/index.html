@@ -4,151 +4,27 @@
     <meta charset="UTF-8">
     <title>Home - Sitarello</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        .hero-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 60px 20px;
-            text-align: center;
-            margin: -20px -20px 40px -20px;
+        body {
+            font-family: 'Nunito', Arial, sans-serif;
+            background: linear-gradient(120deg, #667eea 0%, #764ba2 100%);
         }
         
-        .hero-title {
-            font-size: 3em;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-        
-        .hero-subtitle {
-            font-size: 1.3em;
-            margin-bottom: 30px;
-            opacity: 0.9;
-        }
-        
-        .hero-search {
-            max-width: 600px;
-            margin: 0 auto 30px auto;
-        }
-        
-        .hero-search form {
-            display: flex;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        
-        .hero-search input {
-            flex: 1;
-            padding: 15px 20px;
-            border: none;
-            font-size: 16px;
-            outline: none;
-        }
-        
-        .hero-search button {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        
-        .hero-search button:hover {
-            background: #218838;
-        }
-        
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 40px;
-        }
-        
-        .action-card {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-        
-        .action-card:hover {
-            transform: translateY(-2px);
-        }
-        
-        .action-card h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-        
-        .action-card p {
-            color: #666;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-        
-        .action-card .btn {
-            display: inline-block;
-            padding: 12px 24px;
-            background: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-        
-        .action-card .btn:hover {
-            background: #0056b3;
-        }
-        
-        .action-card .btn-success {
-            background: #28a745;
-        }
-        
-        .action-card .btn-success:hover {
-            background: #218838;
-        }
-        
-        .stats-section {
-            background: #f8f9fa;
-            padding: 30px;
-            border-radius: 8px;
-            margin-top: 40px;
-            text-align: center;
-        }
-        
-        @media (max-width: 768px) {
-            .hero-title {
-                font-size: 2.2em;
-            }
-            
-            .hero-subtitle {
-                font-size: 1.1em;
-            }
-            
-            .hero-search form {
-                flex-direction: column;
-            }
-            
-            .hero-search button {
-                border-radius: 0 0 8px 8px;
-            }
-            
-            .quick-actions {
-                grid-template-columns: 1fr;
-            }
-        }
+        /* Assicurati che la hero-section sia sopra le bolle */
+       
     </style>
 </head>
 <body>
+    <div class="animated-bg">
+        <div class="bubble" style="left:10%; animation-delay:0s;"></div>
+        <div class="bubble" style="left:30%; animation-delay:2s;"></div>
+        <div class="bubble" style="left:55%; animation-delay:4s;"></div>
+        <div class="bubble" style="left:75%; animation-delay:1s;"></div>
+        <div class="bubble" style="left:85%; animation-delay:3s;"></div>
+    </div>
     <header>
-        <nav class="navbar">
+        <nav class="navbar glass">
             <div class="nav-brand">
                 <a th:href="@{/}">Sitarello</a>
             </div>
@@ -189,18 +65,48 @@
     </header>
     
     <div class="hero-section">
-        <h1 class="hero-title">Benvenuto su Sitarello</h1>
-        <p class="hero-subtitle">Il marketplace per comprare e vendere prodotti in modo semplice e sicuro</p>
-        
-        <div class="hero-search">
+        <div class="hero-icon">
+            <!-- SVG decorativo, puoi sostituirlo con un’immagine a piacere -->
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                <circle cx="40" cy="40" r="38" fill="#fff" fill-opacity="0.13" stroke="#fff" stroke-width="4"/>
+                <path d="M25 45L40 30L55 45" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <h1 class="hero-title animate-fadein">Benvenuto su Sitarello</h1>
+        <p class="hero-subtitle animate-fadein" style="animation-delay:0.2s;">Il marketplace per comprare e vendere prodotti in modo semplice, sicuro e veloce</p>
+        <div class="hero-badge animate-fadein" style="animation-delay:0.4s;">
+            <span>🛡️ Sicurezza garantita &nbsp;|&nbsp; 🚚 Spedizioni rapide &nbsp;|&nbsp; ⭐ 1000+ utenti soddisfatti</span>
+        </div>
+        <div class="hero-search animate-fadein" style="animation-delay:0.6s;">
             <form th:action="@{/products/search}" method="get">
                 <input type="text" name="searchTerm" placeholder="Cosa stai cercando? (es. libro, smartphone, scarpe...)" />
                 <button type="submit">🔍 Cerca</button>
             </form>
         </div>
-        
-        <p>Oppure <a th:href="@{/products}" style="color: #fff; text-decoration: underline;">esplora tutti i prodotti</a></p>
+        <p class="animate-fadein" style="animation-delay:0.8s;">Oppure <a th:href="@{/products}" style="color: #fff; text-decoration: underline; font-weight: 700;">esplora tutti i prodotti</a></p>
     </div>
+    
+    <!-- Nuova sezione: Come funziona -->
+    <section class="how-it-works">
+        <h2>Come funziona Sitarello?</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-icon">🔎</div>
+                <div class="step-title">1. Cerca</div>
+                <div class="step-desc">Trova il prodotto che desideri tra migliaia di annunci.</div>
+            </div>
+            <div class="step">
+                <div class="step-icon">💬</div>
+                <div class="step-title">2. Contatta</div>
+                <div class="step-desc">Scrivi al venditore in modo sicuro e veloce.</div>
+            </div>
+            <div class="step">
+                <div class="step-icon">🤝</div>
+                <div class="step-title">3. Concludi</div>
+                <div class="step-desc">Acquista o vendi in tutta tranquillità e sicurezza.</div>
+            </div>
+        </div>
+    </section>
     
     <main class="container">
         <!-- Messaggio personalizzato per utenti autenticati -->
