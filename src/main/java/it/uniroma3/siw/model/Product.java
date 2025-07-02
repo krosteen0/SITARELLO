@@ -35,9 +35,13 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images;
+    
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Rating> ratings;
 
     public Product() {
         this.images = new ArrayList<>();
+        this.ratings = new ArrayList<>();
     }
 
     // Getters and Setters
@@ -55,4 +59,21 @@ public class Product {
     public void setDescrizione(String descrizione) { this.descrizione = descrizione; }
     public List<ProductImage> getImages() { return images; }
     public void setImages(List<ProductImage> images) { this.images = images != null ? images : new ArrayList<>(); }
+    public List<Rating> getRatings() { return ratings; }
+    public void setRatings(List<Rating> ratings) { this.ratings = ratings != null ? ratings : new ArrayList<>(); }
+    
+    // Metodi utility per i rating
+    public Double getAverageRating() {
+        if (this.ratings == null || this.ratings.isEmpty()) {
+            return 0.0;
+        }
+        return this.ratings.stream()
+                .mapToInt(Rating::getValue)
+                .average()
+                .orElse(0.0);
+    }
+    
+    public Integer getRatingCount() {
+        return this.ratings != null ? this.ratings.size() : 0;
+    }
 }

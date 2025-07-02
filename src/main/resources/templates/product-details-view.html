@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title th:text="${product.nome + ' - Dettagli Prodotto - Sitarello'}">Dettagli Prodotto - Sitarello</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/rating-stars.css}" />
     <style>
         .product-detail-container {
             display: grid;
@@ -374,6 +375,21 @@
                         <span class="meta-label">🆔 Codice Prodotto:</span>
                         <span class="meta-value" th:text="${product.id}">#12345</span>
                     </div>
+                    <div class="meta-item">
+                        <span class="meta-label">⭐ Valutazione:</span>
+                        <span class="meta-value">
+                            <span th:if="${ratingCount > 0}">
+                                <div th:replace="~{fragments/rating-stars :: rating-stars(${averageRating}, ${ratingCount})}"></div>
+                                <a th:href="@{'/ratings/product/' + ${product.id}}" style="margin-left: 5px; font-size: 0.9em; color: #007bff;">Vedi tutte</a>
+                            </span>
+                            <span th:unless="${ratingCount > 0}">
+                                Nessuna recensione
+                                <a th:if="${isAuthenticated and (product.autore == null or username != product.autore.username)}" 
+                                   th:href="@{'/ratings/product/' + ${product.id}}" 
+                                   style="margin-left: 5px; font-size: 0.9em; color: #007bff;">Scrivi la prima</a>
+                            </span>
+                        </span>
+                    </div>
                 </div>
 
                 <!-- Descrizione -->
@@ -420,7 +436,10 @@
                         <button class="btn btn-success" onclick="contactSeller()">
                             💬 Contatta Venditore
                         </button>
-                        <button class="btn btn-primary" onclick="shareProduct()">
+                        <a th:href="@{'/ratings/product/' + ${product.id}}" class="btn btn-primary">
+                            ⭐ Valuta Prodotto
+                        </a>
+                        <button class="btn btn-outline" style="color: #007bff; border-color: #007bff;" onclick="shareProduct()">
                             📤 Condividi
                         </button>
                     </div>
@@ -440,9 +459,8 @@
         <img class="modal-content" id="modalImage">
     </div>
 
-    <footer class="footer">
-        <p>© 2025 Sitarello. La tua piattaforma di fiducia per il commercio online.</p>
-    </footer>
+    <!-- Include footer fragment -->
+    <div th:insert="~{fragments/footer :: footer}"></div>
 
     <script>
         // Funzione per cambiare l'immagine principale

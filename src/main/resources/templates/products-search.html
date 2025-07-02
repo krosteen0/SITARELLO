@@ -4,269 +4,8 @@
     <meta charset="UTF-8">
     <title>Ricerca Prodotti - Sitarello</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <style>
-        .search-container {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .search-form {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-        
-        .search-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            align-items: end;
-        }
-        
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .form-group label {
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #333;
-        }
-        
-        .form-group input,
-        .form-group select {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
-        }
-        
-        .search-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-start;
-            flex-wrap: wrap;
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-            transition: all 0.2s;
-        }
-        
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-        
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #545b62;
-        }
-        
-        .btn-outline {
-            background-color: transparent;
-            color: #007bff;
-            border: 1px solid #007bff;
-        }
-        
-        .btn-outline:hover {
-            background-color: #007bff;
-            color: white;
-        }
-        
-        .results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 15px 0;
-            border-bottom: 2px solid #eee;
-        }
-        
-        .results-count {
-            font-size: 16px;
-            color: #666;
-        }
-        
-        .sort-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .sort-controls label {
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .product-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            padding: 20px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .product-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        
-        .product-title {
-            font-size: 1.2em;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        .product-meta {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-        
-        .product-meta .label {
-            font-weight: 600;
-            color: #666;
-        }
-        
-        .product-meta .value {
-            color: #333;
-        }
-        
-        .product-price {
-            font-size: 1.3em;
-            font-weight: 700;
-            color: #28a745;
-            margin-bottom: 15px;
-        }
-        
-        .product-description {
-            color: #666;
-            line-height: 1.4;
-            margin-bottom: 15px;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        
-        .product-images {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 15px;
-            overflow-x: auto;
-        }
-        
-        .product-images img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-        
-        .product-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-        
-        .no-results {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-        }
-        
-        .no-results h3 {
-            margin-bottom: 10px;
-            color: #333;
-        }
-        
-        .active-filters {
-            background: #e9ecef;
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }
-        
-        .active-filters h4 {
-            margin-bottom: 10px;
-            color: #333;
-        }
-        
-        .filter-tag {
-            display: inline-block;
-            background: #007bff;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            margin-right: 8px;
-            margin-bottom: 5px;
-        }
-        
-        @media (max-width: 768px) {
-            .search-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .results-header {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
-            }
-            
-            .products-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .search-actions {
-                justify-content: stretch;
-            }
-            
-            .btn {
-                flex: 1;
-            }
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/products-search.css}" />
+    <link rel="stylesheet" th:href="@{/css/rating-stars.css}" />
 </head>
 <body>
     <div th:insert="~{fragments/navbar :: navbar}"></div>
@@ -308,6 +47,18 @@
                     </div>
                     
                     <div class="form-group">
+                        <label for="ratingMin">Valutazione minima:</label>
+                        <select id="ratingMin" th:field="*{ratingMin}">
+                            <option value="">Qualsiasi valutazione</option>
+                            <option value="1">⭐ e superiori</option>
+                            <option value="2">⭐⭐ e superiori</option>
+                            <option value="3">⭐⭐⭐ e superiori</option>
+                            <option value="4">⭐⭐⭐⭐ e superiori</option>
+                            <option value="5">⭐⭐⭐⭐⭐ Solo il meglio</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
                         <label for="sortBy">Ordina per:</label>
                         <select id="sortBy" th:field="*{sortBy}">
                             <option value="id">Più recenti</option>
@@ -315,6 +66,7 @@
                             <option value="prezzo">Prezzo crescente</option>
                             <option value="prezzo_desc">Prezzo decrescente</option>
                             <option value="categoria">Categoria</option>
+                            <option value="rating">Valutazione più alta</option>
                         </select>
                     </div>
                 </div>
@@ -342,12 +94,21 @@
             <span th:if="${searchDTO.hasPrezzoMax()}" class="filter-tag">
                 💰 Max: €<span th:text="${searchDTO.prezzoMax}"></span>
             </span>
+            <span th:if="${searchDTO.hasRatingMin()}" class="filter-tag">
+                ⭐ Min: <span th:text="${searchDTO.ratingMin}"></span> stelle
+            </span>
         </div>
         
         <!-- Header Risultati -->
         <div class="results-header">
             <div class="results-count">
                 <strong th:text="${totalProducts}">0</strong> prodotti trovati
+                <span th:if="${searchDTO.hasRatingMin()}" class="rating-filter-info">
+                    (filtrati con valutazione ≥ <span th:text="${searchDTO.ratingMin}"></span> stelle)
+                </span>
+                <span th:if="${searchDTO.sortBy == 'rating'}" class="rating-sort-info">
+                    (ordinati per valutazione più alta)
+                </span>
             </div>
         </div>
         
@@ -364,6 +125,10 @@
                     <div>
                         <span class="label">Venditore:</span>
                         <span class="value" th:text="${product.autore.username}">Venditore</span>
+                    </div>
+                    <div>
+                        <span class="label">Valutazione:</span>
+                        <div th:replace="~{fragments/rating-stars :: rating-stars(${product.getAverageRating()}, ${product.getRatingCount()})}"></div>
                     </div>
                 </div>
                 
@@ -399,19 +164,13 @@
         <!-- Nessun Risultato -->
         <div th:if="${totalProducts == 0}" class="no-results">
             <h3>🔍 Nessun prodotto trovato</h3>
-            <p>Prova a modificare i filtri di ricerca o <a th:href="@{/products/reset}">rimuovi tutti i filtri</a>.</p>
-        </div>
+            <p>Prova a modificare i filtri di ricerca o <a th:href="@{/products/reset}">rimuovi tutti i filtri</a>.</p>        </div>
     </main>
-
-    <footer class="footer">
-        <p>© 2025 Sitarello. Tutti i diritti riservati.</p>
-    </footer>
-
-    <script>
-        // Auto-submit del form quando si cambia ordinamento o altri filtri (opzionale)
-        document.getElementById('sortBy').addEventListener('change', function() {
-            document.querySelector('.search-form').submit();
-        });
-    </script>
+    
+    <!-- Include footer fragment -->
+    <div th:insert="~{fragments/footer :: footer}"></div>    
+    <script th:src="@{/js/products-search.js}"></script>
 </body>
 </html>
+
+

@@ -580,6 +580,26 @@ public class ProductController {
                             product.getAutore().getId().equals(authenticatedUser.getId());
             model.addAttribute("isOwner", isOwner);
             
+            // Aggiungi informazioni sui rating tramite il servizio dedicato
+            try {
+                Double avgRating = 0.0;
+                Integer ratingCount = 0;
+                
+                // Carica ratings dal repository se necessario
+                if (product.getRatings() != null && !product.getRatings().isEmpty()) {
+                    avgRating = product.getAverageRating();
+                    ratingCount = product.getRatingCount();
+                }
+                
+                model.addAttribute("averageRating", avgRating);
+                model.addAttribute("ratingCount", ratingCount);
+            } catch (Exception e) {
+                // Fallback se c'è un problema con i rating
+                logger.warn("Impossibile caricare i rating: {}", e.getMessage());
+                model.addAttribute("averageRating", 0.0);
+                model.addAttribute("ratingCount", 0);
+            }
+            
             logger.debug("Displaying product details for ID: {}", id);
             return "product-details-view";
         } catch (Exception e) {

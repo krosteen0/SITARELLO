@@ -5,15 +5,17 @@ public class ProductSearchDTO {
     private String categoria;
     private Double prezzoMin;
     private Double prezzoMax;
+    private Integer ratingMin;
     private String sortBy = "id"; // Default sort by id (newest first)
     
     public ProductSearchDTO() {}
     
-    public ProductSearchDTO(String searchTerm, String categoria, Double prezzoMin, Double prezzoMax, String sortBy) {
+    public ProductSearchDTO(String searchTerm, String categoria, Double prezzoMin, Double prezzoMax, Integer ratingMin, String sortBy) {
         this.searchTerm = searchTerm;
         this.categoria = categoria;
         this.prezzoMin = prezzoMin;
         this.prezzoMax = prezzoMax;
+        this.ratingMin = ratingMin;
         this.sortBy = sortBy != null ? sortBy : "id";
     }
     
@@ -50,6 +52,14 @@ public class ProductSearchDTO {
         this.prezzoMax = prezzoMax;
     }
     
+    public Integer getRatingMin() {
+        return ratingMin;
+    }
+    
+    public void setRatingMin(Integer ratingMin) {
+        this.ratingMin = ratingMin;
+    }
+    
     public String getSortBy() {
         return sortBy;
     }
@@ -75,8 +85,12 @@ public class ProductSearchDTO {
         return prezzoMax != null && prezzoMax > 0;
     }
     
+    public boolean hasRatingMin() {
+        return ratingMin != null && ratingMin > 0;
+    }
+    
     public boolean hasFilters() {
-        return hasSearchTerm() || hasCategoria() || hasPrezzoMin() || hasPrezzoMax();
+        return hasSearchTerm() || hasCategoria() || hasPrezzoMin() || hasPrezzoMax() || hasRatingMin();
     }
     
     @Override
@@ -86,6 +100,7 @@ public class ProductSearchDTO {
                 ", categoria='" + categoria + '\'' +
                 ", prezzoMin=" + prezzoMin +
                 ", prezzoMax=" + prezzoMax +
+                ", ratingMin=" + ratingMin +
                 ", sortBy='" + sortBy + '\'' +
                 '}';
     }

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title th:text="${product.nome} + ' - Dettagli Prodotto'">Dettagli Prodotto</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/rating-stars.css}" />
 </head>
 <body>
     <!-- Include navbar fragment -->
@@ -16,6 +17,18 @@
                 <p><strong>Categoria:</strong> <span th:text="${product.categoria}">Categoria</span></p>
                 <p><strong>Descrizione:</strong> <span th:text="${product.descrizione}">Descrizione</span></p>
                 <p><strong>Prezzo:</strong> <span th:text="${product.prezzo}">0.00</span> €</p>
+                <p><strong>Valutazione:</strong>
+                    <span th:if="${product.getAverageRating() > 0}">
+                        <div th:replace="~{fragments/rating-stars :: rating-stars(${product.getAverageRating()}, ${product.getRatingCount()})}"></div>
+                        <a th:href="@{'/ratings/product/' + ${product.id}}" style="margin-left: 5px; font-size: 0.9em; color: #007bff;">Vedi tutte</a>
+                    </span>
+                    <span th:unless="${product.getAverageRating() > 0}">
+                        Nessuna recensione
+                        <a th:if="${isAuthenticated and username != product.autore.username}" 
+                           th:href="@{'/ratings/product/' + ${product.id}}" 
+                           style="margin-left: 5px; font-size: 0.9em; color: #007bff;">Scrivi la prima</a>
+                    </span>
+                </p>
                 <p th:if="${product.autore != null}">
                     <strong>Venditore:</strong> 
                     <a th:href="@{'/users/seller/' + ${product.autore.username}}" style="color: #007bff; text-decoration: none; font-weight: bold;">
@@ -43,8 +56,8 @@
             <a th:if="${isAuthenticated}" th:href="@{/users/products}" class="button secondary">I Miei Prodotti</a>
         </div>
     </main>
-    <footer class="footer">
-        <p>© 2025 Gestione Prodotti. Tutti i diritti riservati.</p>
-    </footer>
+    <!-- Include footer fragment -->    <div th:insert="~{fragments/footer :: footer}"></div>
 </body>
 </html>
+
+

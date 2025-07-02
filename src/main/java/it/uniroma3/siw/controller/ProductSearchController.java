@@ -97,24 +97,65 @@ public class ProductSearchController {
             String categoria = searchDTO.hasCategoria() ? searchDTO.getCategoria() : null;
             Double prezzoMin = searchDTO.hasPrezzoMin() ? searchDTO.getPrezzoMin() : null;
             Double prezzoMax = searchDTO.hasPrezzoMax() ? searchDTO.getPrezzoMax() : null;
+            Integer ratingMin = searchDTO.hasRatingMin() ? searchDTO.getRatingMin() : null;
             String sortBy = searchDTO.getSortBy() != null ? searchDTO.getSortBy() : "id";
             
             // Esegue la ricerca con i filtri usando il metodo appropriato
-            List<Product> products = switch (sortBy) {
-                case "nome" -> productRepository.findProductsWithFiltersOrderByNome(
-                        searchTerm, categoria, prezzoMin, prezzoMax);
-                case "prezzo" -> productRepository.findProductsWithFiltersOrderByPrezzo(
-                        searchTerm, categoria, prezzoMin, prezzoMax);
-                case "prezzo_desc" -> productRepository.findProductsWithFiltersOrderByPrezzoDesc(
-                        searchTerm, categoria, prezzoMin, prezzoMax);
-                case "categoria" -> productRepository.findProductsWithFiltersOrderByCategoria(
-                        searchTerm, categoria, prezzoMin, prezzoMax);
-                default -> productRepository.findProductsWithFiltersOrderById(
-                        searchTerm, categoria, prezzoMin, prezzoMax);
-            };
+            List<Product> products;
             
-            // Carica manualmente le immagini per tutti i prodotti
-            loadImagesForProducts(products);
+            try {
+                // Per l'ordinamento per rating, non usiamo la query diretta perché è problematica
+                // Invece recuperiamo i prodotti con filtri e poi li ordiniamo manualmente
+                boolean sortByRating = "rating".equals(sortBy);
+                String effectiveSortBy = sortByRating ? "id" : sortBy; // Se l'ordinamento è per rating, usiamo id come default
+                
+                if (ratingMin != null && ratingMin > 0) {
+                    // Se c'è un filtro di rating, usa la query con filtro rating
+                    products = switch (effectiveSortBy) {
+                        case "nome" -> productRepository.findProductsWithRatingFilterOrderByNome(
+                                searchTerm, categoria, prezzoMin, prezzoMax, ratingMin);
+                        case "prezzo" -> productRepository.findProductsWithRatingFilterOrderByPrezzo(
+                                searchTerm, categoria, prezzoMin, prezzoMax, ratingMin);
+                        case "prezzo_desc" -> productRepository.findProductsWithRatingFilterOrderByPrezzoDesc(
+                                searchTerm, categoria, prezzoMin, prezzoMax, ratingMin);
+                        case "categoria" -> productRepository.findProductsWithRatingFilterOrderByCategoria(
+                                searchTerm, categoria, prezzoMin, prezzoMax, ratingMin);
+                        default -> productRepository.findProductsWithRatingFilterOrderById(
+                                searchTerm, categoria, prezzoMin, prezzoMax, ratingMin);
+                    };
+                } else {
+                    // Altrimenti usa le query normali
+                    products = switch (effectiveSortBy) {
+                        case "nome" -> productRepository.findProductsWithFiltersOrderByNome(
+                                searchTerm, categoria, prezzoMin, prezzoMax);
+                        case "prezzo" -> productRepository.findProductsWithFiltersOrderByPrezzo(
+                                searchTerm, categoria, prezzoMin, prezzoMax);
+                        case "prezzo_desc" -> productRepository.findProductsWithFiltersOrderByPrezzoDesc(
+                                searchTerm, categoria, prezzoMin, prezzoMax);
+                        case "categoria" -> productRepository.findProductsWithFiltersOrderByCategoria(
+                                searchTerm, categoria, prezzoMin, prezzoMax);
+                        default -> productRepository.findProductsWithFiltersOrderById(
+                                searchTerm, categoria, prezzoMin, prezzoMax);
+                    };
+                }
+                
+                // Carica manualmente le immagini per tutti i prodotti
+                loadImagesForProducts(products);
+                
+                // Carica manualmente i ratings per ogni prodotto
+                for (Product product : products) {
+                    product.setRatings(productRepository.findRatingsForProduct(product.getId()));
+                }
+                
+                // Se l'ordinamento è per rating, ordina i prodotti a livello di applicazione
+                if (sortByRating) {
+                    products.sort((p1, p2) -> Double.compare(p2.getAverageRating(), p1.getAverageRating()));
+                }
+                
+            } catch (Exception e) {
+                logger.error("Error in product search: {}", e.getMessage(), e);
+                throw e; // Ripropaga l'eccezione per il gestione dell'errore generale
+            }
             
             // Carica le categorie per il dropdown
             List<String> categories = productRepository.findDistinctCategories();
@@ -157,6 +198,7 @@ public class ProductSearchController {
             ProductSearchDTO searchDTO = new ProductSearchDTO();
             searchDTO.setSearchTerm(q);
             searchDTO.setSortBy("nome");
+            searchDTO.setRatingMin(null);
             
             model.addAttribute("products", products);
             model.addAttribute("categories", categories);

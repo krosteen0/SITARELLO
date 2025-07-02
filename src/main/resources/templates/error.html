@@ -81,8 +81,8 @@
             <a th:href="@{/users/products}" class="button secondary" th:if="${isAuthenticated}">I Miei Prodotti</a>
         </div>
     </main>
-    <footer class="footer">
-        <p>© 2025 Gestione Prodotti. Tutti i diritti riservati.</p>
-    </footer>
+    <!-- Include footer fragment -->    <div th:insert="~{fragments/footer :: footer}"></div>
 </body>
 </html>
+
+

@@ -19,39 +19,10 @@
             <button type="submit" id="forwardButton" disabled>Avanti</button>
         </form>
     </main>
-    <footer class="footer">
-        <p>© 2025 Gestione Prodotti. Tutti i diritti riservati.</p>
-    </footer>
-
-    <script>
-        function validateImages(input) {
-            const files = input.files;
-            const count = files.length;
-            const errorMessage = document.getElementById('errorMessage');
-            const imageCount = document.getElementById('imageCount');
-            const forwardButton = document.getElementById('forwardButton');
-            const imagePreview = document.getElementById('imagePreview');
-
-            imageCount.textContent = `Immagini selezionate: ${count}`;
-            imagePreview.innerHTML = '';
-
-            if (count < 2) {
-                errorMessage.textContent = 'Seleziona almeno 2 immagini.';
-                forwardButton.disabled = true;
-            } else if (count > 10) {
-                errorMessage.textContent = 'Puoi selezionare un massimo di 10 immagini.';
-                forwardButton.disabled = true;
-            } else {
-                errorMessage.textContent = '';
-                forwardButton.disabled = false;
-            }
-
-            for (let i = 0; i < count; i++) {
-                const img = document.createElement('img');
-                img.src = URL.createObjectURL(files[i]);
-                imagePreview.appendChild(img);
-            }
-        }
-    </script>
+    
+    <!-- Include footer fragment -->
+    <div th:insert="~{fragments/footer :: footer}"></div>    
+    <script th:src="@{/js/image-upload.js}"></script>
 </body>
 </html>
+
