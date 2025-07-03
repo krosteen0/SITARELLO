@@ -51,12 +51,6 @@ class EnhancedProductCreator {
     
     setupAll() {
         console.log('Setting up enhanced product creator...');
-        console.log('Document ready state:', document.readyState);
-        
-        // Check if elements exist
-        console.log('Upload button exists:', !!document.getElementById('uploadBtn'));
-        console.log('File input exists:', !!document.getElementById('imageInput'));
-        console.log('Upload area exists:', !!document.getElementById('imageUploadArea'));
         
         this.setupEventListeners();
         this.setupImageUpload();
@@ -67,8 +61,13 @@ class EnhancedProductCreator {
         this.updateProgressBar();
         this.showStep(this.currentStep);
         
-        // Fallback setup for upload button
-        this.setupUploadButtonFallback();
+        // Semplice setup del pulsante di upload
+        const uploadBtn = document.getElementById('uploadBtn');
+        if (uploadBtn) {
+            uploadBtn.onclick = function() {
+                document.getElementById('imageInput').click();
+            };
+        }
         
         console.log('Enhanced product creator initialized');
     }
