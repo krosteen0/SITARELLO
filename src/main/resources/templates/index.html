@@ -9,28 +9,94 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+        <div class="animated-bg">
+        <div class="floating-shapes">
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+        </div>
+    </div>
     <!-- Include navbar fragment -->
     <div th:insert="~{fragments/navbar :: navbar}"></div>
 
     <div class="hero-section">
+        <!-- Sfondo con pattern geometrico -->
+        <div class="hero-background">
+            <div class="hero-pattern"></div>
+            <div class="hero-glow"></div>
+        </div>
+        
         <div class="hero-content">
+            <!-- Badge di benvenuto -->
+            <div class="hero-badge">
+                <i class="fas fa-star"></i>
+                <span>Marketplace #1 in Italia</span>
+            </div>
+            
             <h1 class="hero-title">Benvenuto su Sitarello</h1>
             <p class="hero-subtitle">Il marketplace per comprare e vendere prodotti in modo semplice e sicuro.</p>
+            
+            <!-- Statistiche -->
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">10K+</span>
+                    <span class="stat-label">Utenti Attivi</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">50K+</span>
+                    <span class="stat-label">Prodotti Venduti</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">99%</span>
+                    <span class="stat-label">Soddisfazione</span>
+                </div>
+            </div>
             
             <div class="hero-search">
                 <form th:action="@{/products/search}" method="get" class="search-form">
                     <div class="search-input-group">
                         <i class="fas fa-search search-icon"></i>
-                        <input type="text" name="searchTerm" class="search-input" placeholder="Cerca prodotti, categorie...">
+                        <input type="text" name="searchTerm" class="search-input" placeholder="Cerca prodotti, categorie, brand...">
                         <button type="submit" class="search-btn">Cerca</button>
                     </div>
                 </form>
             </div>
 
             <div class="hero-actions">
+<<<<<<< Updated upstream
                 <a th:href="@{/products}" class="btn btn-primary">Esplora Prodotti</a>
                 <a sec:authorize="!isAuthenticated()" th:href="@{/register}" class="btn btn-outline">Registrati Ora</a>
                 <a sec:authorize="isAuthenticated()" th:href="@{/product/create}" class="btn btn-success">Vendi un Prodotto</a>
+=======
+                <a th:href="@{/products}" class="btn btn-primary">
+                    <i class="fas fa-shopping-bag"></i>
+                    Esplora Prodotti
+                </a>
+                <a sec:authorize="!isAuthenticated()" th:href="@{/register}" class="btn btn-outline">
+                    <i class="fas fa-user-plus"></i>
+                    Registrati Ora
+                </a>
+                <a sec:authorize="isAuthenticated()" th:href="@{/product/create/images}" class="btn btn-success">
+                    <i class="fas fa-plus-circle"></i>
+                    Vendi un Prodotto
+                </a>
+            </div>
+            
+            <!-- Caratteristiche principali -->
+            <div class="hero-features">
+                <div class="feature-mini">
+                    <i class="fas fa-shield-check"></i>
+                    <span>Pagamenti Sicuri</span>
+                </div>
+                <div class="feature-mini">
+                    <i class="fas fa-truck"></i>
+                    <span>Spedizione Rapida</span>
+                </div>
+                <div class="feature-mini">
+                    <i class="fas fa-headset"></i>
+                    <span>Supporto 24/7</span>
+                </div>
+>>>>>>> Stashed changes
             </div>
         </div>
     </div>
