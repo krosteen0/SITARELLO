@@ -77,8 +77,15 @@
                     <p>Siamo felici di rivederti. Esplora le ultime novità o gestisci i tuoi prodotti.</p>
                 </div>
                 <div class="welcome-actions">
-                    <a th:href="@{/profile}" class="btn btn-sm">Mio Profilo</a>
-                    <button onclick="SitarelloHomepage.closeWelcomeMessage()" class="btn btn-sm btn-outline">Chiudi</button>
+                    <a th:href="@{/users/profile}" class="btn btn-sm">Mio Profilo</a>
+                    <button onclick="
+                        const welcomeSection = document.querySelector('.welcome-section');
+                        if (welcomeSection) {
+                            welcomeSection.style.opacity = '0';
+                            welcomeSection.style.transform = 'translateY(-20px)';
+                            setTimeout(() => { welcomeSection.style.display = 'none'; }, 300);
+                        }
+                    " class="btn btn-sm btn-outline">Chiudi</button>
                 </div>
             </div>
         </div>

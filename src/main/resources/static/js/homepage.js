@@ -239,3 +239,6 @@ window.SitarelloHomepage = {
     showLoading,
     hideLoading
 };
+
+// Rendi disponibile la funzione anche globalmente per facilità d'uso
+window.closeWelcomeMessage = closeWelcomeMessage;
