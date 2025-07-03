@@ -114,15 +114,15 @@
                                 <div class="product-image">
                                     <img th:if="${not #lists.isEmpty(product.images)}" 
                                          th:src="@{'/product/image/' + ${product.images[0].id}}" 
-                                         th:alt="${product.nome}" />
+                                         th:alt="${product.name}" />
                                     <img th:if="${#lists.isEmpty(product.images)}" 
                                          th:src="@{/immagini/placeholder.jpg}" 
                                          alt="Nessuna immagine" />
                                 </div>
                                 
                                 <div class="product-details">
-                                    <div class="product-name" th:text="${product.nome}">Nome Prodotto</div>
-                                    <div class="product-price">€<span th:text="${#numbers.formatDecimal(product.prezzo, 1, 2)}">0.00</span></div>
+                                    <div class="product-name" th:text="${product.name}">Nome Prodotto</div>
+                                    <div class="product-price">€<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span></div>
                                 </div>
                                 
                                 <div class="product-actions">

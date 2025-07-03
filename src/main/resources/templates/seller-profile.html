@@ -63,12 +63,12 @@
                 
                 <div th:unless="${sellerProducts.isEmpty()}" class="products-grid">
                     <div th:each="product : ${sellerProducts}" class="product-card">
-                        <div class="product-title" th:text="${product.nome}">Nome Prodotto</div>
+                        <div class="product-title" th:text="${product.name}">Nome Prodotto</div>
                         
                         <div class="product-meta">
                             <div>
                                 <span class="label">Categoria:</span>
-                                <span class="value" th:text="${product.categoria}">Categoria</span>
+                                <span class="value" th:text="${product.category.name}">Categoria</span>
                             </div>
                             <div>
                                 <span class="label">Valutazione:</span>
@@ -84,14 +84,14 @@
                         </div>
                         
                         <div class="product-price">
-                            €<span th:text="${#numbers.formatDecimal(product.prezzo, 1, 2)}">0.00</span>
+                            €<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span>
                         </div>
                         
                         <div th:if="${product.images != null and not #lists.isEmpty(product.images)}" class="product-images">
                             <img th:each="image, iterStat : ${product.images}" 
                                  th:if="${iterStat.index < 3}"
                                  th:src="@{'/product/image/' + ${image.id}}" 
-                                 th:alt="${product.nome}" />
+                                 th:alt="${product.name}" />
                         </div>
                         
                         <div class="product-actions">
@@ -121,10 +121,9 @@
         </div>
     </main>
     
-    <!-- Include footer fragment -->    <div th:insert="~{fragments/footer :: footer}"></div>
+    <!-- Include footer fragment -->
+    <div th:insert="~{fragments/footer :: footer}"></div>
     
     <script th:src="@{/js/seller-profile.js}"></script>
 </body>
 </html>
-
-

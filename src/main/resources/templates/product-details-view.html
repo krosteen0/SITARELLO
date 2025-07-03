@@ -323,7 +323,7 @@
             <span>></span>
             <a th:href="@{/products}">🛍️ Prodotti</a>
             <span>></span>
-            <strong th:text="${product.nome}">Prodotto</strong>
+            <strong th:text="${product.name}">Prodotto</strong>
         </div>
 
         <div class="product-detail-container">
@@ -333,7 +333,7 @@
                     <!-- Immagine principale -->
                     <img id="mainImage" 
                          th:src="@{'/product/image/' + ${product.images[0].id}}" 
-                         th:alt="${product.nome}"
+                         th:alt="${product.name}"
                          class="main-image"
                          onclick="openModal(this.src)" />
                     
@@ -341,7 +341,7 @@
                     <div class="image-thumbnails" th:if="${#lists.size(product.images) > 1}">
                         <img th:each="image, iterStat : ${product.images}"
                              th:src="@{'/product/image/' + ${image.id}}"
-                             th:alt="${product.nome}"
+                             th:alt="${product.name}"
                              th:class="${iterStat.index == 0} ? 'thumbnail active' : 'thumbnail'"
                              th:onclick="'changeMainImage(this.src, this)'" />
                     </div>

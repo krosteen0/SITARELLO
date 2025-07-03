@@ -1,10 +1,5 @@
-<!DOCTYPE ht        <h1 th:text="${product.name}">Nome Prodotto</h1>
-        
-        <div class="product-info">
-            <div class="product-details">
-                <p><strong>Categoria:</strong> <span th:text="${product.category?.name ?: 'Categoria non specificata'}">Categoria</span></p>
-                <p><strong>Descrizione:</strong> <span th:text="${product.description}">Descrizione</span></p>
-                <p><strong>Prezzo:</strong> <span th:text="${product.price}">0.00</span> €</p>tml lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title th:text="${product.name} + ' - Dettagli Prodotto'">Dettagli Prodotto</title>
@@ -15,13 +10,13 @@
     <!-- Include navbar fragment -->
     <div th:insert="~{fragments/navbar :: navbar}"></div>
     <main class="container">
-        <h1 th:text="${product.nome}">Nome Prodotto</h1>
+        <h1 th:text="${product.name}">Nome Prodotto</h1>
         
         <div class="product-info">
             <div class="product-details">
-                <p><strong>Categoria:</strong> <span th:text="${product.categoria}">Categoria</span></p>
-                <p><strong>Descrizione:</strong> <span th:text="${product.descrizione}">Descrizione</span></p>
-                <p><strong>Prezzo:</strong> <span th:text="${product.prezzo}">0.00</span> €</p>
+                <p><strong>Categoria:</strong> <span th:text="${product.category?.name ?: 'Categoria non specificata'}">Categoria</span></p>
+                <p><strong>Descrizione:</strong> <span th:text="${product.description}">Descrizione</span></p>
+                <p><strong>Prezzo:</strong> <span th:text="${product.price}">0.00</span> €</p>
                 <p><strong>Valutazione:</strong>
                     <span th:if="${product.getAverageRating() > 0}">
                         <div th:replace="~{fragments/rating-stars :: rating-stars(${product.getAverageRating()}, ${product.getRatingCount()})}"></div>
@@ -61,7 +56,8 @@
             <a th:if="${isAuthenticated}" th:href="@{/users/products}" class="button secondary">I Miei Prodotti</a>
         </div>
     </main>
-    <!-- Include footer fragment -->    <div th:insert="~{fragments/footer :: footer}"></div>
+    <!-- Include footer fragment -->
+    <div th:insert="~{fragments/footer :: footer}"></div>
 </body>
 </html>
 
