@@ -135,10 +135,9 @@ public class ProductSearchController {
             
             // Carica le categorie per il dropdown
             List<Category> categories = (List<Category>) categoryRepository.findAll();
-            List<String> categoryNames = categories.stream().map(Category::getName).toList();
             
             model.addAttribute("products", products);
-            model.addAttribute("categories", categoryNames);
+            model.addAttribute("categories", categories);
             model.addAttribute("searchDTO", searchDTO);
             model.addAttribute("totalProducts", products.size());
             model.addAttribute("hasFilters", searchDTO.hasFilters());

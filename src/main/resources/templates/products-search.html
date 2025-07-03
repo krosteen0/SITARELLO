@@ -28,9 +28,9 @@
                         <select id="categoria" th:field="*{categoria}">
                             <option value="">Tutte le categorie</option>
                             <option th:each="cat : ${categories}" 
-                                    th:value="${cat}" 
-                                    th:text="${cat}"
-                                    th:selected="${searchDTO.categoria == cat}">Categoria</option>
+                                    th:value="${cat.name}" 
+                                    th:text="${cat.name}"
+                                    th:selected="${searchDTO.categoria == cat.name}">Categoria</option>
                         </select>
                     </div>
                     
@@ -62,10 +62,10 @@
                         <label for="sortBy">Ordina per:</label>
                         <select id="sortBy" th:field="*{sortBy}">
                             <option value="id">Più recenti</option>
-                            <option value="nome">Nome A-Z</option>
-                            <option value="prezzo">Prezzo crescente</option>
-                            <option value="prezzo_desc">Prezzo decrescente</option>
-                            <option value="categoria">Categoria</option>
+                            <option value="name">Nome A-Z</option>
+                            <option value="price">Prezzo crescente</option>
+                            <option value="price_desc">Prezzo decrescente</option>
+                            <option value="category">Categoria</option>
                             <option value="rating">Valutazione più alta</option>
                         </select>
                     </div>
@@ -115,16 +115,16 @@
         <!-- Risultati -->
         <div th:if="${totalProducts > 0}" class="products-grid">
             <div th:each="product : ${products}" class="product-card">
-                <div class="product-title" th:text="${product.nome}">Nome Prodotto</div>
+                <div class="product-title" th:text="${product.name}">Nome Prodotto</div>
                 
                 <div class="product-meta">
                     <div>
                         <span class="label">Categoria:</span>
-                        <span class="value" th:text="${product.categoria}">Categoria</span>
+                        <span class="value" th:text="${product.category.name}">Categoria</span>
                     </div>
                     <div>
                         <span class="label">Venditore:</span>
-                        <span class="value" th:text="${product.autore.username}">Venditore</span>
+                        <span class="value" th:text="${product.seller.username}">Venditore</span>
                     </div>
                     <div>
                         <span class="label">Valutazione:</span>
@@ -133,17 +133,17 @@
                 </div>
                 
                 <div class="product-price">
-                    €<span th:text="${#numbers.formatDecimal(product.prezzo, 1, 2)}">0.00</span>
+                    €<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span>
                 </div>
                 
-                <div class="product-description" th:text="${product.descrizione}">
+                <div class="product-description" th:text="${product.description}">
                     Descrizione del prodotto...
                 </div>
                 
                 <div th:if="${product.images != null and not #lists.isEmpty(product.images)}" class="product-images">
                     <img th:each="image : ${product.images}" 
                          th:src="@{'/product/image/' + ${image.id}}" 
-                         th:alt="${product.nome}" />
+                         th:alt="${product.name}" />
                 </div>
                 
                 <div class="product-actions">
@@ -152,7 +152,7 @@
                     </a>
                     
                     <!-- Pulsanti di modifica solo se l'utente è autenticato e proprietario del prodotto -->
-                    <div th:if="${isAuthenticated and product.autore.username == username}">
+                    <div th:if="${isAuthenticated and product.seller.username == username}">
                         <a th:href="@{'/product/edit/' + ${product.id}}" class="btn btn-outline btn-sm">
                             ✏️ Modifica
                         </a>
@@ -164,7 +164,8 @@
         <!-- Nessun Risultato -->
         <div th:if="${totalProducts == 0}" class="no-results">
             <h3>🔍 Nessun prodotto trovato</h3>
-            <p>Prova a modificare i filtri di ricerca o <a th:href="@{/products/reset}">rimuovi tutti i filtri</a>.</p>        </div>
+            <p>Prova a modificare i filtri di ricerca o <a th:href="@{/products/reset}">rimuovi tutti i filtri</a>.</p>
+        </div>
     </main>
     
     <!-- Include footer fragment -->
