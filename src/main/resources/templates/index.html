@@ -6,6 +6,7 @@
     <title>Home - Sitarello</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
     <link rel="stylesheet" th:href="@{/css/homepage.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -63,40 +64,9 @@
             </div>
 
             <div class="hero-actions">
-<<<<<<< Updated upstream
                 <a th:href="@{/products}" class="btn btn-primary">Esplora Prodotti</a>
                 <a sec:authorize="!isAuthenticated()" th:href="@{/register}" class="btn btn-outline">Registrati Ora</a>
                 <a sec:authorize="isAuthenticated()" th:href="@{/product/create}" class="btn btn-success">Vendi un Prodotto</a>
-=======
-                <a th:href="@{/products}" class="btn btn-primary">
-                    <i class="fas fa-shopping-bag"></i>
-                    Esplora Prodotti
-                </a>
-                <a sec:authorize="!isAuthenticated()" th:href="@{/register}" class="btn btn-outline">
-                    <i class="fas fa-user-plus"></i>
-                    Registrati Ora
-                </a>
-                <a sec:authorize="isAuthenticated()" th:href="@{/product/create/images}" class="btn btn-success">
-                    <i class="fas fa-plus-circle"></i>
-                    Vendi un Prodotto
-                </a>
-            </div>
-            
-            <!-- Caratteristiche principali -->
-            <div class="hero-features">
-                <div class="feature-mini">
-                    <i class="fas fa-shield-check"></i>
-                    <span>Pagamenti Sicuri</span>
-                </div>
-                <div class="feature-mini">
-                    <i class="fas fa-truck"></i>
-                    <span>Spedizione Rapida</span>
-                </div>
-                <div class="feature-mini">
-                    <i class="fas fa-headset"></i>
-                    <span>Supporto 24/7</span>
-                </div>
->>>>>>> Stashed changes
             </div>
         </div>
     </div>

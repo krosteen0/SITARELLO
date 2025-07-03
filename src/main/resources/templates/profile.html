@@ -2,16 +2,32 @@
 <html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Il Tuo Profilo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Il Tuo Profilo - Sitarello</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
     <link rel="stylesheet" th:href="@{/css/profile.css}" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <div class="animated-bg">
+        <div class="floating-shapes">
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+        </div>
+    </div>
+    
     <div th:insert="~{fragments/navbar :: navbar}"></div>
     
     <main class="container">
-        <h1>Il Tuo Profilo</h1>
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-user-circle"></i>
+                Il Tuo Profilo
+            </h1>
+            <p class="page-subtitle">Gestisci le tue informazioni e preferenze</p>
+        </div>
         
         <div class="profile-container">
             <div class="profile-sidebar">
