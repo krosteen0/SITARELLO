@@ -73,17 +73,30 @@
                                     </div>
                                     <div class="upload-text">Trascina le immagini qui o clicca per caricare</div>
                                     <div class="upload-subtext">Fino a 10 immagini • JPG, PNG, WEBP • Max 5MB ciascuna</div>
-                                    <button type="button" class="upload-btn" id="uploadBtn">
-                                        <i class="fas fa-plus"></i> Scegli File
-                                    </button>
+                                    
+                                    <!-- SOLUZIONE: File input trasparente sovrapposto al pulsante -->
+                                    <div class="file-input-container" style="position: relative; display: inline-block;">
+                                        <button type="button" class="upload-btn" id="customFileBtn">
+                                            <i class="fas fa-plus"></i> Scegli File
+                                        </button>
+                                        <input type="file" 
+                                               id="imageInput" 
+                                               name="images" 
+                                               multiple 
+                                               accept="image/*"
+                                               style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2;" />
+                                    </div>
+                                    <script>
+                                    // Fix: trigger file input on button click
+                                    const customFileBtn = document.getElementById('customFileBtn');
+                                    const imageInput = document.getElementById('imageInput');
+                                    if(customFileBtn && imageInput) {
+                                        customFileBtn.addEventListener('click', function(e) {
+                                            imageInput.click();
+                                        });
+                                    }
+                                    </script>
                                 </div>
-                                
-                                <input type="file" 
-                                       id="imageInput" 
-                                       name="images" 
-                                       multiple 
-                                       accept="image/jpeg,image/jpg,image/png,image/webp" 
-                                       style="display: none;" />
                             </div>
 
                             <div class="image-preview-container" id="imagePreviewGrid">

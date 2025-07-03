@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+l<!DOCTYPE html>
 <html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
@@ -35,15 +35,13 @@
                 <!-- Product Image -->
                 <div class="product-image">
                     <div th:if="${product.images != null && !product.images.isEmpty()}" 
-                         th:class="'product-image-grid ' + (${product.images.size() == 1} ? 'single' : 
-                                  ${product.images.size() == 3} ? 'three' : 
-                                  ${product.images.size() >= 4} ? 'four' : '')">
+                         th:class="${'product-image-grid ' + (product.images.size() == 1 ? ' single' : (product.images.size() == 3 ? ' three' : (product.images.size() >= 4 ? ' four' : '')))}">
                         <img th:each="image, iterStat : ${product.images}" 
                              th:if="${iterStat.index < 4}"
                              th:src="@{'/product/image/' + ${image.id}}" 
                              th:alt="${product.name}" />
                     </div>
-                    <div th:if="${product.images == null || product.images.isEmpty()}" class="product-image-placeholder">
+                    <div th:unless="${product.images != null && !product.images.isEmpty()}" class="product-image-placeholder">
                         <i class="fas fa-image"></i>
                     </div>
                 </div>

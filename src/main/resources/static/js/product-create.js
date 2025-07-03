@@ -1,3 +1,85 @@
+// SOLUZIONE SEMPLICE: File input sovrapposto
+console.log('=== PRODUCT CREATE JS LOADED ===');
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('=== DOM READY ===');
+    
+    const fileInput = document.getElementById('imageInput');
+    
+    if (fileInput) {
+        console.log('✅ File input trovato:', fileInput);
+        
+        // Listener per il cambio file
+        fileInput.addEventListener('change', function(e) {
+            console.log('🎉 FILE SELEZIONATI! 🎉');
+            console.log('Files:', e.target.files);
+            
+            if (e.target.files && e.target.files.length > 0) {
+                handleFileSelection(e.target.files);
+            }
+        });
+        
+        // Test del drag and drop sull'area
+        const uploadArea = document.getElementById('imageUploadArea');
+        if (uploadArea) {
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.style.backgroundColor = '#f0f8ff';
+            });
+            
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                uploadArea.style.backgroundColor = '';
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.style.backgroundColor = '';
+                
+                const files = e.dataTransfer.files;
+                if (files && files.length > 0) {
+                    console.log('🎯 Files dropped:', files);
+                    handleFileSelection(files);
+                }
+            });
+        }
+        
+        console.log('✅ Event listeners configurati');
+    } else {
+        console.error('❌ File input non trovato!');
+    }
+});
+
+function handleFileSelection(files) {
+    console.log('Gestione file selezionati:', files.length);
+    
+    // Mostra alert di test
+    alert(`${files.length} file selezionato(i):\n${Array.from(files).map(f => f.name).join('\n')}`);
+    
+    // Qui andrà la logica per mostrare le anteprime
+    const previewContainer = document.getElementById('imagePreviewGrid');
+    if (previewContainer) {
+        previewContainer.innerHTML = '';
+        
+        Array.from(files).forEach((file, index) => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.innerHTML = `
+                        <div style="display: inline-block; margin: 5px; border: 1px solid #ccc; padding: 5px;">
+                            <img src="${e.target.result}" style="width: 100px; height: 100px; object-fit: cover;">
+                            <div>${file.name}</div>
+                        </div>
+                    `;
+                    previewContainer.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+}
+
 // Enhanced Product Creation JavaScript - Sitarello
 console.log('Enhanced Product Create JS loaded');
 
@@ -61,72 +143,7 @@ class EnhancedProductCreator {
         this.updateProgressBar();
         this.showStep(this.currentStep);
         
-        // Semplice setup del pulsante di upload
-        const uploadBtn = document.getElementById('uploadBtn');
-        if (uploadBtn) {
-            uploadBtn.onclick = function() {
-                document.getElementById('imageInput').click();
-            };
-        }
-        
         console.log('Enhanced product creator initialized');
-    }
-    
-    setupUploadButtonFallback() {
-        console.log('Setting up upload button...');
-        
-        // Wait for DOM to be fully ready
-        setTimeout(() => {
-            const uploadBtn = document.getElementById('uploadBtn');
-            const fileInput = document.getElementById('imageInput');
-            
-            console.log('Upload button element:', uploadBtn);
-            console.log('File input element:', fileInput);
-            
-            if (uploadBtn && fileInput) {
-                console.log('Elements found, setting up event listener...');
-                
-                // Clear ALL existing handlers
-                uploadBtn.onclick = null;
-                uploadBtn.removeAttribute('onclick');
-                
-                // Remove any existing event listeners by cloning
-                const newBtn = uploadBtn.cloneNode(true);
-                uploadBtn.parentNode.replaceChild(newBtn, uploadBtn);
-                
-                // Get fresh reference
-                const cleanBtn = document.getElementById('uploadBtn');
-                console.log('Fresh button reference:', cleanBtn);
-                
-                // ONE SINGLE CLEAN EVENT LISTENER
-                cleanBtn.addEventListener('click', function(e) {
-                    console.log('=== UPLOAD BUTTON CLICKED ===');
-                    
-                    // Stop ALL propagation immediately
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
-                    
-                    // Add a small delay to ensure the click event is processed
-                    setTimeout(() => {
-                        console.log('Attempting to trigger file input...');
-                        try {
-                            fileInput.click();
-                            console.log('File input click() called successfully');
-                        } catch (error) {
-                            console.error('Error opening file dialog:', error);
-                        }
-                    }, 10);
-                    
-                    return false;
-                }, { once: false, passive: false });
-                
-                console.log('Upload button event listener attached successfully');
-            } else {
-                console.error('Upload button or file input not found!');
-                console.error('Upload button:', uploadBtn);
-                console.error('File input:', fileInput);
-            }
-        }, 200);
     }
     
     setupEventListeners() {
@@ -170,13 +187,6 @@ class EnhancedProductCreator {
         
         // Format buttons (if present)
         this.setupFormatButtons();
-        
-        // Upload button setup will be handled by fallback method
-        const uploadBtn = document.getElementById('uploadBtn');
-        const fileInput = document.getElementById('imageInput');
-        console.log('Elements found - Upload button:', !!uploadBtn, 'File input:', !!fileInput);
-        
-        // Skip main setup to avoid conflicts - let fallback handle it
     }
     
     setupImageUpload() {
