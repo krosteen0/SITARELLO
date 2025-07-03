@@ -1,2 +1,374 @@
-/* CSS per product-ratings.html */
-/* Questo file contiene tutti gli stili precedentemente inline */
+/* Product Ratings Page Specific Styles */
+
+* {
+    box-sizing: border-box;
+}
+
+.ratings-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.rating-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.average-rating {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.rating-value {
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: #28a745;
+    margin-bottom: 10px;
+}
+
+.rating-stars {
+    font-size: 1.8rem;
+    color: #ffc107;
+    margin: 10px 0;
+}
+
+.rating-count {
+    color: #6c757d;
+    font-size: 1.1rem;
+}
+
+.rating-form {
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+    border-bottom: 3px solid #007bff;
+    padding-bottom: 15px;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #555;
+}
+
+.star-rating {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 5px;
+}
+
+.star-rating input {
+    display: none;
+}
+
+.star-rating label {
+    cursor: pointer;
+    width: 45px;
+    height: 45px;
+    font-size: 35px;
+    color: #ddd;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.star-rating label::before {
+    content: "★";
+}
+
+.star-rating input:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: #ffc107;
+    transform: scale(1.1);
+}
+
+textarea {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.ratings-list {
+    margin-top: 40px;
+}
+
+.ratings-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+    color: #333;
+}
+
+.rating-item {
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.rating-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.rating-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.rating-user {
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+}
+
+.rating-date {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.rating-content {
+    margin-top: 15px;
+    color: #555;
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+.no-ratings {
+    text-align: center;
+    padding: 60px 40px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    color: #6c757d;
+    font-size: 1.1rem;
+}
+
+.error-message {
+    color: #dc3545;
+    margin-top: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+}
+
+.user-rating-info {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border: 2px solid #28a745;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    font-weight: 500;
+}
+
+.seller-info {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    border: 2px solid #17a2b8;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    font-size: 14px;
+}
+
+.breadcrumb a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.breadcrumb-separator {
+    margin: 0 12px;
+    color: #6c757d;
+}
+
+.star.filled {
+    color: #ffc107;
+}
+
+.star {
+    color: #e9ecef;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.btn-back {
+    background-color: #6c757d !important;
+    color: white !important;
+    padding: 10px 20px;
+    text-decoration: none !important;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.btn-back:hover {
+    background-color: #5a6268 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .ratings-container {
+        padding: 15px;
+    }
+    
+    .rating-summary {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+    
+    .rating-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    .star-rating label {
+        width: 35px;
+        height: 35px;
+        font-size: 25px;
+    }
+    
+    .rating-value {
+        font-size: 2.5rem;
+    }
+    
+    .form-title {
+        font-size: 1.3rem;
+    }
+    
+    /* Header responsive */
+    .ratings-container > div:first-of-type {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 15px;
+    }
+    
+    .btn-back {
+        align-self: stretch;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .ratings-container {
+        padding: 10px;
+    }
+    
+    .rating-form,
+    .rating-summary {
+        padding: 20px;
+    }
+    
+    .star-rating {
+        justify-content: center;
+    }
+    
+    .btn-submit {
+        width: 100%;
+        padding: 15px;
+    }
+}

@@ -634,4 +634,92 @@ public class ProductController {
             return "error";
         }
     }
+    
+    // Nuovo endpoint per il flusso moderno di creazione prodotti
+    @GetMapping("/create")
+    public String showModernCreatePage(Model model) {
+        addAuthenticationAttributes(model);
+        
+        // Aggiungi le categorie al modello
+        List<Category> categories = (List<Category>) categoryRepository.findAll();
+        model.addAttribute("categories", categories);
+        model.addAttribute("productFormDTO", new ProductFormDTO());
+        
+        logger.debug("Displaying modern product creation page");
+        return "product-create";
+    }
+    
+    @PostMapping("/create")
+    @ResponseBody
+    public String handleModernProductCreation(@RequestParam("name") String name,
+                                            @RequestParam("price") Double price,
+                                            @RequestParam("description") String description,
+                                            @RequestParam("category") Long categoryId,
+                                            @RequestParam("images") List<MultipartFile> images,
+                                            Model model) {
+        try {
+            // Validazione base
+            if (images == null || images.isEmpty()) {
+                return "{\"error\": \"Carica almeno un'immagine\"}";
+            }
+            
+            if (images.size() > 5) {
+                return "{\"error\": \"Massimo 5 immagini consentite\"}";
+            }
+            
+            // Validazione dimensioni e tipo file
+            for (MultipartFile image : images) {
+                if (image.getSize() > 5 * 1024 * 1024) { // 5MB
+                    return "{\"error\": \"Immagine troppo grande (max 5MB): " + image.getOriginalFilename() + "\"}";
+                }
+                
+                String contentType = image.getContentType();
+                if (contentType == null || !isValidImageType(contentType)) {
+                    return "{\"error\": \"Formato immagine non supportato: " + image.getOriginalFilename() + "\"}";
+                }
+            }
+            
+            Users authenticatedUser = getAuthenticatedUser();
+            if (authenticatedUser == null) {
+                return "{\"error\": \"Utente non autenticato\"}";
+            }
+            
+            // Crea il DTO del prodotto
+            ProductFormDTO productFormDTO = new ProductFormDTO();
+            productFormDTO.setNome(name);
+            productFormDTO.setPrezzo(price);
+            productFormDTO.setDescrizione(description);
+            
+            // Trova la categoria per nome
+            Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
+            if (categoryOpt.isPresent()) {
+                productFormDTO.setCategoria(categoryOpt.get().getName());
+            } else {
+                return "{\"error\": \"Categoria non trovata\"}";
+            }
+            
+            // Converti le immagini in byte array
+            List<byte[]> imageDataList = new ArrayList<>();
+            for (MultipartFile image : images) {
+                imageDataList.add(image.getBytes());
+            }
+            
+            // Salva il prodotto
+            Product savedProduct = productService.saveProduct(productFormDTO, imageDataList, authenticatedUser);
+            
+            logger.info("Product created successfully with ID: {}", savedProduct.getId());
+            return "{\"success\": true, \"productId\": " + savedProduct.getId() + "}";
+            
+        } catch (Exception e) {
+            logger.error("Error creating product: {}", e.getMessage(), e);
+            return "{\"error\": \"Errore durante la creazione del prodotto: " + e.getMessage() + "\"}";
+        }
+    }
+    
+    private boolean isValidImageType(String contentType) {
+        return contentType.equals("image/jpeg") || 
+               contentType.equals("image/jpg") || 
+               contentType.equals("image/png") || 
+               contentType.equals("image/webp");
+    }
 }

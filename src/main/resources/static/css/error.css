@@ -1,0 +1,238 @@
+/* Error Page Styles */
+
+.error {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.error-container {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.error-title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #856404;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.error-detail {
+    margin-bottom: 15px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(133, 100, 4, 0.1);
+}
+
+.error-detail:last-of-type {
+    border-bottom: none;
+}
+
+.error-label {
+    font-weight: 600;
+    color: #333;
+    margin-right: 10px;
+}
+
+.error-value {
+    color: #495057;
+}
+
+.error-value.missing {
+    color: #dc3545;
+    font-style: italic;
+}
+
+.error-meta {
+    color: #6c757d;
+    font-size: 0.9em;
+}
+
+.technical-details {
+    margin-top: 25px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.technical-summary {
+    cursor: pointer;
+    font-weight: bold;
+    color: #d73527;
+    padding: 15px;
+    background: #f8f9fa;
+    margin: 0;
+    transition: background-color 0.2s;
+}
+
+.technical-summary:hover {
+    background: #e9ecef;
+}
+
+.technical-content {
+    margin-top: 0;
+    padding: 20px;
+    background: #fff;
+}
+
+.technical-trace {
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    font-size: 12px;
+    border-left: 4px solid #d73527;
+    font-family: 'Courier New', monospace;
+    margin: 0;
+}
+
+.debug-info {
+    margin-top: 25px;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #6c757d;
+}
+
+.debug-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #495057;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.debug-info p {
+    margin-bottom: 10px;
+    color: #6c757d;
+}
+
+.debug-info ul {
+    margin-bottom: 0;
+    padding-left: 20px;
+}
+
+.debug-info li {
+    margin-bottom: 5px;
+    color: #6c757d;
+}
+
+.navigation-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.button {
+    display: inline-block;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: white;
+    text-decoration: none;
+}
+
+.button.secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);
+}
+
+.button.secondary:hover {
+    background: linear-gradient(135deg, #545b62 0%, #495057 100%);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .error-container {
+        padding: 15px;
+    }
+    
+    .navigation-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .button {
+        width: 100%;
+        max-width: 250px;
+        text-align: center;
+    }
+    
+    .technical-trace {
+        font-size: 11px;
+    }
+    
+    .error-title {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .error {
+        margin: 0 10px;
+    }
+    
+    .error-container {
+        padding: 12px;
+    }
+    
+    .debug-info {
+        padding: 15px;
+    }
+    
+    .technical-content {
+        padding: 15px;
+    }
+}
+
+/* Animation for error container */
+.error-container {
+    animation: slideInDown 0.5s ease-out;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Print styles */
+@media print {
+    .navigation-buttons {
+        display: none;
+    }
+    
+    .technical-summary {
+        color: #000 !important;
+    }
+    
+    .error-container {
+        border: 1px solid #000;
+        box-shadow: none;
+    }
+}

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crea Nuovo Prodotto - Sitarello</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/product-create.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div th:insert="~{fragments/navbar :: navbar}"></div>
+
+    <main class="product-create-container">
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-line"></div>
+                <div class="step active">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Immagini</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Dettagli</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Anteprima</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Container -->
+        <div class="form-container">
+            <form id="productForm" th:action="@{/product/create}" method="post" enctype="multipart/form-data">
+                
+                <!-- Step 1: Images -->
+                <div class="form-step active" id="step1">
+                    <div class="step-content">
+                        <div class="step-header">
+                            <h2><i class="fas fa-images"></i> Aggiungi le Immagini del Prodotto</h2>
+                            <p>Carica da 1 a 10 immagini di alta qualità. La prima immagine sarà quella principale.</p>
+                        </div>
+
+                        <div class="image-upload-area" id="imageUploadArea">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="upload-text">Trascina le immagini qui o clicca per caricare</div>
+                            <div class="upload-subtext">Fino a 5 immagini • JPG, PNG, WEBP • Max 5MB ciascuna</div>
+                            
+                            <input type="file" 
+                                   id="imageInput" 
+                                   name="images" 
+                                   multiple 
+                                   accept="image/*" 
+                                   style="display: none;" />
+                        </div>
+
+                        <div class="image-preview-container" id="imagePreviewGrid">
+                            <!-- Le immagini caricate appariranno qui -->
+                        </div>
+
+                        <div class="upload-info">
+                            <div class="info-item">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Immagini selezionate: <strong id="imageCount">0</strong>/10</span>
+                            </div>
+                            <div class="error-message" id="imageError"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Product Details -->
+                <div class="form-step" id="step2">
+                    <div class="step-content">
+                        <div class="step-header">
+                            <h2><i class="fas fa-info-circle"></i> Dettagli del Prodotto</h2>
+                            <p>Fornisci informazioni complete e accurate per attirare più acquirenti.</p>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="productName" class="form-label required">
+                                    <i class="fas fa-tag"></i>
+                                    Nome del Prodotto
+                                </label>
+                                <input type="text" 
+                                       id="productName" 
+                                       name="name" 
+                                       class="form-input" 
+                                       placeholder="es. iPhone 14 Pro 256GB Nero"
+                                       maxlength="100" />
+                                <div class="input-counter">
+                                    <span id="productNameCounter">0</span>/100 caratteri
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="productCategory" class="form-label required">
+                                    <i class="fas fa-folder"></i>
+                                    Categoria
+                                </label>
+                                <select id="productCategory" name="category" class="form-select">
+                                    <option value="">Seleziona una categoria</option>
+                                    <option th:each="category : ${categories}" 
+                                            th:value="${category.id}" 
+                                            th:text="${category.name}">
+                                        Categoria
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="productPrice" class="form-label required">
+                                    <i class="fas fa-euro-sign"></i>
+                                    Prezzo
+                                </label>
+                                <div class="price-input-group">
+                                    <input type="number" 
+                                           id="productPrice" 
+                                           name="price" 
+                                           class="form-input" 
+                                           placeholder="0.00"
+                                           min="0"
+                                           step="0.01" />
+                                    <span class="currency">€</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="productDescription" class="form-label required">
+                                    <i class="fas fa-align-left"></i>
+                                    Descrizione
+                                </label>
+                                <textarea id="productDescription" 
+                                          name="description" 
+                                          class="form-textarea" 
+                                          rows="6"
+                                          placeholder="Descrivi il tuo prodotto nel dettaglio: caratteristiche, condizioni, motivo della vendita..."
+                                          maxlength="2000"></textarea>
+                                <div class="input-counter">
+                                    <span id="productDescriptionCounter">0</span>/2000 caratteri
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tips Section -->
+                        <div class="tips-section">
+                            <h3><i class="fas fa-lightbulb"></i> Consigli per una buona descrizione</h3>
+                            <ul class="tips-list">
+                                <li><i class="fas fa-check-circle"></i> Descrivi le condizioni attuali del prodotto</li>
+                                <li><i class="fas fa-check-circle"></i> Menciona tutti gli accessori inclusi</li>
+                                <li><i class="fas fa-check-circle"></i> Specifica il motivo della vendita</li>
+                                <li><i class="fas fa-check-circle"></i> Indica eventuali difetti o segni d'uso</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Preview -->
+                <div class="form-step" id="step3">
+                    <div class="step-content">
+                        <div class="step-header">
+                            <h2><i class="fas fa-eye"></i> Anteprima del Prodotto</h2>
+                            <p>Controlla come apparirà il tuo prodotto agli acquirenti prima di pubblicarlo.</p>
+                        </div>
+
+                        <div class="product-preview">
+                            <div class="preview-images">
+                                <div class="main-preview-image" id="previewImageContainer">
+                                    <div class="no-image-placeholder" id="previewPlaceholder">
+                                        <i class="fas fa-image"></i>
+                                        <span>Nessuna immagine caricata</span>
+                                    </div>
+                                    <img id="previewImage" alt="Anteprima prodotto" style="display: none;">
+                                </div>
+                                <div class="preview-thumbnails" id="previewThumbnails">
+                                    <!-- Thumbnails will be added here -->
+                                </div>
+                            </div>
+
+                            <div class="preview-details">
+                                <h3 class="preview-title" id="previewTitle">Nome del prodotto</h3>
+                                <div class="preview-price" id="previewPrice">€ 0.00</div>
+                                <div class="preview-category" id="previewCategory">Categoria</div>
+                                <div class="preview-description" id="previewDescription">
+                                    Descrizione del prodotto...
+                                </div>
+                                
+                                <div class="preview-seller">
+                                    <div class="seller-info">
+                                        <i class="fas fa-user"></i>
+                                        <span>Venduto da: <strong th:text="${username}">Nome Venditore</strong></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="form-navigation">
+                    <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">
+                        <i class="fas fa-arrow-left"></i> Indietro
+                    </button>
+                    
+                    <div class="nav-spacer"></div>
+                    
+                    <button type="button" class="btn btn-primary" id="nextBtn">
+                        Avanti <i class="fas fa-arrow-right"></i>
+                    </button>
+                    
+                    <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">
+                        <i class="fas fa-check"></i> Pubblica Prodotto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <div th:insert="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/product-create.js}"></script>
+</body>
+</html>

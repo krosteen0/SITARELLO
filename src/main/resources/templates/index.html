@@ -30,7 +30,7 @@
             <div class="hero-actions">
                 <a th:href="@{/products}" class="btn btn-primary">Esplora Prodotti</a>
                 <a sec:authorize="!isAuthenticated()" th:href="@{/register}" class="btn btn-outline">Registrati Ora</a>
-                <a sec:authorize="isAuthenticated()" th:href="@{/product/create/images}" class="btn btn-success">Vendi un Prodotto</a>
+                <a sec:authorize="isAuthenticated()" th:href="@{/product/create}" class="btn btn-success">Vendi un Prodotto</a>
             </div>
         </div>
     </div>
