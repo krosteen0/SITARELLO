@@ -51,7 +51,6 @@ class EnhancedProductCreator {
     
     setupAll() {
         console.log('Setting up enhanced product creator...');
-        
         this.setupEventListeners();
         this.setupImageUpload();
         this.setupFormValidation();
@@ -60,73 +59,7 @@ class EnhancedProductCreator {
         this.setupSmartFeatures();
         this.updateProgressBar();
         this.showStep(this.currentStep);
-        
-        // Semplice setup del pulsante di upload
-        const uploadBtn = document.getElementById('uploadBtn');
-        if (uploadBtn) {
-            uploadBtn.onclick = function() {
-                document.getElementById('imageInput').click();
-            };
-        }
-        
         console.log('Enhanced product creator initialized');
-    }
-    
-    setupUploadButtonFallback() {
-        console.log('Setting up upload button...');
-        
-        // Wait for DOM to be fully ready
-        setTimeout(() => {
-            const uploadBtn = document.getElementById('uploadBtn');
-            const fileInput = document.getElementById('imageInput');
-            
-            console.log('Upload button element:', uploadBtn);
-            console.log('File input element:', fileInput);
-            
-            if (uploadBtn && fileInput) {
-                console.log('Elements found, setting up event listener...');
-                
-                // Clear ALL existing handlers
-                uploadBtn.onclick = null;
-                uploadBtn.removeAttribute('onclick');
-                
-                // Remove any existing event listeners by cloning
-                const newBtn = uploadBtn.cloneNode(true);
-                uploadBtn.parentNode.replaceChild(newBtn, uploadBtn);
-                
-                // Get fresh reference
-                const cleanBtn = document.getElementById('uploadBtn');
-                console.log('Fresh button reference:', cleanBtn);
-                
-                // ONE SINGLE CLEAN EVENT LISTENER
-                cleanBtn.addEventListener('click', function(e) {
-                    console.log('=== UPLOAD BUTTON CLICKED ===');
-                    
-                    // Stop ALL propagation immediately
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
-                    
-                    // Add a small delay to ensure the click event is processed
-                    setTimeout(() => {
-                        console.log('Attempting to trigger file input...');
-                        try {
-                            fileInput.click();
-                            console.log('File input click() called successfully');
-                        } catch (error) {
-                            console.error('Error opening file dialog:', error);
-                        }
-                    }, 10);
-                    
-                    return false;
-                }, { once: false, passive: false });
-                
-                console.log('Upload button event listener attached successfully');
-            } else {
-                console.error('Upload button or file input not found!');
-                console.error('Upload button:', uploadBtn);
-                console.error('File input:', fileInput);
-            }
-        }, 200);
     }
     
     setupEventListeners() {
@@ -171,12 +104,14 @@ class EnhancedProductCreator {
         // Format buttons (if present)
         this.setupFormatButtons();
         
-        // Upload button setup will be handled by fallback method
+        // Upload button
         const uploadBtn = document.getElementById('uploadBtn');
-        const fileInput = document.getElementById('imageInput');
-        console.log('Elements found - Upload button:', !!uploadBtn, 'File input:', !!fileInput);
-        
-        // Skip main setup to avoid conflicts - let fallback handle it
+        if (uploadBtn) {
+            uploadBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('imageInput').click();
+            });
+        }
     }
     
     setupImageUpload() {
@@ -192,21 +127,17 @@ class EnhancedProductCreator {
         fileInput.setAttribute('accept', 'image/jpeg,image/jpg,image/png,image/webp');
         fileInput.setAttribute('multiple', 'true');
         
-        // Click to upload - clean implementation
+        // Click to upload
         uploadArea.addEventListener('click', (e) => {
-            // Don't trigger if clicking on the upload button
-            if (e.target.closest('.upload-btn')) {
-                return;
+            if (e.target === uploadArea || uploadArea.contains(e.target)) {
+                e.preventDefault();
+                fileInput.click();
             }
-            
-            e.preventDefault();
-            fileInput.click();
         });
         
         // File input change
         fileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
-                console.log(`${e.target.files.length} file(s) selected`);
                 this.handleFileSelect(e.target.files);
                 e.target.value = ''; // Reset input
             }
@@ -1094,6 +1025,7 @@ class EnhancedProductCreator {
 let productCreator;
 document.addEventListener('DOMContentLoaded', () => {
     productCreator = new EnhancedProductCreator();
-    // Make it globally accessible for onclick handlers
-    window.productCreator = productCreator;
 });
+
+// Make it globally accessible for onclick handlers
+window.productCreator = productCreator;
