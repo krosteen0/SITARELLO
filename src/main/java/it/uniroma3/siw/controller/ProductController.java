@@ -90,122 +90,8 @@ public class ProductController {
         return null;
     }
 
-    @GetMapping("/create/images")
-    public String showImageUploadPage(Model model) {
-        addAuthenticationAttributes(model);
-        model.addAttribute("productFormDTO", new ProductFormDTO());
-        logger.debug("Displaying image upload page");
-        return "image-upload";
-    }
-
-    @PostMapping("/create/images")
-    public String handleImageUpload(@RequestParam("images") List<MultipartFile> images,
-                                    HttpSession session, Model model) {
-        try {
-            addAuthenticationAttributes(model);
-            if (images.size() < 2 || images.size() > 10) {
-                model.addAttribute("errorMessage", "Seleziona da 2 a 10 immagini.");
-                return "image-upload";
-            }
-            productService.saveImagesToSession(images, session);
-            logger.debug("Images saved to session successfully");
-            return "redirect:/product/create/details";
-        } catch (IOException e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.error("Error uploading images: {}", sw.toString());
-            model.addAttribute("errorMessage", "Errore durante il caricamento delle immagini: " + e.getMessage());
-            return "image-upload";
-        }
-    }
-
-    @GetMapping("/create/details")
-    public String showCreateDetailsPage(Model model, HttpSession session) {
-        addAuthenticationAttributes(model);
-        @SuppressWarnings("unchecked")
-        List<byte[]> imageDataList = (List<byte[]>) session.getAttribute("productImages");
-        if (imageDataList == null || imageDataList.isEmpty()) {
-            return "redirect:/product/create/images";
-        }
-        model.addAttribute("productFormDTO", new ProductFormDTO());
-        model.addAttribute("imageCount", imageDataList.size());
-        
-        // Aggiungi le categorie al modello
-        List<Category> categories = (List<Category>) categoryRepository.findAll();
-        model.addAttribute("categories", categories);
-        
-        logger.debug("Displaying create details page with {} images", imageDataList.size());
-        return "product-details";
-    }
-
-    @PostMapping("/create/details")
-    public String handleCreateDetails(@Valid @ModelAttribute ProductFormDTO productFormDTO,
-                                      BindingResult result, HttpSession session, Model model) {
-        try {
-            addAuthenticationAttributes(model);
-            @SuppressWarnings("unchecked")
-            List<byte[]> imageDataList = (List<byte[]>) session.getAttribute("productImages");
-            if (imageDataList == null || imageDataList.isEmpty()) {
-                model.addAttribute("errorMessage", "Nessuna immagine trovata. Ricarica le immagini.");
-                return "redirect:/product/create/images";
-            }
-
-            if (result.hasErrors()) {
-                model.addAttribute("imageCount", imageDataList.size());
-                // Aggiungi le categorie quando ci sono errori
-                List<Category> categories = (List<Category>) categoryRepository.findAll();
-                model.addAttribute("categories", categories);
-                return "product-details";
-            }
-
-            // Passa i dati inseriti e le immagini al riepilogo
-            session.setAttribute("productFormDTO", productFormDTO);
-            model.addAttribute("productFormDTO", productFormDTO);
-            // Crea lista di indici per le immagini temporanee
-            List<Integer> imageIndices = new ArrayList<>();
-            for (int i = 0; i < imageDataList.size(); i++) {
-                imageIndices.add(i);
-            }
-            model.addAttribute("imageIndices", imageIndices);
-            return "summary";
-        } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.error("Error creating product: {}", sw.toString());
-            model.addAttribute("errorMessage", "Errore durante la creazione del prodotto: " + e.getMessage());
-            return "error";
-        }
-    }
-
-    @PostMapping("/create/confirm")
-    public String confirmCreateProduct(HttpSession session, Model model) {
-        try {
-            addAuthenticationAttributes(model);
-            // Recupera i dati del prodotto e le immagini dalla sessione
-            ProductFormDTO productFormDTO = (ProductFormDTO) session.getAttribute("productFormDTO");
-            @SuppressWarnings("unchecked")
-            List<byte[]> imageDataList = (List<byte[]>) session.getAttribute("productImages");
-            Users authenticatedUser = getAuthenticatedUser();
-            if (productFormDTO == null || imageDataList == null || imageDataList.isEmpty() || authenticatedUser == null) {
-                model.addAttribute("errorMessage", "Dati mancanti o sessione scaduta. Riprova la creazione del prodotto.");
-                return "error";
-            }
-            // Salva il prodotto
-            Product savedProduct = productService.saveProduct(productFormDTO, imageDataList, authenticatedUser);
-            // Pulisci la sessione
-            session.removeAttribute("productFormDTO");
-            session.removeAttribute("productImages");
-            session.removeAttribute("imageIds");
-            // Redirect alla pagina di dettaglio del prodotto
-            return "redirect:/product/" + savedProduct.getId();
-        } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.error("Error confirming product creation: {}", sw.toString());
-            model.addAttribute("errorMessage", "Errore durante la conferma del prodotto: " + e.getMessage());
-            return "error";
-        }
-    }
+    // ENDPOINT RIMOSSI: I vecchi endpoint per il flusso multi-step sono stati rimossi
+    // Ora si usa solo /product/create per il flusso moderno
 
     @GetMapping("/{id}")
     @Transactional(readOnly = true)
@@ -563,25 +449,7 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/create/image/{index}")
-    @ResponseBody
-    public org.springframework.http.ResponseEntity<byte[]> getTemporaryImage(@PathVariable int index, HttpSession session) {
-        try {
-            @SuppressWarnings("unchecked")
-            List<byte[]> imageDataList = (List<byte[]>) session.getAttribute("productImages");
-            if (imageDataList == null || index < 0 || index >= imageDataList.size()) {
-                return org.springframework.http.ResponseEntity.notFound().build();
-            }
-            
-            byte[] imageData = imageDataList.get(index);
-            return org.springframework.http.ResponseEntity.ok()
-                    .contentType(MediaType.IMAGE_JPEG)
-                    .body(imageData);
-        } catch (Exception e) {
-            logger.error("Error loading temporary image with index: {}", index, e);
-            return org.springframework.http.ResponseEntity.internalServerError().build();
-        }
-    }
+    // ENDPOINT RIMOSSO: /create/image/{index} non più necessario
 
     @GetMapping("/details/{id}")
     @Transactional(readOnly = true)

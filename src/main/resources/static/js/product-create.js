@@ -1,84 +1,7 @@
 // SOLUZIONE SEMPLICE: File input sovrapposto
 console.log('=== PRODUCT CREATE JS LOADED ===');
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== DOM READY ===');
-    
-    const fileInput = document.getElementById('imageInput');
-    
-    if (fileInput) {
-        console.log('✅ File input trovato:', fileInput);
-        
-        // Listener per il cambio file
-        fileInput.addEventListener('change', function(e) {
-            console.log('🎉 FILE SELEZIONATI! 🎉');
-            console.log('Files:', e.target.files);
-            
-            if (e.target.files && e.target.files.length > 0) {
-                handleFileSelection(e.target.files);
-            }
-        });
-        
-        // Test del drag and drop sull'area
-        const uploadArea = document.getElementById('imageUploadArea');
-        if (uploadArea) {
-            uploadArea.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                uploadArea.style.backgroundColor = '#f0f8ff';
-            });
-            
-            uploadArea.addEventListener('dragleave', function(e) {
-                e.preventDefault();
-                uploadArea.style.backgroundColor = '';
-            });
-            
-            uploadArea.addEventListener('drop', function(e) {
-                e.preventDefault();
-                uploadArea.style.backgroundColor = '';
-                
-                const files = e.dataTransfer.files;
-                if (files && files.length > 0) {
-                    console.log('🎯 Files dropped:', files);
-                    handleFileSelection(files);
-                }
-            });
-        }
-        
-        console.log('✅ Event listeners configurati');
-    } else {
-        console.error('❌ File input non trovato!');
-    }
-});
-
-function handleFileSelection(files) {
-    console.log('Gestione file selezionati:', files.length);
-    
-    // Mostra alert di test
-    alert(`${files.length} file selezionato(i):\n${Array.from(files).map(f => f.name).join('\n')}`);
-    
-    // Qui andrà la logica per mostrare le anteprime
-    const previewContainer = document.getElementById('imagePreviewGrid');
-    if (previewContainer) {
-        previewContainer.innerHTML = '';
-        
-        Array.from(files).forEach((file, index) => {
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const div = document.createElement('div');
-                    div.innerHTML = `
-                        <div style="display: inline-block; margin: 5px; border: 1px solid #ccc; padding: 5px;">
-                            <img src="${e.target.result}" style="width: 100px; height: 100px; object-fit: cover;">
-                            <div>${file.name}</div>
-                        </div>
-                    `;
-                    previewContainer.appendChild(div);
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
-}
+// RIMOSSO IL PRIMO GESTORE - ora tutto viene gestito dalla classe EnhancedProductCreator
 
 // Enhanced Product Creation JavaScript - Sitarello
 console.log('Enhanced Product Create JS loaded');
@@ -192,31 +115,63 @@ class EnhancedProductCreator {
     setupImageUpload() {
         const uploadArea = document.getElementById('imageUploadArea');
         const fileInput = document.getElementById('imageInput');
+        const uploadButton = document.getElementById('uploadButton');
         
-        if (!uploadArea || !fileInput) {
+        if (!uploadArea || !fileInput || !uploadButton) {
             console.error('Upload elements not found');
             return;
         }
+        
+        console.log('Setting up image upload handlers...');
         
         // File input configuration
         fileInput.setAttribute('accept', 'image/jpeg,image/jpg,image/png,image/webp');
         fileInput.setAttribute('multiple', 'true');
         
-        // Click to upload - clean implementation
+        // Flags per evitare doppie aperture
+        let isFileDialogOpen = false;
+        
+        // Funzione per aprire il file dialog con protezione contro doppie aperture
+        const openFileDialog = (source) => {
+            if (isFileDialogOpen) {
+                console.log('🚫 File dialog già aperto, ignoro click da:', source);
+                return;
+            }
+            
+            console.log('🎯 Opening file dialog from:', source);
+            isFileDialogOpen = true;
+            
+            // Reset flag dopo un breve delay
+            setTimeout(() => {
+                isFileDialogOpen = false;
+            }, 500);
+            
+            fileInput.click();
+        };
+        
+        // Gestore per il bottone di upload
+        uploadButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openFileDialog('button');
+        });
+        
+        // Gestore per l'area di upload (solo se il click non viene dal bottone)
         uploadArea.addEventListener('click', (e) => {
-            // Don't trigger if clicking on the upload button
-            if (e.target.closest('.upload-btn')) {
+            // Ignora i click che vengono dal bottone
+            if (e.target === uploadButton || uploadButton.contains(e.target)) {
                 return;
             }
             
             e.preventDefault();
-            fileInput.click();
+            e.stopPropagation();
+            openFileDialog('upload-area');
         });
         
         // File input change
         fileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
-                console.log(`${e.target.files.length} file(s) selected`);
+                console.log(`🎉 ${e.target.files.length} file(s) selected`);
                 this.handleFileSelect(e.target.files);
                 e.target.value = ''; // Reset input
             }
@@ -1018,9 +973,20 @@ class EnhancedProductCreator {
                 }
             });
             
+            // Get CSRF token
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            
+            // Prepare headers
+            const headers = {};
+            if (csrfToken && csrfHeader) {
+                headers[csrfHeader] = csrfToken;
+            }
+            
             // Submit form
             const response = await fetch('/product/create', {
                 method: 'POST',
+                headers: headers,
                 body: formData
             });
             

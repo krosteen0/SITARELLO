@@ -10,25 +10,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-        <div class="animated-bg">
+    <div class="animated-bg">
         <div class="floating-shapes">
             <div class="shape"></div>
             <div class="shape"></div>
             <div class="shape"></div>
         </div>
     </div>
-    <!-- Include navbar fragment -->
+    
     <div th:insert="~{fragments/navbar :: navbar}"></div>
 
     <div class="hero-section">
-        <!-- Sfondo con pattern geometrico -->
         <div class="hero-background">
             <div class="hero-pattern"></div>
             <div class="hero-glow"></div>
         </div>
         
         <div class="hero-content">
-            <!-- Badge di benvenuto -->
             <div class="hero-badge">
                 <i class="fas fa-star"></i>
                 <span>Marketplace #1 in Italia</span>
@@ -37,7 +35,6 @@
             <h1 class="hero-title">Benvenuto su Sitarello</h1>
             <p class="hero-subtitle">Il marketplace per comprare e vendere prodotti in modo semplice e sicuro.</p>
             
-            <!-- Statistiche -->
             <div class="hero-stats">
                 <div class="stat-item">
                     <span class="stat-number">10K+</span>
@@ -48,15 +45,14 @@
                     <span class="stat-label">Prodotti Venduti</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-number">99%</span>
+                    <span class="stat-number">98%</span>
                     <span class="stat-label">Soddisfazione</span>
                 </div>
             </div>
-            
+
             <div class="hero-search">
-                <form th:action="@{/products/search}" method="get" class="search-form">
-                    <div class="search-input-group">
-                        <i class="fas fa-search search-icon"></i>
+                <form th:action="@{/products}" method="get" class="search-form">
+                    <div class="search-container">
                         <input type="text" name="searchTerm" class="search-input" placeholder="Cerca prodotti, categorie, brand...">
                         <button type="submit" class="search-btn">Cerca</button>
                     </div>
@@ -87,7 +83,7 @@
             </div>
         </div>
 
-        <!-- Prodotti Recenti -->
+        <!-- Prodotti Recenti - VERSIONE SEMPLIFICATA SENZA IMMAGINI COMPLESSE -->
         <section class="product-section" th:if="${recentProducts != null && !recentProducts.isEmpty()}">
             <div class="section-header">
                 <h2>Aggiunti di Recente</h2>
@@ -97,18 +93,26 @@
                 <div th:each="product : ${recentProducts}" class="product-card-small">
                     <a th:href="@{'/product/' + ${product.id}}">
                         <div class="product-image-small">
-                            <img th:src="@{${product.base64Image != null ? 'data:image/jpeg;base64,' + product.base64Image : '/immagini/placeholder.png'}}" alt="Immagine prodotto" />
+                            <!-- Immagine semplificata senza espressioni complesse -->
+                            <img th:if="${product.base64Image != null}" 
+                                 th:src="'data:image/jpeg;base64,' + ${product.base64Image}" 
+                                 alt="Immagine prodotto" />
+                            <img th:unless="${product.base64Image != null}" 
+                                 src="/immagini/placeholder.png" 
+                                 alt="Immagine prodotto" />
                         </div>
                     </a>
                     <div class="product-info-small">
-                        <h3 class="product-title-small"><a th:href="@{'/product/' + ${product.id}}" th:text="${product.name}">Nome Prodotto</a></h3>
+                        <h3 class="product-title-small">
+                            <a th:href="@{'/product/' + ${product.id}}" th:text="${product.name}">Nome Prodotto</a>
+                        </h3>
                         <p class="product-price-small" th:text="${product.price} + ' €'">€0.00</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Prodotti in Evidenza -->
+        <!-- Prodotti in Evidenza - VERSIONE SEMPLIFICATA -->
         <section class="product-section" th:if="${featuredProducts != null && !featuredProducts.isEmpty()}">
             <div class="section-header">
                 <h2>Prodotti in Evidenza</h2>
@@ -117,13 +121,23 @@
             <div class="products-grid">
                 <div th:each="product : ${featuredProducts}" class="product-card">
                     <a th:href="@{'/product/' + ${product.id}}" class="product-image">
-                        <img th:src="@{${product.base64Image != null ? 'data:image/jpeg;base64,' + product.base64Image : '/immagini/placeholder.png'}}" alt="Immagine prodotto" />
+                        <!-- Immagine semplificata senza espressioni complesse -->
+                        <img th:if="${product.base64Image != null}" 
+                             th:src="'data:image/jpeg;base64,' + ${product.base64Image}" 
+                             alt="Immagine prodotto" />
+                        <img th:unless="${product.base64Image != null}" 
+                             src="/immagini/placeholder.png" 
+                             alt="Immagine prodotto" />
                     </a>
                     <div class="product-info">
                         <p class="product-category" th:text="${product.category != null ? product.category.name : 'N/A'}">Categoria</p>
-                        <h3 class="product-title"><a th:href="@{'/product/' + ${product.id}}" th:text="${product.name}">Nome Prodotto</a></h3>
+                        <h3 class="product-title">
+                            <a th:href="@{'/product/' + ${product.id}}" th:text="${product.name}">Nome Prodotto</a>
+                        </h3>
                         <p class="product-price" th:text="${product.price} + ' €'">€0.00</p>
-                        <p class="product-seller">Venduto da: <a th:href="@{'/seller/' + ${product.seller.id}}" th:text="${product.seller.user.username}">Nome Venditore</a></p>
+                        <p class="product-seller">Venduto da: 
+                            <a th:href="@{'/seller/' + ${product.seller.id}}" th:text="${product.seller.user.username}">Nome Venditore</a>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -140,35 +154,12 @@
             </div>
             <div class="categories-grid">
                 <a th:each="category : ${categories}" th:href="@{/products(category=${category.id})}" class="category-card">
-                    <div class="category-icon"><i th:class="${category.iconClass != null ? category.iconClass : 'fas fa-tag'}"></i></div>
+                    <div class="category-icon">
+                        <i th:class="${category.iconClass != null ? category.iconClass : 'fas fa-tag'}"></i>
+                    </div>
                     <h3 th:text="${category.name}">Nome Categoria</h3>
                     <span class="category-count" th:text="${category.productCount} + ' prodotti'">0 prodotti</span>
                 </a>
-            </div>
-        </section>
-
-        <!-- Perchè Scegliere Noi -->
-        <section class="features-section">
-            <div class="section-header">
-                <h2>Perché Scegliere Sitarello</h2>
-                <p>La nostra piattaforma è costruita per offrirti la migliore esperienza di acquisto e vendita.</p>
-            </div>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
-                    <h3>Sicuro e Affidabile</h3>
-                    <p>Transazioni protette e un team di supporto sempre a tua disposizione.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon"><i class="fas fa-rocket"></i></div>
-                    <h3>Veloce e Intuitivo</h3>
-                    <p>Un'interfaccia moderna e semplice da usare per vendere e comprare senza stress.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon"><i class="fas fa-users"></i></div>
-                    <h3>Community Forte</h3>
-                    <p>Unisciti a migliaia di utenti che si fidano di noi per i loro affari online.</p>
-                </div>
             </div>
         </section>
 
@@ -177,12 +168,12 @@
             <div class="empty-state-icon"><i class="fas fa-store-slash"></i></div>
             <h3>Il marketplace è ancora vuoto!</h3>
             <p>Non ci sono prodotti da mostrare al momento. Sii il primo a metterne uno in vendita!</p>
-            <a sec:authorize="isAuthenticated()" th:href="@{/product/create/images}" class="btn btn-success">Vendi il tuo primo prodotto</a>
+            <a sec:authorize="isAuthenticated()" th:href="@{/product/create}" class="btn btn-success">Vendi il tuo primo prodotto</a>
             <a sec:authorize="!isAuthenticated()" th:href="@{/register}" class="btn">Registrati per iniziare a vendere</a>
         </div>
+        
     </main>
 
-    <!-- Include footer fragment -->
     <div th:insert="~{fragments/footer :: footer}"></div>
     
     <script th:src="@{/js/homepage.js}"></script>

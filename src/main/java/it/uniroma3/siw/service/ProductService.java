@@ -17,7 +17,6 @@ import it.uniroma3.siw.model.Users;
 import it.uniroma3.siw.repository.CategoryRepository;
 import it.uniroma3.siw.repository.ProductImageRepository;
 import it.uniroma3.siw.repository.ProductRepository;
-import jakarta.servlet.http.HttpSession;
 
 @Service
 public class ProductService {
@@ -30,19 +29,8 @@ public class ProductService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    public void saveImagesToSession(List<MultipartFile> images, HttpSession session) throws IOException {
-        List<byte[]> imageDataList = new ArrayList<>();
-        for (MultipartFile image : images) {
-            if (!image.isEmpty()) {
-                imageDataList.add(image.getBytes());
-            }
-        }
-        session.setAttribute("productImages", imageDataList);
-    }
-
-    public void saveDetailsToSession(ProductFormDTO productFormDTO, HttpSession session) {
-        session.setAttribute("productDetails", productFormDTO);
-    }
+    // METODI RIMOSSI: saveImagesToSession e saveDetailsToSession non più necessari
+    // Ora si usa solo saveProduct per il flusso moderno
 
     @Transactional
     public Product saveProduct(ProductFormDTO productFormDTO, List<byte[]> imageDataList, Users seller) {

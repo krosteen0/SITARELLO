@@ -504,7 +504,7 @@
                         
                         <div th:if="${user == null || user.authoredProducts == null || user.authoredProducts.isEmpty()}" class="empty-products">
                             <p>Non hai ancora caricato nessun prodotto.</p>
-                            <a th:href="@{/product/create/images}" class="btn-edit-profile">
+                            <a th:href="@{/product/create}" class="btn-edit-profile">
                                 <i class="fas fa-plus-circle"></i> Aggiungi Prodotto
                             </a>
                         </div>
@@ -546,7 +546,7 @@
                             <div class="setting-card">
                                 <div class="setting-title"><i class="fas fa-box-open"></i> Aggiungi Nuovo Prodotto</div>
                                 <div class="setting-description">Carica un nuovo prodotto da vendere.</div>
-                                <a th:href="@{/product/create/images}" class="btn-edit-profile">Aggiungi</a>
+                                <a th:href="@{/product/create}" class="btn-edit-profile">Aggiungi</a>
                             </div>
                             
                             <div class="setting-card">
