@@ -244,7 +244,6 @@ class EnhancedProductCreator {
             this.renderImagePreviews();
             this.updateUploadInfo();
             this.updatePreview();
-            this.validateStep1();
             this.markUnsavedChanges();
             this.scheduleAutoSave();
         };
@@ -256,7 +255,6 @@ class EnhancedProductCreator {
         this.renderImagePreviews();
         this.updateUploadInfo();
         this.updatePreview();
-        this.validateStep1();
         this.markUnsavedChanges();
         this.scheduleAutoSave();
     }
@@ -391,12 +389,24 @@ class EnhancedProductCreator {
     }
     
     validateField(fieldId) {
-        const field = document.getElementById(fieldId) || document.querySelector(`input[name="${fieldId}"]:checked`);
+        let field, value;
+        
+        // Gestione speciale per radio buttons (condition)
+        if (fieldId === 'condition') {
+            const checkedRadio = document.querySelector(`input[name="${fieldId}"]:checked`);
+            field = checkedRadio;
+            value = checkedRadio ? checkedRadio.value : '';
+        } else {
+            field = document.getElementById(fieldId);
+            value = field ? field.value.trim() : '';
+        }
+        
         const rules = this.validationRules[fieldId];
         
-        if (!field || !rules) return true;
+        if (!rules) {
+            return true;
+        }
         
-        const value = field.value ? field.value.trim() : '';
         let isValid = true;
         let errorMessage = '';
         
@@ -465,7 +475,6 @@ class EnhancedProductCreator {
     
     validateStep1() {
         const isValid = this.images.length > 0;
-        this.updateStepValidation(1, isValid);
         return isValid;
     }
     
@@ -474,30 +483,13 @@ class EnhancedProductCreator {
         let allValid = true;
         
         fields.forEach(fieldId => {
-            if (!this.validateField(fieldId)) {
+            const fieldValid = this.validateField(fieldId);
+            if (!fieldValid) {
                 allValid = false;
             }
         });
         
-        this.updateStepValidation(2, allValid);
         return allValid;
-    }
-    
-    updateStepValidation(step, isValid) {
-        const nextBtn = document.getElementById('nextBtn');
-        const submitBtn = document.getElementById('submitBtn');
-        
-        if (step === this.currentStep) {
-            if (this.currentStep < this.totalSteps && nextBtn) {
-                nextBtn.disabled = !isValid;
-            }
-            if (this.currentStep === this.totalSteps && submitBtn) {
-                submitBtn.disabled = !isValid;
-            }
-        }
-        
-        // Update quality check
-        this.updateQualityCheck();
     }
     
     setupPreview() {
@@ -873,10 +865,14 @@ class EnhancedProductCreator {
         
         if (nextBtn) {
             nextBtn.style.display = this.currentStep < this.totalSteps ? 'inline-flex' : 'none';
+            // I bottoni sono sempre abilitati - la validazione avviene solo al click
+            nextBtn.disabled = false;
         }
         
         if (submitBtn) {
             submitBtn.style.display = this.currentStep === this.totalSteps ? 'inline-flex' : 'none';
+            // Il bottone submit è sempre abilitato - la validazione avviene solo al click
+            submitBtn.disabled = false;
         }
     }
     
@@ -912,13 +908,20 @@ class EnhancedProductCreator {
     
     nextStep() {
         let canProceed = false;
+        let errorMessage = '';
         
         switch (this.currentStep) {
             case 1:
                 canProceed = this.validateStep1();
+                if (!canProceed) {
+                    errorMessage = 'Carica almeno una foto del prodotto prima di continuare';
+                }
                 break;
             case 2:
                 canProceed = this.validateStep2();
+                if (!canProceed) {
+                    errorMessage = 'Completa tutti i campi obbligatori prima di continuare';
+                }
                 break;
             default:
                 canProceed = true;
@@ -928,7 +931,7 @@ class EnhancedProductCreator {
             this.currentStep++;
             this.showStep(this.currentStep);
         } else if (!canProceed) {
-            this.showNotification('Completa tutti i campi obbligatori prima di continuare', 'error');
+            this.showNotification(errorMessage, 'error');
         }
     }
     
@@ -941,6 +944,12 @@ class EnhancedProductCreator {
     
     async submitForm(e) {
         e.preventDefault();
+        
+        // Validazione completa: campi obbligatori + almeno una foto
+        if (!this.validateStep1()) {
+            this.showNotification('Carica almeno una foto del prodotto', 'error');
+            return;
+        }
         
         if (!this.validateStep2()) {
             this.showNotification('Completa tutti i campi obbligatori', 'error');

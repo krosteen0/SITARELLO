@@ -16,66 +16,87 @@
         
         <!-- Sezione Filtri di Ricerca -->
         <div class="search-container">
+            <div class="search-header">
+                <h2 class="search-title">🔍 Trova il tuo prodotto ideale</h2>
+                <p class="search-subtitle">Utilizza i filtri per restringere la ricerca</p>
+            </div>
+            
             <form th:action="@{/products/search}" th:object="${searchDTO}" method="get" class="search-form">
-                <div class="search-row">
-                    <div class="form-group">
-                        <label for="searchTerm">Cerca per nome o descrizione:</label>
-                        <input type="text" id="searchTerm" th:field="*{searchTerm}" 
-                               placeholder="Inserisci una parola chiave..." />
+                <!-- Filtri Base -->
+                <div class="filters-section basic-filters">
+                    <h3 class="section-title">🎯 Ricerca Base</h3>
+                    <div class="search-row">
+                        <div class="form-group">
+                            <label for="searchTerm">🔤 Cerca per nome o descrizione:</label>
+                            <input type="text" id="searchTerm" th:field="*{searchTerm}" 
+                                   placeholder="Inserisci una parola chiave..." />
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="categoria">📂 Categoria:</label>
+                            <select id="categoria" th:field="*{categoria}">
+                                <option value="">Tutte le categorie</option>
+                                <option th:each="cat : ${categories}" 
+                                        th:value="${cat.name}" 
+                                        th:text="${cat.name}"
+                                        th:selected="${searchDTO.categoria == cat.name}">Categoria</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Filtri Avanzati -->
+                <div class="filters-section advanced-filters">
+                    <div class="section-header" onclick="toggleAdvancedFilters()">
+                        <h3 class="section-title">⚙️ Filtri Avanzati</h3>
+                        <span class="toggle-icon" id="advancedToggle">▼</span>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="categoria">Categoria:</label>
-                        <select id="categoria" th:field="*{categoria}">
-                            <option value="">Tutte le categorie</option>
-                            <option th:each="cat : ${categories}" 
-                                    th:value="${cat.name}" 
-                                    th:text="${cat.name}"
-                                    th:selected="${searchDTO.categoria == cat.name}">Categoria</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="prezzoMin">Prezzo minimo (€):</label>
-                        <input type="number" id="prezzoMin" th:field="*{prezzoMin}" 
-                               min="0" step="0.01" placeholder="0.00" />
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="prezzoMax">Prezzo massimo (€):</label>
-                        <input type="number" id="prezzoMax" th:field="*{prezzoMax}" 
-                               min="0" step="0.01" placeholder="1000.00" />
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="ratingMin">Valutazione minima:</label>
-                        <select id="ratingMin" th:field="*{ratingMin}">
-                            <option value="">Qualsiasi valutazione</option>
-                            <option value="1">⭐ e superiori</option>
-                            <option value="2">⭐⭐ e superiori</option>
-                            <option value="3">⭐⭐⭐ e superiori</option>
-                            <option value="4">⭐⭐⭐⭐ e superiori</option>
-                            <option value="5">⭐⭐⭐⭐⭐ Solo il meglio</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="sortBy">Ordina per:</label>
-                        <select id="sortBy" th:field="*{sortBy}">
-                            <option value="id">Più recenti</option>
-                            <option value="name">Nome A-Z</option>
-                            <option value="price">Prezzo crescente</option>
-                            <option value="price_desc">Prezzo decrescente</option>
-                            <option value="category">Categoria</option>
-                            <option value="rating">Valutazione più alta</option>
-                        </select>
+                    <div class="advanced-content" id="advancedFiltersContent">
+                        <div class="search-row">
+                            <div class="form-group">
+                                <label for="prezzoMin">💰 Prezzo minimo (€):</label>
+                                <input type="number" id="prezzoMin" th:field="*{prezzoMin}" 
+                                       min="0" step="0.01" placeholder="0.00" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="prezzoMax">💰 Prezzo massimo (€):</label>
+                                <input type="number" id="prezzoMax" th:field="*{prezzoMax}" 
+                                       min="0" step="0.01" placeholder="1000.00" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="ratingMin">⭐ Valutazione minima:</label>
+                                <select id="ratingMin" th:field="*{ratingMin}">
+                                    <option value="">Qualsiasi valutazione</option>
+                                    <option value="1">⭐ e superiori</option>
+                                    <option value="2">⭐⭐ e superiori</option>
+                                    <option value="3">⭐⭐⭐ e superiori</option>
+                                    <option value="4">⭐⭐⭐⭐ e superiori</option>
+                                    <option value="5">⭐⭐⭐⭐⭐ Solo il meglio</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="sortBy">📊 Ordina per:</label>
+                                <select id="sortBy" th:field="*{sortBy}">
+                                    <option value="id">🕒 Più recenti</option>
+                                    <option value="name">🔤 Nome A-Z</option>
+                                    <option value="price">💰 Prezzo crescente</option>
+                                    <option value="price_desc">💰 Prezzo decrescente</option>
+                                    <option value="category">📂 Categoria</option>
+                                    <option value="rating">⭐ Valutazione più alta</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="search-actions">
-                    <button type="submit" class="btn btn-primary">🔍 Cerca</button>
-                    <a th:href="@{/products/reset}" class="btn btn-outline">↻ Reset Filtri</a>
-                    <a th:href="@{/}" class="btn btn-secondary">← Torna alla Home</a>
+                    <button type="submit" class="btn btn-primary">🔍 Cerca Prodotti</button>
+                    <a th:href="@{/products/reset}" class="btn btn-outline">🔄 Reset Filtri</a>
+                    <a th:href="@{/}" class="btn btn-secondary">🏠 Torna alla Home</a>
                 </div>
             </form>
         </div>
