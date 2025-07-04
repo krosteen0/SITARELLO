@@ -4,11 +4,22 @@
     <meta charset="UTF-8">
     <title>Ricerca Prodotti - Sitarello</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <link rel="stylesheet" th:href="@{/css/products-search.css}" />
+    <link rel="stylesheet" th:href="@{/css/products.css?v=10}" />
+    <link rel="stylesheet" th:href="@{/css/products-search.css?v=6}" />
     <link rel="stylesheet" th:href="@{/css/rating-stars.css}" />
     <link rel="stylesheet" th:href="@{/css/footer.css}" />
 </head>
-<body>
+<body class="products-page">
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    
     <div th:insert="~{fragments/navbar :: navbar}"></div>
 
     <main class="container">

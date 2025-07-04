@@ -16,6 +16,14 @@
     <meta name="description" content="Crea e pubblica un nuovo prodotto su Sitarello">
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
     <div th:insert="~{fragments/navbar :: navbar}"></div>
 
     <main class="product-create-container">
@@ -325,115 +333,68 @@
                         </div>
 
                         <div class="preview-container">
-                            <div class="product-preview-card">
-                                <div class="preview-images-section">
-                                    <div class="main-preview-image" id="previewMainImageContainer">
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <div class="main-image" id="previewMainImageContainer">
                                         <div class="image-placeholder" id="previewPlaceholder">
                                             <i class="fas fa-image"></i>
                                             <span>Nessuna immagine caricata</span>
                                         </div>
                                         <img id="previewMainImage" alt="Anteprima prodotto" style="display: none;">
                                         <div class="image-badges">
-                                            <div class="badge new-badge" id="conditionBadge" style="display: none;">
+                                            <div class="condition-badge" id="conditionBadge" style="display: none;">
                                                 <i class="fas fa-star"></i>
                                                 <span>Nuovo</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="preview-thumbnails" id="previewThumbnails">
+                                    <div class="image-thumbnails" id="previewThumbnails">
                                         <!-- Thumbnails will be added here -->
                                     </div>
                                 </div>
 
-                                <div class="preview-details-section">
-                                    <div class="preview-header">
-                                        <h3 class="preview-title" id="previewTitle">Nome del prodotto</h3>
-                                        <div class="preview-meta">
-                                            <span class="preview-category" id="previewCategory">Categoria</span>
-                                            <span class="preview-date">Pubblicato oggi</span>
+                                <div class="product-info">
+                                    <div class="product-header">
+                                        <h3 class="product-title" id="previewTitle">Nome del prodotto</h3>
+                                        <div class="product-meta">
+                                            <span class="product-category" id="previewCategory">Categoria</span>
+                                            <span class="product-date">Pubblicato oggi</span>
                                         </div>
                                     </div>
 
-                                    <div class="preview-price-section">
-                                        <div class="preview-price" id="previewPrice">€ 0.00</div>
-                                        <div class="price-comparison" id="priceComparison" style="display: none;">
-                                            <span class="comparison-text">Prezzo medio di mercato: <strong>€ 450.00</strong></span>
-                                            <span class="price-indicator good">Prezzo competitivo</span>
-                                        </div>
+                                    <div class="product-price">
+                                        <span class="price" id="previewPrice">€ 0.00</span>
                                     </div>
 
-                                    <div class="preview-description-section">
-                                        <h4>Descrizione</h4>
-                                        <div class="preview-description" id="previewDescription">
-                                            Descrizione del prodotto...
-                                        </div>
+                                    <div class="product-description">
+                                        <p id="previewDescription">Descrizione del prodotto...</p>
                                     </div>
-                                    
-                                    <div class="preview-seller-section">
-                                        <div class="seller-info">
-                                            <div class="seller-avatar">
-                                                <i class="fas fa-user"></i>
-                                            </div>
-                                            <div class="seller-details">
-                                                <span class="seller-name" th:text="${username}">Nome Venditore</span>
-                                                <div class="seller-stats">
-                                                    <span class="stat">
-                                                        <i class="fas fa-star"></i>
-                                                        <span>4.8 (23 recensioni)</span>
-                                                    </span>
-                                                    <span class="stat">
-                                                        <i class="fas fa-clock"></i>
-                                                        <span>Risponde in 2h</span>
-                                                    </span>
-                                                </div>
+
+                                    <div class="seller-info">
+                                        <div class="seller-avatar">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <div class="seller-details">
+                                            <span class="seller-name" th:text="${username}">Nome Venditore</span>
+                                            <div class="seller-stats">
+                                                <span class="rating">
+                                                    <i class="fas fa-star"></i>
+                                                    4.8 (23)
+                                                </span>
+                                                <span class="response-time">Risponde in 2h</span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="preview-actions">
-                                        <button type="button" class="btn-preview btn-primary">
+                                    <div class="product-actions">
+                                        <button type="button" class="btn-action btn-primary">
                                             <i class="fas fa-message"></i>
-                                            Contatta Venditore
+                                            Contatta
                                         </button>
-                                        <button type="button" class="btn-preview btn-secondary">
+                                        <button type="button" class="btn-action btn-secondary">
                                             <i class="fas fa-heart"></i>
-                                            Aggiungi ai Preferiti
                                         </button>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Preview Quality Check -->
-                            <div class="quality-check">
-                                <h4><i class="fas fa-clipboard-check"></i> Controllo Qualità</h4>
-                                <div class="quality-items">
-                                    <div class="quality-item" id="qualityImages">
-                                        <i class="fas fa-times-circle"></i>
-                                        <span>Aggiungi almeno 1 immagine</span>
-                                    </div>
-                                    <div class="quality-item" id="qualityTitle">
-                                        <i class="fas fa-times-circle"></i>
-                                        <span>Inserisci un titolo descrittivo</span>
-                                    </div>
-                                    <div class="quality-item" id="qualityPrice">
-                                        <i class="fas fa-times-circle"></i>
-                                        <span>Imposta un prezzo</span>
-                                    </div>
-                                    <div class="quality-item" id="qualityDescription">
-                                        <i class="fas fa-times-circle"></i>
-                                        <span>Scrivi una descrizione dettagliata</span>
-                                    </div>
-                                    <div class="quality-item" id="qualityCategory">
-                                        <i class="fas fa-times-circle"></i>
-                                        <span>Seleziona una categoria</span>
-                                    </div>
-                                </div>
-                                <div class="quality-score">
-                                    <div class="score-label">Punteggio qualità:</div>
-                                    <div class="score-bar">
-                                        <div class="score-fill" id="qualityScoreFill" style="width: 0%"></div>
-                                    </div>
-                                    <div class="score-text" id="qualityScoreText">0%</div>
                                 </div>
                             </div>
                         </div>

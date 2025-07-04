@@ -596,51 +596,9 @@ class EnhancedProductCreator {
             
             badge.innerHTML = `<i class="fas fa-star"></i><span>${conditionText}</span>`;
             badge.style.display = 'flex';
-            
-            // Update badge color based on condition
-            badge.className = 'badge';
-            if (conditionValue === 'nuovo') badge.classList.add('new-badge');
-            else if (conditionValue === 'eccellente') badge.classList.add('excellent-badge');
-            else badge.classList.add('good-badge');
         } else if (badge) {
             badge.style.display = 'none';
         }
-    }
-    
-    updateQualityCheck() {
-        const qualityItems = {
-            'qualityImages': this.images.length > 0,
-            'qualityTitle': document.getElementById('productName')?.value?.trim().length >= 3,
-            'qualityPrice': parseFloat(document.getElementById('productPrice')?.value || 0) > 0,
-            'qualityDescription': document.getElementById('productDescription')?.value?.trim().length >= 10,
-            'qualityCategory': document.getElementById('productCategory')?.value?.length > 0
-        };
-        
-        let completedCount = 0;
-        const totalCount = Object.keys(qualityItems).length;
-        
-        Object.entries(qualityItems).forEach(([itemId, isComplete]) => {
-            const item = document.getElementById(itemId);
-            if (item) {
-                const icon = item.querySelector('i');
-                if (isComplete) {
-                    icon.className = 'fas fa-check-circle';
-                    item.classList.add('completed');
-                    completedCount++;
-                } else {
-                    icon.className = 'fas fa-times-circle';
-                    item.classList.remove('completed');
-                }
-            }
-        });
-        
-        // Update quality score
-        const scorePercentage = Math.round((completedCount / totalCount) * 100);
-        const scoreFill = document.getElementById('qualityScoreFill');
-        const scoreText = document.getElementById('qualityScoreText');
-        
-        if (scoreFill) scoreFill.style.width = `${scorePercentage}%`;
-        if (scoreText) scoreText.textContent = `${scorePercentage}%`;
     }
     
     setupAutoSave() {
@@ -852,6 +810,11 @@ class EnhancedProductCreator {
         
         // Update progress bar
         this.updateProgressBar();
+        
+        // Update preview when on step 3
+        if (step === 3) {
+            this.updatePreview();
+        }
     }
     
     updateNavigationButtons() {

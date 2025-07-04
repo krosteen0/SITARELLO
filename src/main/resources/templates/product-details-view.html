@@ -2,329 +2,39 @@
 <html lang="it" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${product.name + ' - Dettagli Prodotto - Sitarello'}">Dettagli Prodotto - Sitarello</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/product-details-view.css}" />
     <link rel="stylesheet" th:href="@{/css/rating-stars.css}" />
     <link rel="stylesheet" th:href="@{/css/footer.css}" />
-    <style>
-        .product-detail-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            margin-top: 20px;
-        }
-        
-        .product-images {
-            position: sticky;
-            top: 20px;
-        }
-        
-        .main-image {
-            width: 100%;
-            max-height: 400px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .main-image:hover {
-            transform: scale(1.02);
-        }
-        
-        .image-thumbnails {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .thumbnail {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 4px;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: border-color 0.2s;
-        }
-        
-        .thumbnail:hover,
-        .thumbnail.active {
-            border-color: #007bff;
-        }
-        
-        .product-info {
-            padding: 20px 0;
-        }
-        
-        .product-title {
-            font-size: 2.2em;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        .product-price {
-            font-size: 2.5em;
-            font-weight: 700;
-            color: #28a745;
-            margin-bottom: 20px;
-        }
-        
-        .product-meta {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-        }
-        
-        .meta-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .meta-item:last-child {
-            border-bottom: none;
-        }
-        
-        .meta-label {
-            font-weight: 600;
-            color: #666;
-        }
-        
-        .meta-value {
-            color: #333;
-            font-weight: 500;
-        }
-        
-        .product-description {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            margin-bottom: 25px;
-        }
-        
-        .description-title {
-            font-size: 1.3em;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 10px;
-        }
-        
-        .description-text {
-            line-height: 1.6;
-            color: #555;
-            font-size: 1.1em;
-        }
-        
-        .seller-info {
-            background: #e8f5e8;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-        }
-        
-        .seller-title {
-            font-size: 1.2em;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-            justify-content: center;
-        }
-        
-        .btn-primary {
-            background: #007bff;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #0056b3;
-            transform: translateY(-1px);
-        }
-        
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background: #218838;
-            transform: translateY(-1px);
-        }
-        
-        .btn-warning {
-            background: #ffc107;
-            color: #212529;
-        }
-        
-        .btn-warning:hover {
-            background: #e0a800;
-            transform: translateY(-1px);
-        }
-        
-        .btn-outline {
-            background: transparent;
-            color: #007bff;
-            border: 2px solid #007bff;
-        }
-        
-        .btn-outline:hover {
-            background: #007bff;
-            color: white;
-        }
-        
-        .breadcrumb {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }
-        
-        .breadcrumb a {
-            color: #007bff;
-            text-decoration: none;
-            margin-right: 10px;
-        }
-        
-        .breadcrumb a:hover {
-            text-decoration: underline;
-        }
-        
-        .breadcrumb span {
-            color: #6c757d;
-            margin: 0 5px;
-        }
-        
-        .no-images {
-            background: #f8f9fa;
-            border: 2px dashed #ddd;
-            border-radius: 8px;
-            padding: 40px;
-            text-align: center;
-            color: #666;
-        }
-        
-        /* Modal per immagini a schermo intero */
-        .image-modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.9);
-        }
-        
-        .modal-content {
-            margin: auto;
-            display: block;
-            width: 80%;
-            max-width: 700px;
-            max-height: 90%;
-            object-fit: contain;
-        }
-        
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 35px;
-            color: #f1f1f1;
-            font-size: 40px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        
-        .close:hover {
-            color: #bbb;
-        }
-        
-        @media (max-width: 968px) {
-            .product-detail-container {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .product-images {
-                position: static;
-            }
-            
-            .product-title {
-                font-size: 1.8em;
-            }
-            
-            .product-price {
-                font-size: 2em;
-            }
-            
-            .action-buttons {
-                justify-content: stretch;
-            }
-            
-            .btn {
-                flex: 1;
-                min-width: 150px;
-            }
-        }
-        
-        @media (max-width: 576px) {
-            .product-title {
-                font-size: 1.5em;
-            }
-            
-            .product-price {
-                font-size: 1.8em;
-            }
-            
-            .btn {
-                padding: 10px 16px;
-                font-size: 14px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <div class="animated-bg">
+        <div class="floating-shapes">
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+        </div>
+    </div>
+    
     <div th:insert="~{fragments/navbar :: navbar}"></div>
 
     <main class="container">
-        <!-- Breadcrumb -->
-        <div class="breadcrumb">
-            <a th:href="@{/}">🏠 Home</a>
-            <span>></span>
-            <a th:href="@{/products}">🛍️ Prodotti</a>
-            <span>></span>
-            <strong th:text="${product.name}">Prodotto</strong>
+        <!-- Breadcrumb moderno -->
+        <div class="breadcrumb" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 15px; padding: 1rem 2rem; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.2); display: flex; align-items: center; gap: 1rem; font-weight: 500;">
+            <a th:href="@{/}" style="color: #3498db; text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <i class="fas fa-chevron-right" style="color: #bdc3c7; font-size: 0.8rem;"></i>
+            <a th:href="@{/products}" style="color: #3498db; text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
+                <i class="fas fa-shopping-bag"></i> Prodotti
+            </a>
+            <i class="fas fa-chevron-right" style="color: #bdc3c7; font-size: 0.8rem;"></i>
+            <strong th:text="${product.name}" style="color: #2c3e50; display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.05rem;">
+                <i class="fas fa-box"></i> Prodotto
+            </strong>
         </div>
 
         <div class="product-detail-container">
@@ -349,7 +59,8 @@
                 </div>
                 
                 <div th:if="${product.images == null or #lists.isEmpty(product.images)}" class="no-images">
-                    <h3>📷 Nessuna immagine disponibile</h3>
+                    <i class="fas fa-images"></i>
+                    <h3>Nessuna immagine disponibile</h3>
                     <p>Il venditore non ha ancora caricato immagini per questo prodotto.</p>
                 </div>
             </div>
@@ -365,37 +76,60 @@
                 <!-- Meta informazioni -->
                 <div class="product-meta">
                     <div class="meta-item">
-                        <span class="meta-label">📂 Categoria:</span>
-                        <span class="meta-value" th:text="${product.category?.name ?: 'Categoria non specificata'}">Categoria</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">🏪 Venditore:</span>
-                        <span class="meta-value" th:text="${product.seller.username}">Venditore</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">🆔 Codice Prodotto:</span>
-                        <span class="meta-value" th:text="${product.id}">#12345</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">⭐ Valutazione:</span>
+                        <span class="meta-label">
+                            <i class="fas fa-tag"></i> Categoria:
+                        </span>
                         <span class="meta-value">
-                            <span th:if="${ratingCount > 0}">
-                                <div th:replace="~{fragments/rating-stars :: rating-stars(${averageRating}, ${ratingCount})}"></div>
-                                <a th:href="@{'/ratings/product/' + ${product.id}}" style="margin-left: 5px; font-size: 0.9em; color: #007bff;">Vedi tutte</a>
-                            </span>
-                            <span th:unless="${ratingCount > 0}">
-                                Nessuna recensione
-                                <a th:if="${isAuthenticated and (product.seller == null or username != product.seller.username)}" 
-                                   th:href="@{'/ratings/product/' + ${product.id}}" 
-                                   style="margin-left: 5px; font-size: 0.9em; color: #007bff;">Scrivi la prima</a>
-                            </span>
+                            <span class="category-badge" th:text="${product.category?.name ?: 'Non specificata'}">Categoria</span>
+                        </span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">
+                            <i class="fas fa-store"></i> Venditore:
+                        </span>
+                        <span class="meta-value">
+                            <a th:href="@{'/users/seller/' + ${product.seller.username}}" class="seller-link">
+                                <i class="fas fa-user-circle"></i>
+                                <span th:text="${product.seller.username}">Venditore</span>
+                            </a>
+                        </span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">
+                            <i class="fas fa-barcode"></i> Codice Prodotto:
+                        </span>
+                        <span class="meta-value" th:text="'#' + ${product.id}">#12345</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">
+                            <i class="fas fa-star"></i> Valutazione:
+                        </span>
+                        <span class="meta-value">
+                            <div class="rating-container">
+                                <span th:if="${ratingCount > 0}">
+                                    <div th:replace="~{fragments/rating-stars :: rating-stars(${averageRating}, ${ratingCount})}"></div>
+                                    <a th:href="@{'/ratings/product/' + ${product.id}}" class="rating-link">
+                                        <i class="fas fa-eye"></i> Vedi tutte
+                                    </a>
+                                </span>
+                                <span th:unless="${ratingCount > 0}" class="no-rating">
+                                    Nessuna recensione
+                                    <a th:if="${isAuthenticated and (product.seller == null or username != product.seller.username)}" 
+                                       th:href="@{'/ratings/product/' + ${product.id}}" 
+                                       class="rating-link">
+                                        <i class="fas fa-edit"></i> Scrivi la prima
+                                    </a>
+                                </span>
+                            </div>
                         </span>
                     </div>
                 </div>
 
                 <!-- Descrizione -->
                 <div class="product-description" th:if="${product.description != null and not #strings.isEmpty(product.description)}">
-                    <h3 class="description-title">📝 Descrizione</h3>
+                    <h3 class="description-title">
+                        <i class="fas fa-align-left"></i> Descrizione del Prodotto
+                    </h3>
                     <div class="description-text" th:text="${product.description}">
                         Descrizione dettagliata del prodotto...
                     </div>
@@ -404,60 +138,69 @@
                 <!-- Informazioni venditore -->
                 <div class="seller-info">
                     <h3 class="seller-title">
-                        👤 Informazioni Venditore
+                        <i class="fas fa-user-circle"></i> Informazioni Venditore
                     </h3>
-                    <p>
-                        <strong>Nome utente:</strong> 
-                        <a th:href="@{'/users/seller/' + ${product.seller.username}}" class="seller-link" 
-                           style="color: #007bff; text-decoration: none; font-weight: bold;">
-                            <span th:text="${product.seller.username}">venditore123</span>
-                            <span style="font-size: 0.9em;">👤</span>
+                    <div style="text-align: center;">
+                        <p style="margin-bottom: 1rem; font-size: 1.1rem;">
+                            <strong style="color: #2c3e50;">Nome utente:</strong> 
+                            <span th:text="${product.seller.username}" style="color: #3498db; font-weight: 600; font-size: 1.1rem;">venditore123</span>
+                        </p>
+                        <p style="margin-bottom: 1.5rem; font-size: 1rem;">
+                            <strong style="color: #2c3e50;">Email:</strong> 
+                            <span th:text="${product.seller.email}" style="color: #34495e; font-weight: 500;">email@example.com</span>
+                        </p>
+                        <a th:href="@{'/users/seller/' + ${product.seller.username}}" class="seller-link">
+                            <i class="fas fa-store"></i> Visita Profilo Venditore
                         </a>
-                    </p>
-                    <p><strong>Email:</strong> <span th:text="${product.seller.email}">email@example.com</span></p>
-                    <a th:href="@{'/users/seller/' + ${product.seller.username}}" class="btn btn-outline" style="margin-top: 10px;">
-                        🏪 Visita Profilo Venditore
-                    </a>
+                    </div>
                 </div>
 
                 <!-- Pulsanti di azione -->
                 <div class="action-buttons">
                     <!-- Pulsanti per il proprietario -->
-                    <div th:if="${isOwner}">
+                    <div th:if="${isOwner}" style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
                         <a th:href="@{'/product/edit/' + ${product.id}}" class="btn btn-warning">
-                            ✏️ Modifica Prodotto
+                            <i class="fas fa-edit"></i> Modifica Prodotto
                         </a>
                         <button onclick="confirmDelete()" class="btn btn-outline" style="color: #dc3545; border-color: #dc3545;">
-                            🗑️ Elimina
+                            <i class="fas fa-trash"></i> Elimina Prodotto
                         </button>
                     </div>
                     
                     <!-- Pulsanti per altri utenti -->
-                    <div th:unless="${isOwner}">
+                    <div th:unless="${isOwner}" style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
                         <button class="btn btn-success" onclick="contactSeller()">
-                            💬 Contatta Venditore
+                            <i class="fas fa-comment"></i> Contatta Venditore
                         </button>
                         <a th:href="@{'/ratings/product/' + ${product.id}}" class="btn btn-primary">
-                            ⭐ Valuta Prodotto
+                            <i class="fas fa-star"></i> Valuta Prodotto
                         </a>
                         <button class="btn btn-outline" style="color: #007bff; border-color: #007bff;" onclick="shareProduct()">
-                            📤 Condividi
+                            <i class="fas fa-share"></i> Condividi
                         </button>
                     </div>
                     
-                    <!-- Pulsante sempre disponibile -->
-                    <a th:href="@{/products}" class="btn btn-outline">
-                        ← Torna ai Prodotti
-                    </a>
+                    <!-- Pulsanti di navigazione sempre disponibili -->
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(102, 126, 234, 0.2);">
+                        <a th:href="@{/}" class="btn btn-secondary">
+                            <i class="fas fa-home"></i> Torna alla Home
+                        </a>
+                        <a th:href="@{/products}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Tutti i Prodotti
+                        </a>
+                        <a th:if="${isAuthenticated}" th:href="@{/users/products}" class="btn btn-primary">
+                            <i class="fas fa-user-tag"></i> I Miei Prodotti
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
     <!-- Modal per visualizzazione immagini a schermo intero -->
-    <div id="imageModal" class="image-modal">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <img class="modal-content" id="modalImage">
+    <div id="imageModal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.9); cursor: pointer;" onclick="closeModal()">
+        <span onclick="closeModal()" style="position: absolute; top: 15px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.3s;">&times;</span>
+        <img id="modalImage" style="margin: auto; display: block; width: 80%; max-width: 700px; max-height: 90%; object-fit: contain; margin-top: 50px; border-radius: 15px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);">
     </div>
 
     <!-- Include footer fragment -->
