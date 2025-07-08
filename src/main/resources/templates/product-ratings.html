@@ -23,10 +23,9 @@
                 <span>Valutazioni</span>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <div class="page-header">
                 <h1 th:text="${'Valutazioni per ' + product.name}">Valutazioni del Prodotto</h1>
-                <a th:href="@{'/product/details/' + ${product.id}}" class="btn-back" 
-                   style="background-color: #6c757d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: 500; transition: all 0.3s ease;">
+                <a th:href="@{'/product/details/' + ${product.id}}" class="btn-back">
                     ← Torna al Prodotto
                 </a>
             </div>

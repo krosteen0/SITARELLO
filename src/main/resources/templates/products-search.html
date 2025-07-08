@@ -22,182 +22,286 @@
     
     <div th:insert="~{fragments/navbar :: navbar}"></div>
 
-    <main class="container">
-        <h1>Ricerca Prodotti</h1>
-        
-        <!-- Sezione Filtri di Ricerca -->
-        <div class="search-container">
-            <div class="search-header">
-                <h2 class="search-title">🔍 Trova il tuo prodotto ideale</h2>
-                <p class="search-subtitle">Utilizza i filtri per restringere la ricerca</p>
+    <!-- Hero Section -->
+    <section class="hero-search-section">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    <span class="hero-emoji">🔍</span>
+                    <span class="hero-title-text">Scopri il tuo prodotto perfetto</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Naviga tra migliaia di prodotti con la nostra ricerca avanzata
+                </p>
             </div>
-            
-            <form th:action="@{/products/search}" th:object="${searchDTO}" method="get" class="search-form">
-                <!-- Filtri Base -->
-                <div class="filters-section basic-filters">
-                    <h3 class="section-title">🎯 Ricerca Base</h3>
-                    <div class="search-row">
-                        <div class="form-group">
-                            <label for="searchTerm">🔤 Cerca per nome o descrizione:</label>
-                            <input type="text" id="searchTerm" th:field="*{searchTerm}" 
-                                   placeholder="Inserisci una parola chiave..." />
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number" th:text="${totalProducts}">0</div>
+                    <div class="stat-label">Prodotti</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" th:text="${#lists.size(categories)}">0</div>
+                    <div class="stat-label">Categorie</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">⭐</div>
+                    <div class="stat-label">Qualità</div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-decoration">
+            <div class="floating-icon">🛍️</div>
+            <div class="floating-icon">💎</div>
+            <div class="floating-icon">🎯</div>
+        </div>
+    </section>
+
+    <main class="container">
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-container">
+                <form th:action="@{/products/search}" th:object="${searchDTO}" method="get" class="search-form">
+                    <!-- Quick Search Bar -->
+                    <div class="quick-search-bar">
+                        <div class="search-input-group">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" 
+                                   id="quickSearch" 
+                                   th:field="*{searchTerm}" 
+                                   placeholder="Cerca prodotti, marchi, categorie... (Ctrl+K)"
+                                   class="quick-search-input" 
+                                   autocomplete="off" />
+                            <button type="submit" class="quick-search-btn">
+                                <span>Cerca</span>
+                                <i class="arrow">→</i>
+                            </button>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="categoria">📂 Categoria:</label>
-                            <select id="categoria" th:field="*{categoria}">
+                    </div>
+
+                    <!-- Filter Pills -->
+                    <div class="filter-pills">
+                        <div class="filter-pill" data-filter="category">
+                            <span class="pill-icon">📂</span>
+                            <select th:field="*{categoria}" class="pill-select">
                                 <option value="">Tutte le categorie</option>
                                 <option th:each="cat : ${categories}" 
                                         th:value="${cat.name}" 
-                                        th:text="${cat.name}"
-                                        th:selected="${searchDTO.categoria == cat.name}">Categoria</option>
+                                        th:text="${cat.name}">Categoria</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-pill" data-filter="price">
+                            <span class="pill-icon">💰</span>
+                            <span class="pill-label">Prezzo</span>
+                            <input type="number" th:field="*{prezzoMin}" placeholder="Min" class="pill-input" />
+                            <span class="pill-separator">-</span>
+                            <input type="number" th:field="*{prezzoMax}" placeholder="Max" class="pill-input" />
+                        </div>
+                        
+                        <div class="filter-pill" data-filter="rating">
+                            <span class="pill-icon">⭐</span>
+                            <select th:field="*{ratingMin}" class="pill-select">
+                                <option value="">Qualsiasi</option>
+                                <option value="5">⭐⭐⭐⭐⭐</option>
+                                <option value="4">⭐⭐⭐⭐+</option>
+                                <option value="3">⭐⭐⭐+</option>
+                                <option value="2">⭐⭐+</option>
+                                <option value="1">⭐+</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-pill" data-filter="sort">
+                            <span class="pill-icon">📊</span>
+                            <select th:field="*{sortBy}" class="pill-select">
+                                <option value="id">Più recenti</option>
+                                <option value="name">Nome A-Z</option>
+                                <option value="price">Prezzo ↑</option>
+                                <option value="price_desc">Prezzo ↓</option>
+                                <option value="rating">Top rating</option>
                             </select>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Filtri Avanzati -->
-                <div class="filters-section advanced-filters">
-                    <div class="section-header" onclick="toggleAdvancedFilters()">
-                        <h3 class="section-title">⚙️ Filtri Avanzati</h3>
-                        <span class="toggle-icon" id="advancedToggle">▼</span>
+
+                    <!-- Action Buttons -->
+                    <div class="search-actions">
+                        <button type="submit" class="btn-search">
+                            <span class="btn-icon">🔍</span>
+                            <span class="btn-text">Cerca Prodotti</span>
+                        </button>
+                        <a th:href="@{/products/reset}" class="btn-reset">
+                            <span class="btn-icon">🔄</span>
+                            <span class="btn-text">Reset</span>
+                        </a>
                     </div>
-                    
-                    <div class="advanced-content" id="advancedFiltersContent">
-                        <div class="search-row">
-                            <div class="form-group">
-                                <label for="prezzoMin">💰 Prezzo minimo (€):</label>
-                                <input type="number" id="prezzoMin" th:field="*{prezzoMin}" 
-                                       min="0" step="0.01" placeholder="0.00" />
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="prezzoMax">💰 Prezzo massimo (€):</label>
-                                <input type="number" id="prezzoMax" th:field="*{prezzoMax}" 
-                                       min="0" step="0.01" placeholder="1000.00" />
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="ratingMin">⭐ Valutazione minima:</label>
-                                <select id="ratingMin" th:field="*{ratingMin}">
-                                    <option value="">Qualsiasi valutazione</option>
-                                    <option value="1">⭐ e superiori</option>
-                                    <option value="2">⭐⭐ e superiori</option>
-                                    <option value="3">⭐⭐⭐ e superiori</option>
-                                    <option value="4">⭐⭐⭐⭐ e superiori</option>
-                                    <option value="5">⭐⭐⭐⭐⭐ Solo il meglio</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="sortBy">📊 Ordina per:</label>
-                                <select id="sortBy" th:field="*{sortBy}">
-                                    <option value="id">🕒 Più recenti</option>
-                                    <option value="name">🔤 Nome A-Z</option>
-                                    <option value="price">💰 Prezzo crescente</option>
-                                    <option value="price_desc">💰 Prezzo decrescente</option>
-                                    <option value="category">📂 Categoria</option>
-                                    <option value="rating">⭐ Valutazione più alta</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="search-actions">
-                    <button type="submit" class="btn btn-primary">🔍 Cerca Prodotti</button>
-                    <a th:href="@{/products/reset}" class="btn btn-outline">🔄 Reset Filtri</a>
-                    <a th:href="@{/}" class="btn btn-secondary">🏠 Torna alla Home</a>
-                </div>
-            </form>
-        </div>
-        
-        <!-- Filtri Attivi -->
-        <div th:if="${hasFilters}" class="active-filters">
-            <h4>Filtri attivi:</h4>
-            <span th:if="${searchDTO.hasSearchTerm()}" class="filter-tag">
-                🔍 "<span th:text="${searchDTO.searchTerm}"></span>"
-            </span>
-            <span th:if="${searchDTO.hasCategoria()}" class="filter-tag">
-                📂 <span th:text="${searchDTO.categoria}"></span>
-            </span>
-            <span th:if="${searchDTO.hasPrezzoMin()}" class="filter-tag">
-                💰 Min: €<span th:text="${searchDTO.prezzoMin}"></span>
-            </span>
-            <span th:if="${searchDTO.hasPrezzoMax()}" class="filter-tag">
-                💰 Max: €<span th:text="${searchDTO.prezzoMax}"></span>
-            </span>
-            <span th:if="${searchDTO.hasRatingMin()}" class="filter-tag">
-                ⭐ Min: <span th:text="${searchDTO.ratingMin}"></span> stelle
-            </span>
-        </div>
-        
-        <!-- Header Risultati -->
-        <div class="results-header">
-            <div class="results-count">
-                <strong th:text="${totalProducts}">0</strong> prodotti trovati
-                <span th:if="${searchDTO.hasRatingMin()}" class="rating-filter-info">
-                    (filtrati con valutazione ≥ <span th:text="${searchDTO.ratingMin}"></span> stelle)
-                </span>
-                <span th:if="${searchDTO.sortBy == 'rating'}" class="rating-sort-info">
-                    (ordinati per valutazione più alta)
-                </span>
+                </form>
             </div>
-        </div>
+        </section>
         
-        <!-- Risultati -->
-        <div th:if="${totalProducts > 0}" class="products-grid">
-            <div th:each="product : ${products}" class="product-card">
-                <div class="product-title" th:text="${product.name}">Nome Prodotto</div>
-                
-                <div class="product-meta">
-                    <div>
-                        <span class="label">Categoria:</span>
-                        <span class="value" th:text="${product.category.name}">Categoria</span>
+        <!-- Active Filters -->
+        <section th:if="${hasFilters}" class="active-filters-section">
+            <div class="active-filters-header">
+                <h3>🎯 Filtri attivi</h3>
+                <a th:href="@{/products/reset}" class="clear-all-btn">Cancella tutti</a>
+            </div>
+            <div class="active-filters-list">
+                <div th:if="${searchDTO.hasSearchTerm()}" class="active-filter">
+                    <span class="filter-icon">🔍</span>
+                    <span class="filter-text" th:text="'&quot;' + ${searchDTO.searchTerm} + '&quot;'"></span>
+                    <button class="remove-filter" onclick="removeFilter('searchTerm')">×</button>
+                </div>
+                <div th:if="${searchDTO.hasCategoria()}" class="active-filter">
+                    <span class="filter-icon">📂</span>
+                    <span class="filter-text" th:text="${searchDTO.categoria}"></span>
+                    <button class="remove-filter" onclick="removeFilter('categoria')">×</button>
+                </div>
+                <div th:if="${searchDTO.hasPrezzoMin()}" class="active-filter">
+                    <span class="filter-icon">💰</span>
+                    <span class="filter-text" th:text="'Min: €' + ${searchDTO.prezzoMin}"></span>
+                    <button class="remove-filter" onclick="removeFilter('prezzoMin')">×</button>
+                </div>
+                <div th:if="${searchDTO.hasPrezzoMax()}" class="active-filter">
+                    <span class="filter-icon">💰</span>
+                    <span class="filter-text" th:text="'Max: €' + ${searchDTO.prezzoMax}"></span>
+                    <button class="remove-filter" onclick="removeFilter('prezzoMax')">×</button>
+                </div>
+                <div th:if="${searchDTO.hasRatingMin()}" class="active-filter">
+                    <span class="filter-icon">⭐</span>
+                    <span class="filter-text" th:text="'Min: ' + ${searchDTO.ratingMin} + ' stelle'"></span>
+                    <button class="remove-filter" onclick="removeFilter('ratingMin')">×</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section class="results-section">
+            <div class="results-header">
+                <div class="results-info">
+                    <h2 class="results-title">
+                        <span class="results-count" th:text="${totalProducts}">0</span>
+                        <span class="results-label">prodotti trovati</span>
+                    </h2>
+                    <div class="results-meta">
+                        <span th:if="${searchDTO.hasRatingMin()}" class="meta-badge">
+                            ⭐ Rating ≥ <span th:text="${searchDTO.ratingMin}"></span>
+                        </span>
+                        <span th:if="${searchDTO.sortBy == 'rating'}" class="meta-badge">
+                            📊 Ordinato per rating
+                        </span>
                     </div>
-                    <div>
-                        <span class="label">Venditore:</span>
-                        <span class="value" th:text="${product.seller.username}">Venditore</span>
+                </div>
+                <div class="results-actions">
+                    <button class="view-toggle" onclick="toggleView('grid')" id="gridView">
+                        <span class="toggle-icon">⊞</span>
+                        <span class="toggle-text">Griglia</span>
+                    </button>
+                    <button class="view-toggle active" onclick="toggleView('list')" id="listView">
+                        <span class="toggle-icon">☰</span>
+                        <span class="toggle-text">Lista</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Products Grid -->
+        <div th:if="${totalProducts > 0}" class="products-container list-view" id="productsContainer">
+            <div th:each="product : ${products}" class="product-card modern-card" th:data-product-id="${product.id}">
+                <div class="card-header">
+                    <div class="product-badge">
+                        <span class="badge-icon">🏷️</span>
+                        <span class="badge-text" th:text="${product.category.name}">Categoria</span>
                     </div>
-                    <div>
-                        <span class="label">Valutazione:</span>
+                    <div class="product-rating">
                         <div th:replace="~{fragments/rating-stars :: rating-stars(${product.getAverageRating()}, ${product.getRatingCount()})}"></div>
                     </div>
                 </div>
-                
-                <div class="product-price">
-                    €<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span>
+
+                <div class="card-image-section">
+                    <div th:if="${product.images != null and not #lists.isEmpty(product.images)}" class="product-gallery">
+                        <div class="main-image">
+                            <img th:src="@{'/product/image/' + ${product.images[0].id}}" 
+                                 th:alt="${product.name}" 
+                                 class="featured-image" />
+                        </div>
+                        <div th:if="${#lists.size(product.images) > 1}" class="image-thumbnails">
+                            <img th:each="image, iterStat : ${product.images}" 
+                                 th:if="${iterStat.index < 4}"
+                                 th:src="@{'/product/image/' + ${image.id}}" 
+                                 th:alt="${product.name}" 
+                                 class="thumbnail-image"
+                                 th:onclick="'switchImage(this.src, &quot;' + ${product.id} + '&quot;)'" />
+                        </div>
+                    </div>
+                    <div th:unless="${product.images != null and not #lists.isEmpty(product.images)}" class="no-image-placeholder">
+                        <span class="placeholder-icon">📷</span>
+                        <span class="placeholder-text">Nessuna immagine</span>
+                    </div>
+
+                    <!-- Quick View Overlay - Now inside image section -->
+                    <div class="card-overlay">
+                        <div class="overlay-content">
+                            <button class="quick-view-btn" th:data-product-id="${product.id}" th:onclick="'quickView(' + ${product.id} + ')'">
+                                <span class="btn-icon">👁️</span>
+                                <span class="btn-text">Anteprima rapida</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="product-description" th:text="${product.description}">
-                    Descrizione del prodotto...
+
+                <div class="card-content">
+                    <div class="product-header">
+                        <h3 class="product-name" th:text="${product.name}">Nome Prodotto</h3>
+                        <div class="product-price">
+                            <span class="price-symbol">€</span>
+                            <span class="price-value" th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="product-description">
+                        <p th:text="${product.description}">Descrizione del prodotto...</p>
+                    </div>
+
+                    <div class="product-meta">
+                        <div class="meta-item">
+                            <span class="meta-icon">👤</span>
+                            <span class="meta-label">Venditore:</span>
+                            <span class="meta-value" th:text="${product.seller.username}">Venditore</span>
+                        </div>
+                    </div>
                 </div>
-                
-                <div th:if="${product.images != null and not #lists.isEmpty(product.images)}" class="product-images">
-                    <img th:each="image : ${product.images}" 
-                         th:src="@{'/product/image/' + ${image.id}}" 
-                         th:alt="${product.name}" />
-                </div>
-                
-                <div class="product-actions">
-                    <a th:href="@{'/product/details/' + ${product.id}}" class="btn btn-primary btn-sm">
-                        👁️ Visualizza
+
+                <div class="card-actions">
+                    <a th:href="@{'/product/details/' + ${product.id}}" class="btn-primary">
+                        <span class="btn-icon">👁️</span>
+                        <span class="btn-text">Visualizza</span>
                     </a>
                     
-                    <!-- Pulsanti di modifica solo se l'utente è autenticato e proprietario del prodotto -->
-                    <div th:if="${isAuthenticated and product.seller.username == username}">
-                        <a th:href="@{'/product/edit/' + ${product.id}}" class="btn btn-outline btn-sm">
-                            ✏️ Modifica
+                    <div th:if="${isAuthenticated and product.seller.username == username}" class="owner-actions">
+                        <a th:href="@{'/product/edit/' + ${product.id}}" class="btn-secondary">
+                            <span class="btn-icon">✏️</span>
+                            <span class="btn-text">Modifica</span>
                         </a>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Nessun Risultato -->
-        <div th:if="${totalProducts == 0}" class="no-results">
-            <h3>🔍 Nessun prodotto trovato</h3>
-            <p>Prova a modificare i filtri di ricerca o <a th:href="@{/products/reset}">rimuovi tutti i filtri</a>.</p>
+
+        <!-- Empty State -->
+        <div th:if="${totalProducts == 0}" class="empty-state">
+            <div class="empty-icon">🔍</div>
+            <h3 class="empty-title">Nessun prodotto trovato</h3>
+            <p class="empty-message">
+                Prova a modificare i filtri di ricerca o esplora tutte le nostre categorie
+            </p>
+            <div class="empty-actions">
+                <a th:href="@{/products/reset}" class="btn-primary">
+                    <span class="btn-icon">🔄</span>
+                    <span class="btn-text">Rimuovi filtri</span>
+                </a>
+                <a th:href="@{/products}" class="btn-secondary">
+                    <span class="btn-icon">📂</span>
+                    <span class="btn-text">Vedi tutti i prodotti</span>
+                </a>
+            </div>
         </div>
     </main>
     
