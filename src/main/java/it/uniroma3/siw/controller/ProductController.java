@@ -519,24 +519,50 @@ public class ProductController {
     
     @PostMapping("/create")
     @ResponseBody
-    public String handleModernProductCreation(@RequestParam("name") String name,
-                                            @RequestParam("price") Double price,
-                                            @RequestParam("description") String description,
-                                            @RequestParam("category") Long categoryId,
-                                            @RequestParam("images") List<MultipartFile> images,
+    public String handleModernProductCreation(@RequestParam(value = "name", required = false) String name,
+                                            @RequestParam(value = "price", required = false) Double price,
+                                            @RequestParam(value = "description", required = false) String description,
+                                            @RequestParam(value = "category", required = false) String categoryParam,
+                                            @RequestParam(value = "condition", required = false) String condition,
+                                            @RequestParam(value = "images", required = false) List<MultipartFile> images,
                                             Model model) {
         try {
-            // Validazione base
+            logger.info("Product creation request received with parameters: name={}, price={}, description={}, category={}, condition={}, images={}",
+                    name, price, description != null ? description.length() + " chars" : "null", categoryParam, condition, 
+                    images != null ? images.size() + " files" : "null");
+            
+            // Validazione parametri base
+            if (name == null || name.trim().isEmpty()) {
+                return "{\"error\": \"Il nome del prodotto è obbligatorio\"}";
+            }
+            
+            if (price == null || price <= 0) {
+                return "{\"error\": \"Il prezzo deve essere maggiore di zero\"}";
+            }
+            
+            if (description == null || description.trim().isEmpty()) {
+                return "{\"error\": \"La descrizione è obbligatoria\"}";
+            }
+            
+            if (categoryParam == null || categoryParam.trim().isEmpty()) {
+                return "{\"error\": \"La categoria è obbligatoria\"}";
+            }
+            
+            // Validazione immagini
             if (images == null || images.isEmpty()) {
                 return "{\"error\": \"Carica almeno un'immagine\"}";
             }
             
-            if (images.size() > 5) {
-                return "{\"error\": \"Massimo 5 immagini consentite\"}";
+            if (images.size() > 10) {
+                return "{\"error\": \"Massimo 10 immagini consentite\"}";
             }
             
             // Validazione dimensioni e tipo file
             for (MultipartFile image : images) {
+                if (image.isEmpty()) {
+                    continue; // Skip empty files
+                }
+                
                 if (image.getSize() > 5 * 1024 * 1024) { // 5MB
                     return "{\"error\": \"Immagine troppo grande (max 5MB): " + image.getOriginalFilename() + "\"}";
                 }
@@ -552,24 +578,38 @@ public class ProductController {
                 return "{\"error\": \"Utente non autenticato\"}";
             }
             
-            // Crea il DTO del prodotto
-            ProductFormDTO productFormDTO = new ProductFormDTO();
-            productFormDTO.setNome(name);
-            productFormDTO.setPrezzo(price);
-            productFormDTO.setDescrizione(description);
+            // Parse category ID
+            Long categoryId;
+            try {
+                categoryId = Long.parseLong(categoryParam);
+            } catch (NumberFormatException e) {
+                logger.error("Invalid category format: {}", categoryParam);
+                return "{\"error\": \"Categoria non valida\"}";
+            }
             
-            // Trova la categoria per nome
+            // Trova la categoria per ID
             Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
-            if (categoryOpt.isPresent()) {
-                productFormDTO.setCategoria(categoryOpt.get().getName());
-            } else {
+            if (categoryOpt.isEmpty()) {
                 return "{\"error\": \"Categoria non trovata\"}";
             }
             
-            // Converti le immagini in byte array
+            // Crea il DTO del prodotto
+            ProductFormDTO productFormDTO = new ProductFormDTO();
+            productFormDTO.setNome(name.trim());
+            productFormDTO.setPrezzo(price);
+            productFormDTO.setDescrizione(description.trim());
+            productFormDTO.setCategoria(categoryOpt.get().getName());
+            
+            // Converti le immagini in byte array, filtrando quelle vuote
             List<byte[]> imageDataList = new ArrayList<>();
             for (MultipartFile image : images) {
-                imageDataList.add(image.getBytes());
+                if (!image.isEmpty()) {
+                    imageDataList.add(image.getBytes());
+                }
+            }
+            
+            if (imageDataList.isEmpty()) {
+                return "{\"error\": \"Nessuna immagine valida caricata\"}";
             }
             
             // Salva il prodotto
@@ -579,7 +619,9 @@ public class ProductController {
             return "{\"success\": true, \"productId\": " + savedProduct.getId() + "}";
             
         } catch (Exception e) {
-            logger.error("Error creating product: {}", e.getMessage(), e);
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.error("Error creating product: {}", sw.toString());
             return "{\"error\": \"Errore durante la creazione del prodotto: " + e.getMessage() + "\"}";
         }
     }
