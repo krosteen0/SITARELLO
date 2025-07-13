@@ -963,13 +963,40 @@ class EnhancedProductCreator {
             });
             
             if (response.ok) {
-                // Clear auto-saved data
-                localStorage.removeItem('productCreateAutoSave');
-                
-                // Show success modal
-                this.showSuccessModal();
+                // Check if response is JSON and has success field
+                const responseText = await response.text();
+                try {
+                    const responseData = JSON.parse(responseText);
+                    if (responseData.success) {
+                        // Clear auto-saved data
+                        localStorage.removeItem('productCreateAutoSave');
+                        
+                        // Show success modal
+                        this.showSuccessModal();
+                    } else if (responseData.error) {
+                        this.showNotification(responseData.error, 'error');
+                    } else {
+                        this.showNotification('Risposta del server non valida', 'error');
+                    }
+                } catch (jsonError) {
+                    // Fallback for non-JSON responses
+                    console.error('Failed to parse response:', jsonError);
+                    this.showNotification('Prodotto creato con successo', 'success');
+                }
             } else {
-                throw new Error('Errore durante il salvataggio');
+                // Handle error responses
+                try {
+                    const errorText = await response.text();
+                    const errorData = JSON.parse(errorText);
+                    if (errorData.error) {
+                        this.showNotification(errorData.error, 'error');
+                    } else {
+                        this.showNotification('Errore durante il salvataggio del prodotto', 'error');
+                    }
+                } catch (jsonError) {
+                    console.error('Failed to parse error response:', jsonError);
+                    this.showNotification('Errore durante il salvataggio del prodotto', 'error');
+                }
             }
             
         } catch (error) {
