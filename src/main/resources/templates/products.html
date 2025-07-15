@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elenco Prodotti - Sitarello</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <link rel="stylesheet" th:href="@{/css/products.css?v=10}" />
+    <link rel="stylesheet" th:href="@{/css/products-new.css?v=2}" />
     <link rel="stylesheet" th:href="@{/css/footer.css}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,13 +40,10 @@
         <!-- Products Grid -->
         <div th:if="${products != null && !products.isEmpty()}" class="products-grid">
             <div th:each="product : ${products}" class="product-card">
-                <!-- Product Image -->
+                <!-- Product Image - Show only first image -->
                 <div class="product-image">
-                    <div th:if="${product.images != null && !product.images.isEmpty()}" 
-                         th:class="${'product-image-grid ' + (product.images.size() == 1 ? ' single' : (product.images.size() == 3 ? ' three' : (product.images.size() >= 4 ? ' four' : '')))}">
-                        <img th:each="image, iterStat : ${product.images}" 
-                             th:if="${iterStat.index < 4}"
-                             th:src="@{'/product/image/' + ${image.id}}" 
+                    <div th:if="${product.images != null && !product.images.isEmpty()}" class="product-image-grid">
+                        <img th:src="@{'/product/image/' + ${product.images[0].id}}" 
                              th:alt="${product.name}" />
                     </div>
                     <div th:unless="${product.images != null && !product.images.isEmpty()}" class="product-image-placeholder">
