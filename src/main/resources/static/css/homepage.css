@@ -1,9 +1,9 @@
 /* Homepage Styles - Sitarello - Elegant Redesign */
 
-/* Global Background */
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
-    background: linear-gradient(135deg, #0a0f1c 0%, #1e293b 25%, #2d3748 50%, #374151 100%);
+/* Global Background - Override styles.css */
+html, body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif !important;
+    background: linear-gradient(135deg, #0a0f1c 0%, #1e293b 25%, #2d3748 50%, #374151 100%) !important;
     margin: 0;
     padding: 0;
     min-height: 100vh;
@@ -13,6 +13,14 @@ body {
     overflow-x: hidden;
     line-height: 1.6;
     letter-spacing: -0.01em;
+    color: #e2e8f0 !important;
+}
+
+/* Ensure our background always applies */
+body.homepage-body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif !important;
+    background: linear-gradient(135deg, #0a0f1c 0%, #1e293b 25%, #2d3748 50%, #374151 100%) !important;
+    color: #e2e8f0 !important;
 }
 
 body::before {
@@ -36,6 +44,42 @@ body::before {
     max-width: 1240px;
     margin: 0 auto;
     padding: 40px 24px;
+}
+
+/* Override navbar styles for homepage */
+.homepage-body .navbar {
+    background: rgba(15, 23, 42, 0.8) !important;
+    backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+.homepage-body .navbar:hover {
+    background: rgba(15, 23, 42, 0.9) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4) !important;
+    transform: translateY(0) !important;
+}
+
+/* Ensure all text elements use our color scheme */
+.homepage-body * {
+    color: inherit;
+}
+
+.homepage-body h1, .homepage-body h2, .homepage-body h3, .homepage-body h4, .homepage-body h5, .homepage-body h6 {
+    color: #ffffff !important;
+}
+
+.homepage-body p, .homepage-body span, .homepage-body div {
+    color: #e2e8f0;
+}
+
+.homepage-body a {
+    color: #a5b4fc;
+    transition: color 0.3s ease;
+}
+
+.homepage-body a:hover {
+    color: #6366f1;
 }
 
 /* Hero Section moderna con sfondo pulito */
@@ -1412,4 +1456,28 @@ footer {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Force dark theme consistency - Ultimate override */
+.homepage-body, .homepage-body * {
+    box-sizing: border-box;
+}
+
+.homepage-body {
+    background: linear-gradient(135deg, #0a0f1c 0%, #1e293b 25%, #2d3748 50%, #374151 100%) !important;
+    background-attachment: fixed !important;
+    color: #e2e8f0 !important;
+}
+
+/* Ensure no other background interferes */
+.homepage-body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #0a0f1c 0%, #1e293b 25%, #2d3748 50%, #374151 100%);
+    z-index: -2;
+    pointer-events: none;
 }
