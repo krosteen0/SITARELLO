@@ -110,10 +110,30 @@
                         </div>
                     </a>
                     <div class="product-info-small">
+                        <div class="product-category-small" th:text="${product.category != null ? product.category.name : 'N/A'}">Categoria</div>
                         <h3 class="product-title-small">
                             <a th:href="@{'/product/' + ${product.id}}" th:text="${product.name}">Nome Prodotto</a>
                         </h3>
                         <p class="product-price-small" th:text="${product.price} + ' €'">€0.00</p>
+                        
+                        <!-- Rating Section -->
+                        <div class="product-rating-small" th:if="${product.averageRating != null && product.averageRating > 0}">
+                            <div class="stars">
+                                <i th:each="i : ${#numbers.sequence(1, 5)}" 
+                                   th:class="${i <= product.averageRating} ? 'fas fa-star star' : 'fas fa-star star empty'"></i>
+                            </div>
+                            <span class="rating-text" th:text="'(' + ${product.ratingCount} + ')'">
+                                (0)
+                            </span>
+                        </div>
+                        
+                        <!-- Seller Section - Now more prominent -->
+                        <div class="product-seller-small">
+                            <a th:href="@{'/seller/' + ${product.seller.id}}">
+                                <i class="fas fa-store"></i>
+                                <span th:text="${product.seller.user.username}">Nome Venditore</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

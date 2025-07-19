@@ -1,17 +1,28 @@
 /* Homepage JavaScript - Sitarello */
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Controllo messaggio di benvenuto
+    checkWelcomeMessage();
+    
     // Gestione scroll orizzontale per i prodotti recenti
     initHorizontalScroll();
     
     // Gestione errori immagini
     initImageErrorHandling();
     
-    // Animazioni al caricamento
+    // Animazioni al caricamento eleganti
     initScrollAnimations();
     
-    // Gestione ricerca con Enter
+    // Gestione ricerca con miglioramenti
     initSearchEnhancements();
+    
+    // Aggiunge un effetto di fade-in alla pagina
+    document.body.style.opacity = '0';
+    document.body.style.transition = 'opacity 0.6s ease';
+    
+    setTimeout(() => {
+        document.body.style.opacity = '1';
+    }, 100);
 });
 
 /**
@@ -98,12 +109,12 @@ function initImageErrorHandling() {
 }
 
 /**
- * Inizializza le animazioni al scroll
+ * Inizializza le animazioni al scroll - versione elegante
  */
 function initScrollAnimations() {
     // Controllo se l'API IntersectionObserver è supportata
     if ('IntersectionObserver' in window) {
-        const animateElements = document.querySelectorAll('.product-card, .feature-card, .category-card');
+        const animateElements = document.querySelectorAll('.product-card, .category-card, .welcome-card');
         
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -114,50 +125,49 @@ function initScrollAnimations() {
                 }
             });
         }, {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
+            threshold: 0.15,
+            rootMargin: '0px 0px -30px 0px'
         });
         
         // Imposta lo stato iniziale per l'animazione
-        animateElements.forEach(el => {
+        animateElements.forEach((el, index) => {
             el.style.opacity = '0';
-            el.style.transform = 'translateY(20px)';
-            el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = `opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.1}s, transform 0.8s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.1}s`;
             observer.observe(el);
         });
     }
 }
 
 /**
- * Migliora la funzionalità di ricerca
+ * Migliora la funzionalità di ricerca - versione elegante
  */
 function initSearchEnhancements() {
     const searchInput = document.querySelector('.search-input');
     const searchForm = document.querySelector('.search-form');
     
     if (searchInput && searchForm) {
-        // Gestione del placeholder animato
+        // Gestione del placeholder semplice
         const placeholders = [
-            'Cerca prodotti, categorie...',
-            'Prova "elettronica"...',
-            'Cerca "abbigliamento"...',
-            'Trova "libri"...',
-            'Scopri "arte"...'
+            'Cerca prodotti, categorie, brand...',
+            'Prova "elettronica", "moda", "libri"...',
+            'Scopri prodotti unici su Sitarello...'
         ];
         
         let currentPlaceholder = 0;
         
-        // Cambia placeholder ogni 3 secondi se l'input non è focalizzato
-        setInterval(() => {
-            if (document.activeElement !== searchInput) {
+        // Cambia placeholder ogni 4 secondi se l'input non è focalizzato
+        const placeholderInterval = setInterval(() => {
+            if (document.activeElement !== searchInput && searchInput.value === '') {
                 currentPlaceholder = (currentPlaceholder + 1) % placeholders.length;
                 searchInput.placeholder = placeholders[currentPlaceholder];
             }
-        }, 3000);
+        }, 4000);
         
-        // Gestione focus
+        // Gestione focus elegante
         searchInput.addEventListener('focus', function() {
-            this.placeholder = 'Cerca...';
+            this.placeholder = 'Inserisci termini di ricerca...';
+            this.style.transition = 'all 0.3s ease';
         });
         
         searchInput.addEventListener('blur', function() {
@@ -166,52 +176,102 @@ function initSearchEnhancements() {
             }
         });
         
-        // Validazione form
+        // Validazione form elegante
         searchForm.addEventListener('submit', function(e) {
             if (searchInput.value.trim() === '') {
                 e.preventDefault();
                 searchInput.focus();
-                searchInput.style.border = '1px solid #ef4444';
+                searchInput.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+                searchInput.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+                
                 setTimeout(() => {
-                    searchInput.style.border = 'none';
+                    searchInput.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                    searchInput.style.boxShadow = 'none';
                 }, 2000);
             }
+        });
+        
+        // Cleanup interval quando la pagina viene scaricata
+        window.addEventListener('beforeunload', () => {
+            clearInterval(placeholderInterval);
         });
     }
 }
 
 /**
- * Gestione della chiusura del messaggio di benvenuto
+ * Gestione della chiusura del messaggio di benvenuto - versione elegante
  */
 function closeWelcomeMessage() {
     const welcomeSection = document.querySelector('.welcome-section');
     if (welcomeSection) {
+        welcomeSection.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
         welcomeSection.style.opacity = '0';
-        welcomeSection.style.transform = 'translateY(-20px)';
+        welcomeSection.style.transform = 'translateY(-30px) scale(0.95)';
         
         setTimeout(() => {
             welcomeSection.style.display = 'none';
-        }, 300);
+            // Salva lo stato di chiusura nel localStorage
+            localStorage.setItem('welcomeMessageClosed', 'true');
+        }, 400);
     }
 }
 
 /**
- * Funzione per il feedback di caricamento
+ * Controllo se mostrare il messaggio di benvenuto
+ */
+function checkWelcomeMessage() {
+    const welcomeSection = document.querySelector('.welcome-section');
+    const wasClosed = localStorage.getItem('welcomeMessageClosed');
+    
+    if (welcomeSection && wasClosed === 'true') {
+        welcomeSection.style.display = 'none';
+    }
+}
+
+/**
+ * Funzione per il feedback di caricamento elegante
  */
 function showLoading(element) {
     if (element) {
-        element.style.opacity = '0.7';
+        element.style.transition = 'all 0.3s ease';
+        element.style.opacity = '0.6';
         element.style.pointerEvents = 'none';
+        element.style.filter = 'blur(1px)';
         
-        // Aggiunge un indicatore di caricamento
+        // Aggiunge un indicatore di caricamento elegante
         const loader = document.createElement('div');
         loader.className = 'loading-indicator';
-        loader.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        loader.style.position = 'absolute';
-        loader.style.top = '50%';
-        loader.style.left = '50%';
-        loader.style.transform = 'translate(-50%, -50%)';
-        loader.style.zIndex = '1000';
+        loader.innerHTML = '<div class="elegant-spinner"></div>';
+        loader.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        `;
+        
+        // Aggiungi stili per lo spinner
+        const style = document.createElement('style');
+        style.textContent = `
+            .elegant-spinner {
+                width: 20px;
+                height: 20px;
+                border: 2px solid rgba(99, 102, 241, 0.3);
+                border-top: 2px solid #6366f1;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
         
         element.style.position = 'relative';
         element.appendChild(loader);
@@ -225,6 +285,7 @@ function hideLoading(element) {
     if (element) {
         element.style.opacity = '1';
         element.style.pointerEvents = 'auto';
+        element.style.filter = 'none';
         
         const loader = element.querySelector('.loading-indicator');
         if (loader) {
@@ -236,6 +297,7 @@ function hideLoading(element) {
 // Esporta le funzioni per uso globale se necessario
 window.SitarelloHomepage = {
     closeWelcomeMessage,
+    checkWelcomeMessage,
     showLoading,
     hideLoading
 };
