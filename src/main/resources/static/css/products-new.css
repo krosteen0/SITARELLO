@@ -1,3 +1,26 @@
+/* Bottone carrello compatto */
+.btn-cart {
+    background: rgba(99, 102, 241, 0.12);
+    color: #8b5cf6;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.08);
+    margin-left: 0.2rem;
+}
+.btn-cart:hover {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(99,102,241,0.18);
+}
 /* Products Page - Elegant Design matching site style */
 
 /* Global Styles for Products Page */

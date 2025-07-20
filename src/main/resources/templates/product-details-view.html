@@ -121,8 +121,9 @@
                             <button type="submit" class="btn btn-outline btn-danger"><i class="fas fa-trash"></i> Elimina Prodotto</button>
                         </form>
                     </div>
-                    <div th:unless="${isOwner or isAdmin}" class="action-others">
+                    <div th:unless="${isOwner or isAdmin}" class="action-others" style="display:flex; gap:0.5rem;">
                         <a th:href="@{'/ratings/product/' + ${product.id}}" class="btn btn-primary"><i class="fas fa-star"></i> Valuta Prodotto</a>
+                        <button th:if="${isAuthenticated}" class="btn btn-success" type="button" onclick="addToCart([[${product.id}]])"><i class="fas fa-cart-plus"></i> Aggiungi al Carrello</button>
                     </div>
                     <div class="action-nav">
                         <a th:href="@{/}" class="btn btn-secondary"><i class="fas fa-home"></i> Torna alla Home</a>

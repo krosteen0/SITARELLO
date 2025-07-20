@@ -1,6 +1,8 @@
 <!-- Navbar Fragment - riutilizzabile -->
 <header th:fragment="navbar">
     <link rel="stylesheet" th:href="@{/css/navbar.css}" />
+    <link rel="stylesheet" th:href="@{/css/cart-sidebar.css}" />
+    <script th:src="@{/js/cart-sidebar.js}" defer></script>
     <nav class="navbar">
         <div class="nav-brand">
             <a th:href="@{/}">Sitarello</a>
@@ -14,6 +16,11 @@
             </form>
         </div>
         <div class="nav-links">
+            <!-- Carrello icona -->
+            <button id="cart-btn" class="cart-btn" title="Carrello">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="cart-count" class="cart-count" style="display:none;">0</span>
+            </button>
             <!-- Link per utenti autenticati -->
             <div th:if="${isAuthenticated}">
                 <a th:href="@{/products}">Prodotti</a>
@@ -39,4 +46,21 @@
             </div>
         </div>
     </nav>
+    <!-- Sidebar Carrello -->
+    <aside id="cart-sidebar" class="cart-sidebar">
+        <div class="cart-sidebar-header">
+            <span>Il tuo carrello</span>
+            <button class="close-btn" onclick="toggleCartSidebar()"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="cart-items-list" class="cart-items-list">
+            <!-- Elementi carrello caricati via JS -->
+        </div>
+        <div class="cart-sidebar-footer">
+            <div class="cart-total">
+                Totale: <span id="cart-total">0,00 €</span>
+            </div>
+            <button class="btn btn-primary" id="checkout-btn">Procedi all'ordine</button>
+        </div>
+    </aside>
+    <div id="cart-sidebar-overlay" class="cart-sidebar-overlay" onclick="toggleCartSidebar()"></div>
 </header>
