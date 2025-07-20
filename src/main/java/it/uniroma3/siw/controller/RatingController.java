@@ -143,10 +143,29 @@ public class RatingController {
     public String submitRating(@Valid RatingDTO ratingDTO, BindingResult bindingResult, Model model) {
         addAuthenticationAttributes(model);
         
+        // Log dei parametri ricevuti per debugging
+        logger.info("Received rating submission - ProductId: {}, Value: {}, Comment: {}", 
+                   ratingDTO.getProductId(), ratingDTO.getValue(), 
+                   ratingDTO.getComment() != null ? ratingDTO.getComment().substring(0, Math.min(50, ratingDTO.getComment().length())) : "null");
+        
         // Verifica se l'utente è autenticato
         Users authenticatedUser = getAuthenticatedUser();
         if (authenticatedUser == null) {
+            logger.warn("Unauthenticated user trying to submit rating");
             model.addAttribute("errorMessage", "Devi essere autenticato per valutare un prodotto.");
+            return "error";
+        }
+        
+        // Verifica che i parametri essenziali non siano null
+        if (ratingDTO.getProductId() == null) {
+            logger.error("ProductId is null in rating submission");
+            model.addAttribute("errorMessage", "ID prodotto mancante.");
+            return "error";
+        }
+        
+        if (ratingDTO.getValue() == null) {
+            logger.error("Rating value is null in rating submission");
+            model.addAttribute("errorMessage", "Valore della valutazione mancante.");
             return "error";
         }
         

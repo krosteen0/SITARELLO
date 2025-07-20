@@ -4,9 +4,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Controllo messaggio di benvenuto
     checkWelcomeMessage();
     
-    // Gestione scroll orizzontale per i prodotti recenti
-    initHorizontalScroll();
-    
     // Gestione errori immagini
     initImageErrorHandling();
     
@@ -24,53 +21,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.style.opacity = '1';
     }, 100);
 });
-
-/**
- * Inizializza lo scroll orizzontale per le sezioni dei prodotti
- */
-function initHorizontalScroll() {
-    const scrollContainers = document.querySelectorAll('.products-scroll');
-    
-    scrollContainers.forEach(container => {
-        // Scroll con rotella del mouse
-        container.addEventListener('wheel', function(e) {
-            if (e.deltaY !== 0) {
-                e.preventDefault();
-                container.scrollLeft += e.deltaY;
-            }
-        });
-        
-        // Scroll con touch su dispositivi mobili
-        let isDown = false;
-        let startX;
-        let scrollLeft;
-        
-        container.addEventListener('mousedown', function(e) {
-            isDown = true;
-            container.classList.add('scrolling');
-            startX = e.pageX - container.offsetLeft;
-            scrollLeft = container.scrollLeft;
-        });
-        
-        container.addEventListener('mouseleave', function() {
-            isDown = false;
-            container.classList.remove('scrolling');
-        });
-        
-        container.addEventListener('mouseup', function() {
-            isDown = false;
-            container.classList.remove('scrolling');
-        });
-        
-        container.addEventListener('mousemove', function(e) {
-            if (!isDown) return;
-            e.preventDefault();
-            const x = e.pageX - container.offsetLeft;
-            const walk = (x - startX) * 2;
-            container.scrollLeft = scrollLeft - walk;
-        });
-    });
-}
 
 /**
  * Gestisce gli errori di caricamento delle immagini

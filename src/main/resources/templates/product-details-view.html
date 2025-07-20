@@ -22,264 +22,158 @@
     <div th:insert="~{fragments/navbar :: navbar}"></div>
 
     <main class="container">
-        <!-- Breadcrumb moderno -->
-        <div class="breadcrumb" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 15px; padding: 1rem 2rem; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.2); display: flex; align-items: center; gap: 1rem; font-weight: 500;">
-            <a th:href="@{/}" style="color: #3498db; text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
-                <i class="fas fa-home"></i> Home
-            </a>
-            <i class="fas fa-chevron-right" style="color: #bdc3c7; font-size: 0.8rem;"></i>
-            <a th:href="@{/products}" style="color: #3498db; text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
-                <i class="fas fa-shopping-bag"></i> Prodotti
-            </a>
-            <i class="fas fa-chevron-right" style="color: #bdc3c7; font-size: 0.8rem;"></i>
-            <strong th:text="${product.name}" style="color: #2c3e50; display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.05rem;">
-                <i class="fas fa-box"></i> Prodotto
-            </strong>
+        <div class="breadcrumb sitarello-breadcrumb">
+            <a th:href="@{/}" class="breadcrumb-link"><i class="fas fa-home"></i> Home</a>
+            <i class="fas fa-chevron-right breadcrumb-sep"></i>
+            <a th:href="@{/products}" class="breadcrumb-link"><i class="fas fa-shopping-bag"></i> Prodotti</a>
+            <i class="fas fa-chevron-right breadcrumb-sep"></i>
+            <strong th:text="${product.name}" class="breadcrumb-current"><i class="fas fa-box"></i> Prodotto</strong>
         </div>
-
-        <div class="product-detail-container">
-            <!-- Sezione Immagini -->
-            <div class="product-images">
-                <div th:if="${product.images != null and not #lists.isEmpty(product.images)}">
-                    <!-- Immagine principale -->
-                    <img id="mainImage" 
-                         th:src="@{'/product/image/' + ${product.images[0].id}}" 
-                         th:alt="${product.name}"
-                         class="main-image"
-                         onclick="openModal(this.src)" />
-                    
-                    <!-- Thumbnails -->
-                    <div class="image-thumbnails" th:if="${#lists.size(product.images) > 1}">
-                        <img th:each="image, iterStat : ${product.images}"
-                             th:src="@{'/product/image/' + ${image.id}}"
-                             th:alt="${product.name}"
-                             th:class="${iterStat.index == 0} ? 'thumbnail active' : 'thumbnail'"
-                             th:onclick="'changeMainImage(this.src, this)'" />
+        <div class="product-main-card card-glass">
+            <div class="product-main-row">
+                <div class="main-image-col">
+                    <div th:if="${product.images != null and not #lists.isEmpty(product.images)}" style="position:relative;">
+                        <img id="mainImage" th:src="@{'/product/image/' + ${product.images[0].id}}" th:alt="${product.name}" class="main-image" onclick="openModal(this.src)" />
+                        <button class="btn btn-outline btn-share-icon" type="button" onclick="shareProduct()" title="Condividi" style="position:absolute; top:-0.8rem; right:-0.8rem; z-index:3; padding:0.5rem 0.7rem; min-width:unset; box-shadow:0 2px 12px rgba(139,92,246,0.18);">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                        <div class="image-thumbnails" th:if="${#lists.size(product.images) > 1}">
+                            <img th:each="image, iterStat : ${product.images}" th:src="@{'/product/image/' + ${image.id}}" th:alt="${product.name}" th:class="${iterStat.index == 0} ? 'thumbnail active' : 'thumbnail'" th:onclick="'changeMainImage(this.src, this)'" />
+                        </div>
+                    </div>
+                    <div th:if="${product.images == null or #lists.isEmpty(product.images)}" class="no-images">
+                        <i class="fas fa-images"></i>
+                        <h3>Nessuna immagine disponibile</h3>
+                        <p>Il venditore non ha ancora caricato immagini per questo prodotto.</p>
                     </div>
                 </div>
-                
-                <div th:if="${product.images == null or #lists.isEmpty(product.images)}" class="no-images">
-                    <i class="fas fa-images"></i>
-                    <h3>Nessuna immagine disponibile</h3>
-                    <p>Il venditore non ha ancora caricato immagini per questo prodotto.</p>
+                <div class="main-info-col">
+                    <div style="position: relative;">
+                        <h1 class="product-title" th:text="${product.name}" style="margin:0;">Nome Prodotto</h1>
+                    </div>
+                    <div class="product-price">€<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span></div>
+                    <div class="product-meta info-section">
+                        <div class="meta-item">
+                            <span class="meta-label"><i class="fas fa-tag"></i> Categoria:</span>
+                            <span class="meta-value"><span class="category-badge" th:text="${product.category?.name ?: 'Non specificata'}">Categoria</span></span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label"><i class="fas fa-store"></i> Venditore:</span>
+                            <span class="meta-value"><a th:href="@{'/users/seller/' + ${product.seller.username}}" class="seller-link"><i class="fas fa-user-circle"></i> <span th:text="${product.seller.username}">Venditore</span></a></span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label"><i class="fas fa-barcode"></i> Codice Prodotto:</span>
+                            <span class="meta-value" th:text="'#' + ${product.id}">#12345</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label"><i class="fas fa-star"></i> Valutazione:</span>
+                            <span class="meta-value">
+                                <div class="rating-container">
+                                    <span th:if="${ratingCount > 0}"><div th:replace="~{fragments/rating-stars :: rating-stars(${averageRating}, ${ratingCount})}"></div><a th:href="@{'/ratings/product/' + ${product.id}}" class="rating-link"><i class="fas fa-eye"></i> Vedi tutte</a></span>
+                                    <span th:unless="${ratingCount > 0}" class="no-rating">Nessuna recensione <a th:if="${isAuthenticated and (product.seller == null or username != product.seller.username)}" th:href="@{'/ratings/product/' + ${product.id}}" class="rating-link"><i class="fas fa-edit"></i> Scrivi la prima</a></span>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <!-- Sezione Informazioni -->
-            <div class="product-info">
-                <h1 class="product-title" th:text="${product.name}">Nome Prodotto</h1>
-                
-                <div class="product-price">
-                    €<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span>
+            <div class="product-main-column">
+                <div class="product-description info-section" th:if="${product.description != null and not #strings.isEmpty(product.description)}">
+                    <h3 class="description-title"><i class="fas fa-align-left"></i> Descrizione del Prodotto</h3>
+                    <div class="description-text" th:text="${product.description}">Descrizione dettagliata del prodotto...</div>
                 </div>
-
-                <!-- Meta informazioni -->
-                <div class="product-meta">
-                    <div class="meta-item">
-                        <span class="meta-label">
-                            <i class="fas fa-tag"></i> Categoria:
-                        </span>
-                        <span class="meta-value">
-                            <span class="category-badge" th:text="${product.category?.name ?: 'Non specificata'}">Categoria</span>
-                        </span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">
-                            <i class="fas fa-store"></i> Venditore:
-                        </span>
-                        <span class="meta-value">
-                            <a th:href="@{'/users/seller/' + ${product.seller.username}}" class="seller-link">
-                                <i class="fas fa-user-circle"></i>
-                                <span th:text="${product.seller.username}">Venditore</span>
-                            </a>
-                        </span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">
-                            <i class="fas fa-barcode"></i> Codice Prodotto:
-                        </span>
-                        <span class="meta-value" th:text="'#' + ${product.id}">#12345</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">
-                            <i class="fas fa-star"></i> Valutazione:
-                        </span>
-                        <span class="meta-value">
-                            <div class="rating-container">
-                                <span th:if="${ratingCount > 0}">
-                                    <div th:replace="~{fragments/rating-stars :: rating-stars(${averageRating}, ${ratingCount})}"></div>
-                                    <a th:href="@{'/ratings/product/' + ${product.id}}" class="rating-link">
-                                        <i class="fas fa-eye"></i> Vedi tutte
-                                    </a>
-                                </span>
-                                <span th:unless="${ratingCount > 0}" class="no-rating">
-                                    Nessuna recensione
-                                    <a th:if="${isAuthenticated and (product.seller == null or username != product.seller.username)}" 
-                                       th:href="@{'/ratings/product/' + ${product.id}}" 
-                                       class="rating-link">
-                                        <i class="fas fa-edit"></i> Scrivi la prima
-                                    </a>
-                                </span>
-                            </div>
-                        </span>
-                    </div>
+                <div class="seller-info info-section">
+    <h3 class="seller-title"><i class="fas fa-user-circle"></i> Informazioni Venditore</h3>
+    <div class="seller-details-table">
+        <div class="seller-row">
+            <span class="seller-label"><i class="fas fa-user"></i> Nome utente</span>
+            <span class="seller-value seller-username" th:text="${product.seller.username}">venditore123</span>
+        </div>
+        <div class="seller-row">
+            <span class="seller-label"><i class="fas fa-envelope"></i> Email</span>
+            <span class="seller-value seller-email" th:text="${product.seller.email}">email@example.com</span>
+        </div>
+        <div class="seller-row">
+            <span class="seller-label"><i class="fas fa-store"></i> Profilo</span>
+            <span class="seller-value"><a th:href="@{'/users/seller/' + ${product.seller.username}}" class="seller-link">Visita Profilo</a></span>
+        </div>
+        <div class="seller-row" th:unless="${isOwner}">
+            <span class="seller-label"><i class="fas fa-comment"></i> Contatta</span>
+            <span class="seller-value">
+                <button class="btn btn-success" style="width:100%" onclick="contactSeller()"><i class="fas fa-comment"></i> Contatta Venditore</button>
+            </span>
+        </div>
+    </div>
                 </div>
-
-                <!-- Descrizione -->
-                <div class="product-description" th:if="${product.description != null and not #strings.isEmpty(product.description)}">
-                    <h3 class="description-title">
-                        <i class="fas fa-align-left"></i> Descrizione del Prodotto
-                    </h3>
-                    <div class="description-text" th:text="${product.description}">
-                        Descrizione dettagliata del prodotto...
-                    </div>
+                <div class="reviews-preview info-section" th:if="${recentRatings != null}">
+    <h3 class="reviews-title"><i class="fas fa-comments"></i> Recensioni <span th:if="${ratingCount > 0}" class="reviews-count" th:text="'(' + ${ratingCount} + ')'"/></h3>
+    <div th:if="${!recentRatings.isEmpty()}" class="reviews-container glass-reviews">
+        <div class="reviews-stats"><div class="rating-overview"><div class="average-rating"><span class="rating-number" th:text="${#numbers.formatDecimal(averageRating, 1, 1)}">4.5</span><div th:replace="~{fragments/rating-stars :: rating-stars-static(${averageRating})}"></div><span class="rating-text" th:text="${ratingCount + ' recensioni'}">12 recensioni</span></div></div></div>
+        <div class="recent-reviews"><div class="review-item glass-review-item" th:each="rating : ${recentRatings}"><div class="review-header"><div class="reviewer-info"><span class="reviewer-name" th:text="${rating.user.username}">utente123</span><div class="review-rating"><div th:replace="~{fragments/rating-stars :: rating-stars-static(${rating.value})}"></div></div></div><span class="review-date" th:text="${rating.createdAt != null ? #temporals.format(rating.createdAt, 'dd/MM/yyyy') : 'Data non disponibile'}">01/01/2024</span></div><div class="review-comment" th:if="${rating.comment != null and !#strings.isEmpty(rating.comment)}" th:text="${rating.comment}">Ottimo prodotto, molto soddisfatto dell'acquisto!</div><div class="review-comment no-comment" th:unless="${rating.comment != null and !#strings.isEmpty(rating.comment)}"><em>Nessun commento</em></div></div></div>
+        <div class="view-all-reviews" th:if="${ratingCount > #lists.size(recentRatings)}"><a th:href="@{'/ratings/product/' + ${product.id}}" class="view-all-link"><i class="fas fa-eye"></i> Vedi tutte le <span th:text="${ratingCount}">12</span> recensioni</a></div>
+    </div>
+    <div th:if="${recentRatings.isEmpty()}" class="no-reviews"><i class="fas fa-comment-slash"></i><p>Questo prodotto non ha ancora recensioni.</p><a th:if="${isAuthenticated and (product.seller == null or username != product.seller.username)}" th:href="@{'/ratings/product/' + ${product.id}}" class="first-review-link"><i class="fas fa-star"></i> Scrivi la prima recensione</a></div>
                 </div>
-
-                <!-- Informazioni venditore -->
-                <div class="seller-info">
-                    <h3 class="seller-title">
-                        <i class="fas fa-user-circle"></i> Informazioni Venditore
-                    </h3>
-                    <div style="text-align: center;">
-                        <p style="margin-bottom: 1rem; font-size: 1.1rem;">
-                            <strong style="color: #2c3e50;">Nome utente:</strong> 
-                            <span th:text="${product.seller.username}" style="color: #3498db; font-weight: 600; font-size: 1.1rem;">venditore123</span>
-                        </p>
-                        <p style="margin-bottom: 1.5rem; font-size: 1rem;">
-                            <strong style="color: #2c3e50;">Email:</strong> 
-                            <span th:text="${product.seller.email}" style="color: #34495e; font-weight: 500;">email@example.com</span>
-                        </p>
-                        <a th:href="@{'/users/seller/' + ${product.seller.username}}" class="seller-link">
-                            <i class="fas fa-store"></i> Visita Profilo Venditore
-                        </a>
+                <div class="action-buttons info-section">
+                    <div th:if="${isOwner or isAdmin}" class="action-owner">
+                        <a th:href="@{'/product/edit/' + ${product.id}}" class="btn btn-warning"><i class="fas fa-edit"></i> Modifica Prodotto</a>
+                        <form th:action="@{'/product/delete/' + ${product.id}}" method="post" style="display:inline;" onsubmit="return confirm('Sei sicuro di voler eliminare questo prodotto? Questa azione non può essere annullata.');">
+                            <button type="submit" class="btn btn-outline btn-danger"><i class="fas fa-trash"></i> Elimina Prodotto</button>
+                        </form>
                     </div>
-                </div>
-
-                <!-- Pulsanti di azione -->
-                <div class="action-buttons">
-                    <!-- Pulsanti per il proprietario -->
-                    <div th:if="${isOwner}" style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
-                        <a th:href="@{'/product/edit/' + ${product.id}}" class="btn btn-warning">
-                            <i class="fas fa-edit"></i> Modifica Prodotto
-                        </a>
-                        <button onclick="confirmDelete()" class="btn btn-outline" style="color: #dc3545; border-color: #dc3545;">
-                            <i class="fas fa-trash"></i> Elimina Prodotto
-                        </button>
+                    <div th:unless="${isOwner or isAdmin}" class="action-others">
+                        <a th:href="@{'/ratings/product/' + ${product.id}}" class="btn btn-primary"><i class="fas fa-star"></i> Valuta Prodotto</a>
                     </div>
-                    
-                    <!-- Pulsanti per altri utenti -->
-                    <div th:unless="${isOwner}" style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
-                        <button class="btn btn-success" onclick="contactSeller()">
-                            <i class="fas fa-comment"></i> Contatta Venditore
-                        </button>
-                        <a th:href="@{'/ratings/product/' + ${product.id}}" class="btn btn-primary">
-                            <i class="fas fa-star"></i> Valuta Prodotto
-                        </a>
-                        <button class="btn btn-outline" style="color: #007bff; border-color: #007bff;" onclick="shareProduct()">
-                            <i class="fas fa-share"></i> Condividi
-                        </button>
-                    </div>
-                    
-                    <!-- Pulsanti di navigazione sempre disponibili -->
-                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(102, 126, 234, 0.2);">
-                        <a th:href="@{/}" class="btn btn-secondary">
-                            <i class="fas fa-home"></i> Torna alla Home
-                        </a>
-                        <a th:href="@{/products}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Tutti i Prodotti
-                        </a>
-                        <a th:if="${isAuthenticated}" th:href="@{/users/products}" class="btn btn-primary">
-                            <i class="fas fa-user-tag"></i> I Miei Prodotti
-                        </a>
+                    <div class="action-nav">
+                        <a th:href="@{/}" class="btn btn-secondary"><i class="fas fa-home"></i> Torna alla Home</a>
+                        <a th:href="@{/products}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Tutti i Prodotti</a>
+                        <a th:if="${isAuthenticated}" th:href="@{/users/products}" class="btn btn-primary"><i class="fas fa-user-tag"></i> I Miei Prodotti</a>
                     </div>
                 </div>
             </div>
         </div>
     </main>
-
-    <!-- Modal per visualizzazione immagini a schermo intero -->
-    <div id="imageModal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.9); cursor: pointer;" onclick="closeModal()">
-        <span onclick="closeModal()" style="position: absolute; top: 15px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.3s;">&times;</span>
-        <img id="modalImage" style="margin: auto; display: block; width: 80%; max-width: 700px; max-height: 90%; object-fit: contain; margin-top: 50px; border-radius: 15px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);">
+    <div id="imageModal" class="modal-image-bg" style="display: none;" onclick="closeModal()">
+        <span onclick="closeModal()" class="modal-image-close">&times;</span>
+        <img id="modalImage" class="modal-image-content">
     </div>
-
-    <!-- Include footer fragment -->
     <div th:insert="~{fragments/footer :: footer}"></div>
-
     <script>
-        // Funzione per cambiare l'immagine principale
         function changeMainImage(src, thumbnail) {
             document.getElementById('mainImage').src = src;
-            
-            // Rimuovi la classe active da tutte le thumbnails
-            document.querySelectorAll('.thumbnail').forEach(thumb => {
-                thumb.classList.remove('active');
-            });
-            
-            // Aggiungi la classe active alla thumbnail cliccata
+            document.querySelectorAll('.thumbnail').forEach(thumb => { thumb.classList.remove('active'); });
             thumbnail.classList.add('active');
         }
-        
-        // Funzione per aprire il modal dell'immagine
         function openModal(src) {
             document.getElementById('imageModal').style.display = 'block';
             document.getElementById('modalImage').src = src;
         }
-        
-        // Funzione per chiudere il modal
         function closeModal() {
             document.getElementById('imageModal').style.display = 'none';
         }
-        
-        // Chiudi il modal cliccando fuori dall'immagine
         window.onclick = function(event) {
             const modal = document.getElementById('imageModal');
-            if (event.target == modal) {
-                closeModal();
-            }
+            if (event.target == modal) closeModal();
         }
-        
-        // Funzione per contattare il venditore
         function contactSeller() {
             const email = /*[[${product.seller.email}]]*/ 'email@example.com';
             const productName = /*[[${product.name}]]*/ 'Prodotto';
             const subject = 'Interesse per: ' + productName;
             const body = 'Ciao,\n\nSono interessato al tuo prodotto "' + productName + '" su Sitarello.\n\nPotresti fornirmi maggiori informazioni?\n\nGrazie!';
-            
             window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         }
-        
-        // Funzione per condividere il prodotto
         function shareProduct() {
             const productName = /*[[${product.name}]]*/ 'Prodotto';
             if (navigator.share) {
-                navigator.share({
-                    title: productName,
-                    text: 'Guarda questo prodotto su Sitarello!',
-                    url: window.location.href
-                });
+                navigator.share({ title: productName, text: 'Guarda questo prodotto su Sitarello!', url: window.location.href });
             } else {
-                // Fallback per browser che non supportano Web Share API
-                navigator.clipboard.writeText(window.location.href).then(() => {
-                    alert('Link copiato negli appunti!');
-                });
+                navigator.clipboard.writeText(window.location.href).then(() => { alert('Link copiato negli appunti!'); });
             }
         }
-        
-        // Funzione per confermare l'eliminazione
         function confirmDelete() {
             if (confirm('Sei sicuro di voler eliminare questo prodotto? Questa azione non può essere annullata.')) {
-                // Qui dovresti implementare la logica di eliminazione
                 alert('Funzionalità di eliminazione da implementare');
             }
         }
-        
-        // Gestione keyboard per il modal
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeModal();
-            }
-        });
-    </script>
-</body>
-</html>
+        document.addEventListener('keydown', function(event) { if (event.key === 'Escape') closeModal(); });
+

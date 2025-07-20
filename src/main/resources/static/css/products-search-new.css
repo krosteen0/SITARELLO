@@ -99,6 +99,56 @@
     font-weight: 400;
 }
 
+/* Form Row Layout */
+.search-form .form-row {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.8rem;
+    align-items: end;
+}
+
+.search-form .form-row .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.search-form .form-row .form-group.full-width {
+    flex: 100%;
+}
+
+.search-form .form-row .form-group.form-actions {
+    flex: auto;
+    min-width: 280px;
+}
+
+.search-form .button-group {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Responsive behavior for form rows */
+@media (max-width: 768px) {
+    .search-form .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .search-form .form-row .form-group {
+        margin-bottom: 1.8rem;
+    }
+    
+    .search-form .form-row .form-group.form-actions {
+        min-width: auto;
+    }
+    
+    .search-form .button-group {
+        justify-content: center;
+        width: 100%;
+    }
+}
+
 .search-form select option {
     background: #1e293b;
     color: #ffffff;
@@ -118,8 +168,7 @@
     text-decoration: none;
     border: none;
     cursor: pointer;
-    margin-right: 1rem;
-    margin-bottom: 0.5rem;
+    white-space: nowrap;
 }
 
 .search-form .btn-primary {
@@ -300,4 +349,13 @@
         margin-right: 0;
         margin-bottom: 0.5rem;
     }
+}
+
+/* Product Price colore bianco elegante */
+.product-price {
+    color: #fff;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }

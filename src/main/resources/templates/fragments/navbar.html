@@ -1,53 +1,42 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-    <meta charset="UTF-8">
-    <title>Navbar Fragment</title>
-    <script defer th:src="@{/js/navbar.js}"></script>
-</head>
-<body>
-    <!-- Navbar Fragment -->
-    <header th:fragment="navbar">
-        <nav class="navbar">
-            <div class="nav-brand">
-                <a th:href="@{/}">Sitarello</a>
-            </div>
-            <div class="nav-search">
-                <form th:action="@{/products/quick-search}" method="get">
-                    <input type="text" name="q" placeholder="Cerca..." />
-                    <button type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </form>
-            </div>
-            <div class="nav-links">
-                <!-- Link per utenti autenticati -->
-                <div th:if="${isAuthenticated}">
-                    <a th:href="@{/products}">Prodotti</a>
-                    <a th:href="@{/users/products}">I Miei Prodotti</a>
-                    <a th:href="@{/product/create}">Aggiungi</a>
-                    
-                    <!-- Dropdown per utente loggato -->
-                    <div class="dropdown">
-                        <span class="dropdown-toggle" th:text="${username}">Utente</span>
-                        <div class="dropdown-menu">
-                            <a th:href="@{/users/profile}">Profilo</a>
-                            <form th:action="@{/logout}" method="post" class="nav-logout">
-                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                                <button type="submit">Logout</button>
-                            </form>
-                        </div>
+<!-- Navbar Fragment - riutilizzabile -->
+<header th:fragment="navbar">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}" />
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a th:href="@{/}">Sitarello</a>
+        </div>
+        <div class="nav-search">
+            <form th:action="@{/products/quick-search}" method="get">
+                <input type="text" name="q" placeholder="Cerca..." />
+                <button type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+        <div class="nav-links">
+            <!-- Link per utenti autenticati -->
+            <div th:if="${isAuthenticated}">
+                <a th:href="@{/products}">Prodotti</a>
+                <a th:href="@{/users/products}">I Miei Prodotti</a>
+                <a th:href="@{/product/create}">Aggiungi</a>
+                <!-- Dropdown per utente loggato -->
+                <div class="dropdown">
+                    <span class="dropdown-toggle" th:text="${username}">Utente</span>
+                    <div class="dropdown-menu">
+                        <a th:href="@{/users/profile}">Profilo</a>
+                        <form th:action="@{/logout}" method="post" class="nav-logout">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <button type="submit">Logout</button>
+                        </form>
                     </div>
                 </div>
-                
-                <!-- Link per utenti non autenticati -->
-                <div th:unless="${isAuthenticated}">
-                    <a th:href="@{/products}">Prodotti</a>
-                    <a th:href="@{/users/login}">Accedi</a>
-                    <a th:href="@{/users/register}">Registrati</a>
-                </div>
             </div>
-        </nav>
-    </header>
-</body>
-</html>
+            <!-- Link per utenti non autenticati -->
+            <div th:unless="${isAuthenticated}">
+                <a th:href="@{/products}">Prodotti</a>
+                <a th:href="@{/users/login}">Accedi</a>
+                <a th:href="@{/users/register}">Registrati</a>
+            </div>
+        </div>
+    </nav>
+</header>

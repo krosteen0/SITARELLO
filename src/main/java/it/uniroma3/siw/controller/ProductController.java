@@ -30,6 +30,7 @@ import it.uniroma3.siw.dto.ProductFormDTO;
 import it.uniroma3.siw.model.Category;
 import it.uniroma3.siw.model.Product;
 import it.uniroma3.siw.model.ProductImage;
+import it.uniroma3.siw.model.Rating;
 import it.uniroma3.siw.model.Users;
 import it.uniroma3.siw.repository.CategoryRepository;
 import it.uniroma3.siw.repository.ProductImageRepository;
@@ -62,10 +63,18 @@ public class ProductController {
     private void addAuthenticationAttributes(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAuthenticated = auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser");
-        
         model.addAttribute("isAuthenticated", isAuthenticated);
         if (isAuthenticated && auth != null) {
             model.addAttribute("username", auth.getName());
+            // Aggiungi isAdmin se possibile
+            Object principal = auth.getPrincipal();
+            boolean isAdmin = false;
+            if (principal instanceof it.uniroma3.siw.model.Users user) {
+                isAdmin = "ADMIN".equals(user.getRole());
+            }
+            model.addAttribute("isAdmin", isAdmin);
+        } else {
+            model.addAttribute("isAdmin", false);
         }
     }
 
@@ -168,8 +177,10 @@ public class ProductController {
                 return "error";
             }
             
-            // Verifica che l'utente sia il proprietario del prodotto
-            if (!product.getSeller().getId().equals(authenticatedUser.getId())) {
+            // Permetti modifica se admin o proprietario
+            boolean isAdmin = authenticatedUser != null && "ADMIN".equals(authenticatedUser.getRole());
+            boolean isOwner = product.getSeller().getId().equals(authenticatedUser.getId());
+            if (!(isOwner || isAdmin)) {
                 model.addAttribute("errorMessage", "Non hai i permessi per modificare questo prodotto.");
                 return "error";
             }
@@ -205,8 +216,10 @@ public class ProductController {
             
             Product product = productOpt.get();
             
-            // Verifica che l'utente sia il proprietario del prodotto
-            if (!product.getSeller().getId().equals(authenticatedUser.getId())) {
+            // Permetti modifica se admin o proprietario
+            boolean isAdmin = authenticatedUser != null && "ADMIN".equals(authenticatedUser.getRole());
+            boolean isOwner = product.getSeller().getId().equals(authenticatedUser.getId());
+            if (!(isOwner || isAdmin)) {
                 model.addAttribute("errorMessage", "Non hai i permessi per modificare questo prodotto.");
                 return "error";
             }
@@ -250,8 +263,10 @@ public class ProductController {
                 return "error";
             }
             
-            // Verifica che l'utente sia il proprietario del prodotto
-            if (!product.getSeller().getId().equals(authenticatedUser.getId())) {
+            // Permetti modifica se admin o proprietario
+            boolean isAdmin = authenticatedUser != null && "ADMIN".equals(authenticatedUser.getRole());
+            boolean isOwner = product.getSeller().getId().equals(authenticatedUser.getId());
+            if (!(isOwner || isAdmin)) {
                 model.addAttribute("errorMessage", "Non hai i permessi per modificare questo prodotto.");
                 return "error";
             }
@@ -309,8 +324,10 @@ public class ProductController {
             
             Product product = productOpt.get();
             
-            // Verifica che l'utente sia il proprietario del prodotto
-            if (!product.getSeller().getId().equals(authenticatedUser.getId())) {
+            // Permetti modifica se admin o proprietario
+            boolean isAdmin = authenticatedUser != null && "ADMIN".equals(authenticatedUser.getRole());
+            boolean isOwner = product.getSeller().getId().equals(authenticatedUser.getId());
+            if (!(isOwner || isAdmin)) {
                 model.addAttribute("errorMessage", "Non hai i permessi per modificare questo prodotto.");
                 return "error";
             }
@@ -326,7 +343,7 @@ public class ProductController {
             session.removeAttribute("editingProductId");
             
             logger.debug("Product images updated successfully for ID: {}", productId);
-            return "redirect:/product/" + productId;
+            return "redirect:/product/details/" + productId;
         } catch (IOException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
@@ -374,9 +391,10 @@ public class ProductController {
                 model.addAttribute("errorMessage", "Errore: prodotto senza autore.");
                 return "error";
             }
-            
-            // Verifica che l'utente sia il proprietario del prodotto
-            if (!product.getSeller().getId().equals(authenticatedUser.getId())) {
+            // Permetti modifica se admin o proprietario
+            boolean isAdmin = authenticatedUser != null && "ADMIN".equals(authenticatedUser.getRole());
+            boolean isOwner = product.getSeller().getId().equals(authenticatedUser.getId());
+            if (!(isOwner || isAdmin)) {
                 model.addAttribute("errorMessage", "Non hai i permessi per modificare questo prodotto.");
                 return "error";
             }
@@ -394,7 +412,7 @@ public class ProductController {
             session.removeAttribute("editingProductId");
             
             logger.debug("Product details updated successfully for ID: {}", productId);
-            return "redirect:/product/" + productId;
+            return "redirect:/product/details/" + productId;
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
@@ -430,9 +448,10 @@ public class ProductController {
                 model.addAttribute("errorMessage", "Errore: prodotto senza autore.");
                 return "error";
             }
-            
-            // Verifica che l'utente sia il proprietario del prodotto
-            if (!product.getSeller().getId().equals(authenticatedUser.getId())) {
+            // Permetti eliminazione se admin o proprietario
+            boolean isAdmin = authenticatedUser != null && "ADMIN".equals(authenticatedUser.getRole());
+            boolean isOwner = product.getSeller().getId().equals(authenticatedUser.getId());
+            if (!(isOwner || isAdmin)) {
                 model.addAttribute("errorMessage", "Non hai i permessi per eliminare questo prodotto.");
                 return "error";
             }
@@ -485,11 +504,21 @@ public class ProductController {
                 
                 model.addAttribute("averageRating", avgRating);
                 model.addAttribute("ratingCount", ratingCount);
+                
+                // Carica un'anteprima delle recensioni (ultime 4 recensioni)
+                List<Rating> allRatings = productRepository.findRecentRatingsForProductOrderByIdDesc(id);
+                List<Rating> recentRatings = allRatings.size() > 4 ? 
+                    allRatings.subList(0, 4) : allRatings;
+                model.addAttribute("recentRatings", recentRatings);
+                
+                logger.info("Loaded {} recent ratings for product {}", recentRatings.size(), id);
+                
             } catch (Exception e) {
                 // Fallback se c'è un problema con i rating
                 logger.warn("Impossibile caricare i rating: {}", e.getMessage());
                 model.addAttribute("averageRating", 0.0);
                 model.addAttribute("ratingCount", 0);
+                model.addAttribute("recentRatings", new ArrayList<>());
             }
             
             logger.debug("Displaying product details for ID: {}", id);

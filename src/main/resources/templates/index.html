@@ -98,7 +98,7 @@
             </div>
             <div class="products-scroll">
                 <div th:each="product : ${recentProducts}" class="product-card-small">
-                    <a th:href="@{'/product/' + ${product.id}}">
+                    <a th:href="@{'/product/details/' + ${product.id}}">
                         <div class="product-image-small">
                             <!-- Immagine semplificata senza espressioni complesse -->
                             <img th:if="${product.base64Image != null}" 
@@ -112,7 +112,7 @@
                     <div class="product-info-small">
                         <div class="product-category-small" th:text="${product.category != null ? product.category.name : 'N/A'}">Categoria</div>
                         <h3 class="product-title-small">
-                            <a th:href="@{'/product/' + ${product.id}}" th:text="${product.name}">Nome Prodotto</a>
+                            <a th:href="@{'/product/details/' + ${product.id}}" th:text="${product.name}">Nome Prodotto</a>
                         </h3>
                         <p class="product-price-small" th:text="${product.price} + ' €'">€0.00</p>
                         
@@ -129,9 +129,9 @@
                         
                         <!-- Seller Section - Now more prominent -->
                         <div class="product-seller-small">
-                            <a th:href="@{'/seller/' + ${product.seller.id}}">
+                            <a th:href="@{'/users/seller/' + ${product.seller.username}}">
                                 <i class="fas fa-store"></i>
-                                <span th:text="${product.seller.user.username}">Nome Venditore</span>
+                                <span th:text="${product.seller.username}">Nome Venditore</span>
                             </a>
                         </div>
                     </div>
@@ -139,32 +139,50 @@
             </div>
         </section>
 
-        <!-- Prodotti in Evidenza - VERSIONE SEMPLIFICATA -->
+        <!-- Prodotti in Evidenza - STESSO STILE DELLE CARD RECENTI -->
         <section class="product-section" th:if="${featuredProducts != null && !featuredProducts.isEmpty()}">
             <div class="section-header">
                 <h2>Prodotti in Evidenza</h2>
                 <p>I prodotti più popolari e apprezzati del momento.</p>
             </div>
-            <div class="products-grid">
-                <div th:each="product : ${featuredProducts}" class="product-card">
-                    <a th:href="@{'/product/' + ${product.id}}" class="product-image">
-                        <!-- Immagine semplificata senza espressioni complesse -->
-                        <img th:if="${product.base64Image != null}" 
-                             th:src="'data:image/jpeg;base64,' + ${product.base64Image}" 
-                             alt="Immagine prodotto" />
-                        <img th:unless="${product.base64Image != null}" 
-                             src="/immagini/placeholder.png" 
-                             alt="Immagine prodotto" />
+            <div class="products-scroll">
+                <div th:each="product : ${featuredProducts}" class="product-card-small">
+                    <a th:href="@{'/product/details/' + ${product.id}}">
+                        <div class="product-image-small">
+                            <!-- Immagine semplificata senza espressioni complesse -->
+                            <img th:if="${product.base64Image != null}" 
+                                 th:src="'data:image/jpeg;base64,' + ${product.base64Image}" 
+                                 alt="Immagine prodotto" />
+                            <img th:unless="${product.base64Image != null}" 
+                                 src="/immagini/placeholder.png" 
+                                 alt="Immagine prodotto" />
+                        </div>
                     </a>
-                    <div class="product-info">
-                        <p class="product-category" th:text="${product.category != null ? product.category.name : 'N/A'}">Categoria</p>
-                        <h3 class="product-title">
-                            <a th:href="@{'/product/' + ${product.id}}" th:text="${product.name}">Nome Prodotto</a>
+                    <div class="product-info-small">
+                        <div class="product-category-small" th:text="${product.category != null ? product.category.name : 'N/A'}">Categoria</div>
+                        <h3 class="product-title-small">
+                            <a th:href="@{'/product/details/' + ${product.id}}" th:text="${product.name}">Nome Prodotto</a>
                         </h3>
-                        <p class="product-price" th:text="${product.price} + ' €'">€0.00</p>
-                        <p class="product-seller">Venduto da: 
-                            <a th:href="@{'/seller/' + ${product.seller.id}}" th:text="${product.seller.user.username}">Nome Venditore</a>
-                        </p>
+                        <p class="product-price-small" th:text="${product.price} + ' €'">€0.00</p>
+                        
+                        <!-- Rating Section -->
+                        <div class="product-rating-small" th:if="${product.averageRating != null && product.averageRating > 0}">
+                            <div class="stars">
+                                <i th:each="i : ${#numbers.sequence(1, 5)}" 
+                                   th:class="${i <= product.averageRating} ? 'fas fa-star star' : 'fas fa-star star empty'"></i>
+                            </div>
+                            <span class="rating-text" th:text="'(' + ${product.ratingCount} + ')'">
+                                (0)
+                            </span>
+                        </div>
+                        
+                        <!-- Seller Section - Now more prominent -->
+                        <div class="product-seller-small">
+                            <a th:href="@{'/users/seller/' + ${product.seller.username}}">
+                                <i class="fas fa-store"></i>
+                                <span th:text="${product.seller.username}">Nome Venditore</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

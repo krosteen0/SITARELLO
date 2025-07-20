@@ -58,7 +58,7 @@
                 <h2 class="form-title" th:text="${hasUserRated ? 'Modifica la tua valutazione' : 'Aggiungi una valutazione'}">Aggiungi una valutazione</h2>
                 
                 <form th:action="@{/ratings/submit}" method="post" th:object="${ratingDTO}">
-                    <input type="hidden" name="productId" th:value="${product.id}" />
+                    <input type="hidden" th:field="*{productId}" th:value="${product.id}" />
                     
                     <div class="form-group">
                         <label class="form-label">Il tuo voto:</label>

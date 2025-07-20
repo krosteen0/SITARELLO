@@ -77,7 +77,25 @@ public class UsersController {
             model.addAttribute("successMessage", "Registrazione completata con successo! Ora puoi accedere.");
             return "redirect:/users/login?registered=true";
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Errore durante la registrazione. Riprova.");
+            // Log dell'errore per debugging
+            System.err.println("Errore durante la registrazione: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+            e.printStackTrace();
+            
+            // Messaggio di errore più specifico
+            String errorMessage = "Errore durante la registrazione: ";
+            if (e.getMessage() != null) {
+                if (e.getMessage().contains("users_username_key") || e.getMessage().contains("duplicate key")) {
+                    errorMessage += "Username già in uso.";
+                } else if (e.getMessage().contains("users_email_key")) {
+                    errorMessage += "Email già registrata.";
+                } else {
+                    errorMessage += e.getMessage();
+                }
+            } else {
+                errorMessage += "Errore sconosciuto. Riprova.";
+            }
+            
+            model.addAttribute("errorMessage", errorMessage);
             return "register";
         }
     }

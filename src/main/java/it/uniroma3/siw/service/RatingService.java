@@ -114,8 +114,9 @@ public class RatingService {
         Optional<Rating> ratingOpt = ratingRepository.findById(ratingId);
         if (ratingOpt.isPresent()) {
             Rating rating = ratingOpt.get();
-            // Verifica che l'utente sia il proprietario del rating
-            if (rating.getUser().getId().equals(user.getId())) {
+            boolean isAdmin = user != null && "ADMIN".equals(user.getRole());
+            boolean isOwner = rating.getUser().getId().equals(user.getId());
+            if (isOwner || isAdmin) {
                 ratingRepository.delete(rating);
             } else {
                 throw new IllegalArgumentException("Non hai i permessi per eliminare questo rating");

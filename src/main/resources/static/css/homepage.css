@@ -41,9 +41,9 @@ body::before {
 /* Container principale */
 .container {
     flex: 1;
-    max-width: 1240px;
+    max-width: 1280px;
     margin: 0 auto;
-    padding: 40px 24px;
+    padding: 40px 16px;
 }
 
 /* Override navbar styles for homepage */
@@ -738,43 +738,31 @@ body::before {
     color: #6366f1;
 }
 
-/* Recent Products Scroll moderna */
+/* Recent Products Grid moderna - 3 per riga con 30% vw ciascuna */
 .products-scroll {
-    display: flex;
-    gap: 24px;
-    overflow-x: auto;
-    padding: 20px 16px 32px;
-    scroll-behavior: smooth;
-    scrollbar-width: thin;
-}
-
-.products-scroll::-webkit-scrollbar {
-    height: 6px;
-}
-
-.products-scroll::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 3px;
-}
-
-.products-scroll::-webkit-scrollbar-thumb {
-    background: linear-gradient(45deg, #6366f1, #8b5cf6);
-    border-radius: 3px;
+    display: grid;
+    grid-template-columns: repeat(3, 30vw);
+    justify-content: center;
+    gap: calc((100vw - 90vw) / 4);
+    padding: 20px 0 32px;
+    margin-bottom: 32px;
+    /* Assicura che lo scroll verticale della pagina funzioni sempre */
+    pointer-events: auto;
+    touch-action: pan-y;
 }
 
 .product-card-small {
-    flex: 0 0 280px;
     background: rgba(255, 255, 255, 0.04);
     backdrop-filter: blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
+    border-radius: 20px;
     overflow: hidden;
     box-shadow: 
-        0 6px 24px rgba(0, 0, 0, 0.08),
+        0 8px 32px rgba(0, 0, 0, 0.08),
         inset 0 1px 0 rgba(255, 255, 255, 0.05);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
-    min-height: 320px;
+    min-height: 450px;
     display: flex;
     flex-direction: column;
 }
@@ -785,8 +773,8 @@ body::before {
     top: 0;
     left: 0;
     right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.4), transparent);
+    height: 2px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -796,15 +784,15 @@ body::before {
 }
 
 .product-card-small:hover {
-    transform: translateY(-6px);
+    transform: translateY(-8px);
     box-shadow: 
-        0 12px 32px rgba(0, 0, 0, 0.12),
+        0 20px 40px rgba(0, 0, 0, 0.12),
         inset 0 1px 0 rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.12);
 }
 
 .product-image-small {
-    height: 160px;
+    height: 240px;
     overflow: hidden;
     position: relative;
     background: rgba(0, 0, 0, 0.1);
@@ -1223,6 +1211,12 @@ footer {
         gap: 20px;
     }
     
+    .products-scroll {
+        grid-template-columns: repeat(2, 45vw);
+        gap: 10vw;
+        justify-content: center;
+    }
+    
     .categories-grid {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 20px;
@@ -1325,17 +1319,22 @@ footer {
         grid-template-columns: 1fr;
     }
     
+    .products-scroll {
+        grid-template-columns: 85vw;
+        justify-content: center;
+        gap: 20px;
+    }
+    
     .categories-grid {
         grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     }
     
     .product-card-small {
-        flex: 0 0 240px;
-        min-height: 300px;
+        min-height: 420px;
     }
     
     .product-info-small {
-        padding: 16px;
+        padding: 20px;
     }
     
     .product-title-small {

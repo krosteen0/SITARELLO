@@ -32,41 +32,59 @@
         <!-- Search Form -->
         <div class="search-form">
             <form th:action="@{/products/search}" th:object="${searchDTO}" method="get">
-                <div class="form-group">
-                    <label for="searchTerm">Cerca prodotti:</label>
-                    <input type="text" id="searchTerm" th:field="*{searchTerm}" placeholder="Nome del prodotto..." />
+                <!-- Prima riga: Ricerca principale -->
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="searchTerm">Cerca prodotti:</label>
+                        <input type="text" id="searchTerm" th:field="*{searchTerm}" placeholder="Nome del prodotto..." />
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="categoria">Categoria:</label>
-                    <select id="categoria" th:field="*{categoria}">
-                        <option value="">Tutte le categorie</option>
-                        <option th:each="cat : ${categories}" th:value="${cat.name}" th:text="${cat.name}"></option>
-                    </select>
+                <!-- Seconda riga: Categoria e Ordinamento -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="categoria">Categoria:</label>
+                        <select id="categoria" th:field="*{categoria}">
+                            <option value="">Tutte le categorie</option>
+                            <option th:each="cat : ${categories}" th:value="${cat.name}" th:text="${cat.name}"></option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sortBy">Ordina per:</label>
+                        <select id="sortBy" th:field="*{sortBy}">
+                            <option value="id">Più recenti</option>
+                            <option value="name">Nome A-Z</option>
+                            <option value="price">Prezzo crescente</option>
+                            <option value="price_desc">Prezzo decrescente</option>
+                        </select>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="prezzoMin">Prezzo minimo:</label>
-                    <input type="number" id="prezzoMin" th:field="*{prezzoMin}" placeholder="0.00" step="0.01" />
+                <!-- Terza riga: Range di prezzo e Pulsanti -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="prezzoMin">Prezzo minimo:</label>
+                        <input type="number" id="prezzoMin" th:field="*{prezzoMin}" placeholder="0.00" step="0.01" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="prezzoMax">Prezzo massimo:</label>
+                        <input type="number" id="prezzoMax" th:field="*{prezzoMax}" placeholder="0.00" step="0.01" />
+                    </div>
+                    
+                    <div class="form-group form-actions">
+                        <label>&nbsp;</label> <!-- Spacer per allineare con gli altri campi -->
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Cerca
+                            </button>
+                            <a th:href="@{/products/search}" class="btn btn-secondary">
+                                <i class="fas fa-undo"></i> Reset
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="prezzoMax">Prezzo massimo:</label>
-                    <input type="number" id="prezzoMax" th:field="*{prezzoMax}" placeholder="0.00" step="0.01" />
-                </div>
-                
-                <div class="form-group">
-                    <label for="sortBy">Ordina per:</label>
-                    <select id="sortBy" th:field="*{sortBy}">
-                        <option value="id">Più recenti</option>
-                        <option value="name">Nome A-Z</option>
-                        <option value="price">Prezzo crescente</option>
-                        <option value="price_desc">Prezzo decrescente</option>
-                    </select>
-                </div>
-                
-                <button type="submit" class="btn btn-primary">Cerca</button>
-                <a th:href="@{/products/search}" class="btn btn-secondary">Reset</a>
             </form>
         </div>
 

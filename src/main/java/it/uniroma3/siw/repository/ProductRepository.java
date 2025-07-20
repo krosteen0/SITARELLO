@@ -35,16 +35,20 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategory(Category category);
     
     // Recent products ordered by ID descending
-    @Query("SELECT p FROM Product p ORDER BY p.id DESC")
+    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.seller ORDER BY p.id DESC")
     List<Product> findAllOrderByIdDesc();
     
     // Products with ratings for featured section
-    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN p.ratings")
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.seller LEFT JOIN p.ratings")
     List<Product> findAllWithRatings();
     
     // Get ratings for a specific product
     @Query("SELECT r FROM Rating r WHERE r.product.id = :productId")
     List<Rating> findRatingsForProduct(@Param("productId") Long productId);
+    
+    // Get recent ratings for a specific product (ordered by ID desc)
+    @Query("SELECT r FROM Rating r LEFT JOIN FETCH r.user WHERE r.product.id = :productId ORDER BY r.id DESC")
+    List<Rating> findRecentRatingsForProductOrderByIdDesc(@Param("productId") Long productId);
     
     // Search and filter queries
     @Query("SELECT DISTINCT p FROM Product p LEFT JOIN p.images " +
