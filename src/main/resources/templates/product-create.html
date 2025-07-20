@@ -69,56 +69,44 @@
             <form id="productForm" th:action="@{/product/create}" method="post" enctype="multipart/form-data">
                 <!-- CSRF Token -->
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                
+
                 <!-- Step 1: Images -->
                 <div class="form-step active" id="step1">
                     <div class="step-content">
                         <div class="step-header">
                             <h2><i class="fas fa-images"></i> Aggiungi le Immagini del Prodotto</h2>
-                            <p>Carica da 1 a 10 immagini di alta qualità. La prima immagine sarà quella principale.</p>
+                            <p>Carica una <b>immagine principale</b> obbligatoria e fino a 4 immagini extra opzionali.</p>
                         </div>
-
                         <div class="image-upload-section">
-                            <!-- File input principale -->
-                            <input type="file" 
-                                   id="imageInput" 
-                                   name="images" 
-                                   multiple 
-                                   accept="image/*"
-                                   style="display: none;" />
-                            
-                            <div class="image-upload-area" id="imageUploadArea" style="cursor: pointer;">
-                                <div class="upload-content">
-                                    <div class="upload-icon">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                    </div>
-                                    <div class="upload-text">Trascina le immagini qui o clicca per caricare</div>
-                                    <div class="upload-subtext">Fino a 10 immagini • JPG, PNG, WEBP • Max 5MB ciascuna</div>
-                                    
-                                    <button type="button" class="upload-btn" id="uploadButton">
-                                        <i class="fas fa-plus"></i> Scegli File
-                                    </button>
-                                </div>
+                            <div class="form-group">
+                                <label for="mainImage" class="form-label required">
+                                    <i class="fas fa-image"></i> Immagine Principale (obbligatoria)
+                                </label>
+                                <input type="file" id="mainImage" name="mainImage" accept="image/*" required />
                             </div>
-
-                            <div class="image-preview-container" id="imagePreviewGrid">
-                                <!-- Le immagini caricate appariranno qui -->
+                            <div class="form-group">
+                                <label for="extraImages" class="form-label">
+                                    <i class="fas fa-images"></i> Immagini Extra (opzionali, max 4)
+                                </label>
+                                <input type="file" id="extraImages" name="extraImages" accept="image/*" multiple />
                             </div>
-
                             <div class="upload-info">
                                 <div class="info-stats">
                                     <div class="info-item">
+                                        <i class="fas fa-image"></i>
+                                        <span>1 immagine principale obbligatoria</span>
+                                    </div>
+                                    <div class="info-item">
                                         <i class="fas fa-images"></i>
-                                        <span>Immagini: <strong id="imageCount">0</strong>/10</span>
+                                        <span>Fino a 4 immagini extra opzionali</span>
                                     </div>
                                     <div class="info-item">
                                         <i class="fas fa-hdd"></i>
-                                        <span>Dimensione: <strong id="totalSize">0 MB</strong></span>
+                                        <span>Max 5MB per immagine</span>
                                     </div>
                                 </div>
                                 <div class="error-message" id="imageError"></div>
                             </div>
-
                             <!-- Tips for better images -->
                             <div class="image-tips">
                                 <h4><i class="fas fa-lightbulb"></i> Consigli per foto migliori</h4>

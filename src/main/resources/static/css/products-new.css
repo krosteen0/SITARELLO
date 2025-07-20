@@ -140,7 +140,7 @@ body.products-page::before {
 /* Products Grid */
 .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
     padding: 1rem 0;
 }
@@ -303,7 +303,7 @@ body.products-page::before {
 }
 
 .product-price {
-    color: #10b981;
+    color: #fff;
     font-size: 1.8rem;
     font-weight: 700;
     margin-bottom: 1rem;

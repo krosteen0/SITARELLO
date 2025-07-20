@@ -474,8 +474,17 @@ class EnhancedProductCreator {
     }
     
     validateStep1() {
-        const isValid = this.images.length > 0;
-        return isValid;
+        // Nuova logica: controlla che mainImage sia presente
+        const mainImageInput = document.getElementById('mainImage');
+        if (!mainImageInput || !mainImageInput.files || mainImageInput.files.length === 0) {
+            return false;
+        }
+        // Extra images opzionali, max 4
+        const extraImagesInput = document.getElementById('extraImages');
+        if (extraImagesInput && extraImagesInput.files.length > 4) {
+            return false;
+        }
+        return true;
     }
     
     validateStep2() {
@@ -907,21 +916,27 @@ class EnhancedProductCreator {
     
     async submitForm(e) {
         e.preventDefault();
-        
-        // Validazione completa: campi obbligatori + almeno una foto
-        if (!this.validateStep1()) {
-            this.showNotification('Carica almeno una foto del prodotto', 'error');
+
+        // Validazione immagini: mainImage obbligatoria, max 4 extra
+        const mainImageInput = document.getElementById('mainImage');
+        const extraImagesInput = document.getElementById('extraImages');
+        if (!mainImageInput || !mainImageInput.files || mainImageInput.files.length === 0) {
+            this.showNotification('Carica un\'immagine principale del prodotto', 'error');
             return;
         }
-        
+        if (extraImagesInput && extraImagesInput.files.length > 4) {
+            this.showNotification('Puoi caricare al massimo 4 immagini extra', 'error');
+            return;
+        }
+
         if (!this.validateStep2()) {
             this.showNotification('Completa tutti i campi obbligatori', 'error');
             return;
         }
-        
+
         const submitBtn = document.getElementById('submitBtn');
         const loadingOverlay = document.getElementById('loadingOverlay');
-        
+
         try {
             // Show loading
             if (submitBtn) {
@@ -929,49 +944,51 @@ class EnhancedProductCreator {
                 submitBtn.querySelector('.btn-loading').style.display = 'inline-block';
             }
             if (loadingOverlay) loadingOverlay.style.display = 'flex';
-            
+
             // Prepare form data
             const formData = new FormData();
             const data = this.gatherFormData();
-            
+
             Object.entries(data).forEach(([key, value]) => {
                 formData.append(key, value);
             });
-            
-            // Add images
-            this.images.forEach((image, index) => {
-                if (image.file) {
-                    formData.append('images', image.file);
+
+            // Add main image
+            formData.append('mainImage', mainImageInput.files[0]);
+            // Add extra images
+            if (extraImagesInput && extraImagesInput.files.length > 0) {
+                for (let i = 0; i < extraImagesInput.files.length; i++) {
+                    formData.append('extraImages', extraImagesInput.files[i]);
                 }
-            });
-            
+            }
+
             // Get CSRF token
             const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
             const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-            
+
             // Prepare headers
             const headers = {};
             if (csrfToken && csrfHeader) {
                 headers[csrfHeader] = csrfToken;
             }
-            
+
             // Submit form
             const response = await fetch('/product/create', {
                 method: 'POST',
                 headers: headers,
                 body: formData
             });
-            
+
             if (response.ok) {
                 // Clear auto-saved data
                 localStorage.removeItem('productCreateAutoSave');
-                
+
                 // Show success modal
                 this.showSuccessModal();
             } else {
                 throw new Error('Errore durante il salvataggio');
             }
-            
+
         } catch (error) {
             console.error('Submit error:', error);
             this.showNotification('Errore durante il salvataggio del prodotto', 'error');

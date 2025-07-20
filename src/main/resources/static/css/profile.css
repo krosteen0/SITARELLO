@@ -1,41 +1,143 @@
-/* Page Header */
-.page-header {
-    text-align: center;
-    margin-bottom: 50px;
-    padding: 40px 0;
+/* GLOBAL PROFILE PAGE UNIFORM STYLE */
+body.profile-page {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif !important;
+    background: linear-gradient(135deg, #0a0f1c 0%, #1e293b 25%, #2d3748 50%, #374151 100%) !important;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    color: #e2e8f0 !important;
     position: relative;
-    z-index: 1;
+    overflow-x: hidden;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
 }
 
-.page-title {
-    font-size: clamp(2.5rem, 5vw, 3.5rem);
-    font-weight: 800;
-    background: linear-gradient(135deg, #8b5cf6, #ec4899, #34d399);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 16px;
-    display: flex;
+body.profile-page * {
+    color: inherit;
+}
+
+body.profile-page h1, body.profile-page h2, body.profile-page h3, body.profile-page h4, body.profile-page h5, body.profile-page h6 {
+    color: #ffffff !important;
+}
+
+body.profile-page p, body.profile-page span, body.profile-page div {
+    color: #e2e8f0;
+}
+
+body.profile-page a {
+    color: #a5b4fc;
+    transition: color 0.3s ease;
+}
+
+body.profile-page a:hover {
+    color: #6366f1;
+}
+
+/* Animated Background (copied from homepage/products) */
+.animated-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.03;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+    animation: moveBackground 20s linear infinite;
+}
+
+@keyframes moveBackground {
+    0% { transform: translateX(-100%) translateY(-100%); }
+    100% { transform: translateX(100%) translateY(100%); }
+}
+
+.floating-shapes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.floating-shapes .shape {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: float 15s infinite ease-in-out;
+}
+.floating-shapes .shape:nth-child(1) {
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+}
+.floating-shapes .shape:nth-child(2) {
+    top: 60%;
+    right: 15%;
+    animation-delay: 5s;
+}
+.floating-shapes .shape:nth-child(3) {
+    bottom: 30%;
+    left: 20%;
+    animation-delay: 10s;
+}
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-20px) rotate(120deg); }
+    66% { transform: translateY(10px) rotate(240deg); }
+}
+
+/* Uniforma bottoni e card come products-new.css */
+.btn, .btn-edit-profile, .btn-primary {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;
+    gap: 0.5rem;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+.btn-outline {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e2e8f0;
+}
+.btn-outline:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+.btn:hover, .btn-edit-profile:hover, .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    background: linear-gradient(135deg, #5b52f5, #7c3aed);
 }
 
-.page-title i {
-    font-size: 0.8em;
-    color: #8b5cf6;
-    background: none;
-    -webkit-text-fill-color: #8b5cf6;
+/* Card uniformi */
+.profile-card, .profile-section, .setting-card, .product-item {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
 }
-
-.page-subtitle {
-    color: rgba(248, 250, 252, 0.8);
-    font-size: 1.2rem;
-    font-weight: 500;
-    margin: 0;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
+.profile-card:hover, .profile-section:hover, .setting-card:hover, .product-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
 }
 
 /* Profile Page - Modern Design */
@@ -793,6 +895,9 @@ input:checked + .slider:before {
 /* Container Override for Profile */
 .container {
     padding-top: 120px;
+    max-width: 80%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* Payment Form */

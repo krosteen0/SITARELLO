@@ -300,7 +300,8 @@ public class ProductController {
     // Endpoint per salvare le modifiche alle immagini
     @PostMapping("/edit/images")
     @Transactional
-    public String handleEditImages(@RequestParam("images") List<MultipartFile> images,
+    public String handleEditImages(@RequestParam("mainImage") MultipartFile mainImage,
+                                   @RequestParam(value = "extraImages", required = false) List<MultipartFile> extraImages,
                                    HttpSession session, Model model) {
         try {
             addAuthenticationAttributes(model);
@@ -332,16 +333,57 @@ public class ProductController {
                 return "error";
             }
 
-            if (images.size() < 2 || images.size() > 10) {
-                model.addAttribute("errorMessage", "Seleziona da 2 a 10 immagini.");
+            // Validazione immagini
+            if (mainImage == null || mainImage.isEmpty()) {
+                model.addAttribute("errorMessage", "Carica un'immagine principale.");
                 model.addAttribute("product", product);
                 return "edit-images";
             }
-            
-            // Aggiorna le immagini del prodotto
-            productService.updateProductImages(product, images);
+            if (mainImage.getSize() > 5 * 1024 * 1024) {
+                model.addAttribute("errorMessage", "Immagine principale troppo grande (max 5MB): " + mainImage.getOriginalFilename());
+                model.addAttribute("product", product);
+                return "edit-images";
+            }
+            String mainContentType = mainImage.getContentType();
+            if (mainContentType == null || !isValidImageType(mainContentType)) {
+                model.addAttribute("errorMessage", "Formato immagine principale non supportato: " + mainImage.getOriginalFilename());
+                model.addAttribute("product", product);
+                return "edit-images";
+            }
+            int extraCount = (extraImages != null) ? extraImages.size() : 0;
+            if (extraCount > 4) {
+                model.addAttribute("errorMessage", "Massimo 4 immagini extra consentite.");
+                model.addAttribute("product", product);
+                return "edit-images";
+            }
+            if (extraImages != null) {
+                for (MultipartFile image : extraImages) {
+                    if (image.isEmpty()) continue;
+                    if (image.getSize() > 5 * 1024 * 1024) {
+                        model.addAttribute("errorMessage", "Immagine extra troppo grande (max 5MB): " + image.getOriginalFilename());
+                        model.addAttribute("product", product);
+                        return "edit-images";
+                    }
+                    String contentType = image.getContentType();
+                    if (contentType == null || !isValidImageType(contentType)) {
+                        model.addAttribute("errorMessage", "Formato immagine extra non supportato: " + image.getOriginalFilename());
+                        model.addAttribute("product", product);
+                        return "edit-images";
+                    }
+                }
+            }
+
+            // Aggiorna le immagini del prodotto (main + extra)
+            List<MultipartFile> allImages = new ArrayList<>();
+            allImages.add(mainImage);
+            if (extraImages != null) {
+                for (MultipartFile image : extraImages) {
+                    if (!image.isEmpty()) allImages.add(image);
+                }
+            }
+            productService.updateProductImages(product, allImages);
             session.removeAttribute("editingProductId");
-            
+
             logger.debug("Product images updated successfully for ID: {}", productId);
             return "redirect:/product/details/" + productId;
         } catch (IOException e) {
@@ -548,45 +590,57 @@ public class ProductController {
     
     @PostMapping("/create")
     @ResponseBody
-    public String handleModernProductCreation(@RequestParam("name") String name,
-                                            @RequestParam("price") Double price,
-                                            @RequestParam("description") String description,
-                                            @RequestParam("category") Long categoryId,
-                                            @RequestParam("images") List<MultipartFile> images,
-                                            Model model) {
+    public String handleModernProductCreation(
+            @RequestParam("name") String name,
+            @RequestParam("price") Double price,
+            @RequestParam("description") String description,
+            @RequestParam("category") Long categoryId,
+            @RequestParam("mainImage") MultipartFile mainImage,
+            @RequestParam(value = "extraImages", required = false) List<MultipartFile> extraImages,
+            Model model) {
         try {
             // Validazione base
-            if (images == null || images.isEmpty()) {
-                return "{\"error\": \"Carica almeno un'immagine\"}";
+            if (mainImage == null || mainImage.isEmpty()) {
+                return "{\"error\": \"Carica un'immagine principale\"}";
             }
-            
-            if (images.size() > 5) {
-                return "{\"error\": \"Massimo 5 immagini consentite\"}";
+            // Validazione mainImage
+            if (mainImage.getSize() > 5 * 1024 * 1024) {
+                return "{\"error\": \"Immagine principale troppo grande (max 5MB): " + mainImage.getOriginalFilename() + "\"}";
             }
-            
-            // Validazione dimensioni e tipo file
-            for (MultipartFile image : images) {
-                if (image.getSize() > 5 * 1024 * 1024) { // 5MB
-                    return "{\"error\": \"Immagine troppo grande (max 5MB): " + image.getOriginalFilename() + "\"}";
+            String mainContentType = mainImage.getContentType();
+            if (mainContentType == null || !isValidImageType(mainContentType)) {
+                return "{\"error\": \"Formato immagine principale non supportato: " + mainImage.getOriginalFilename() + "\"}";
+            }
+
+            // Validazione extraImages (opzionali)
+            int extraCount = (extraImages != null) ? extraImages.size() : 0;
+            if (extraCount > 4) {
+                return "{\"error\": \"Massimo 4 immagini extra consentite\"}";
+            }
+            if (extraImages != null) {
+                for (MultipartFile image : extraImages) {
+                    if (image.isEmpty()) continue;
+                    if (image.getSize() > 5 * 1024 * 1024) {
+                        return "{\"error\": \"Immagine extra troppo grande (max 5MB): " + image.getOriginalFilename() + "\"}";
+                    }
+                    String contentType = image.getContentType();
+                    if (contentType == null || !isValidImageType(contentType)) {
+                        return "{\"error\": \"Formato immagine extra non supportato: " + image.getOriginalFilename() + "\"}";
+                    }
                 }
-                
-                String contentType = image.getContentType();
-                if (contentType == null || !isValidImageType(contentType)) {
-                    return "{\"error\": \"Formato immagine non supportato: " + image.getOriginalFilename() + "\"}";
-                }
             }
-            
+
             Users authenticatedUser = getAuthenticatedUser();
             if (authenticatedUser == null) {
                 return "{\"error\": \"Utente non autenticato\"}";
             }
-            
+
             // Crea il DTO del prodotto
             ProductFormDTO productFormDTO = new ProductFormDTO();
             productFormDTO.setNome(name);
             productFormDTO.setPrezzo(price);
             productFormDTO.setDescrizione(description);
-            
+
             // Trova la categoria per nome
             Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
             if (categoryOpt.isPresent()) {
@@ -594,19 +648,24 @@ public class ProductController {
             } else {
                 return "{\"error\": \"Categoria non trovata\"}";
             }
-            
-            // Converti le immagini in byte array
-            List<byte[]> imageDataList = new ArrayList<>();
-            for (MultipartFile image : images) {
-                imageDataList.add(image.getBytes());
+
+            // Converti immagini in byte[]
+            byte[] mainImageData = mainImage.getBytes();
+            List<byte[]> extraImagesData = new ArrayList<>();
+            if (extraImages != null) {
+                for (MultipartFile image : extraImages) {
+                    if (!image.isEmpty()) {
+                        extraImagesData.add(image.getBytes());
+                    }
+                }
             }
-            
-            // Salva il prodotto
-            Product savedProduct = productService.saveProduct(productFormDTO, imageDataList, authenticatedUser);
-            
+
+            // Salva il prodotto (serve aggiornare ProductService per accettare main/extra)
+            Product savedProduct = productService.saveProductWithMainAndExtraImages(productFormDTO, mainImageData, extraImagesData, authenticatedUser);
+
             logger.info("Product created successfully with ID: {}", savedProduct.getId());
             return "{\"success\": true, \"productId\": " + savedProduct.getId() + "}";
-            
+
         } catch (Exception e) {
             logger.error("Error creating product: {}", e.getMessage(), e);
             return "{\"error\": \"Errore durante la creazione del prodotto: " + e.getMessage() + "\"}";
