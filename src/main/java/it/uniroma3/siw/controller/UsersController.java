@@ -220,6 +220,13 @@ public class UsersController {
             model.addAttribute("averageSellerRating", averageSellerRating);
             model.addAttribute("totalSellerRatings", totalRatings);
             
+            // Aggiungi informazione se è il proprio profilo
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            boolean isOwnProfile = auth != null && auth.isAuthenticated() && 
+                                  !auth.getName().equals("anonymousUser") && 
+                                  auth.getName().equals(username);
+            model.addAttribute("isOwnProfile", isOwnProfile);
+            
             return "seller-profile";
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Impossibile caricare il profilo del venditore. Riprova più tardi.");

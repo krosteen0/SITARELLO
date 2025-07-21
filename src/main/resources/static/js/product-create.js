@@ -549,26 +549,59 @@ class EnhancedProductCreator {
         const placeholder = document.getElementById('previewPlaceholder');
         const mainImage = document.getElementById('previewMainImage');
         
-        if (this.images.length > 0) {
-            // Show main image
+        // Check if images are loaded via file inputs (the current working system)
+        const mainImageInput = document.getElementById('mainImage');
+        const extraImagesInput = document.getElementById('extraImages');
+        
+        const hasMainImage = mainImageInput && mainImageInput.files && mainImageInput.files.length > 0;
+        const hasExtraImages = extraImagesInput && extraImagesInput.files && extraImagesInput.files.length > 0;
+        
+        // Use file input images if available, otherwise fall back to this.images array
+        if (hasMainImage || this.images.length > 0) {
+            console.log('Has images - hiding placeholder');
+            
+            // Show main image (if not already shown by setupImagePreview)
             if (mainImage && placeholder) {
-                mainImage.src = this.images[0].dataUrl;
+                // If image src is already set by setupImagePreview, just ensure it's visible
+                if (hasMainImage && !mainImage.src.startsWith('data:')) {
+                    // Load from file input if not already loaded
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        mainImage.src = e.target.result;
+                    };
+                    reader.readAsDataURL(mainImageInput.files[0]);
+                }
                 mainImage.style.display = 'block';
                 placeholder.style.display = 'none';
             }
             
-            // Show thumbnails
-            if (thumbnailsContainer) {
-                thumbnailsContainer.innerHTML = '';
-                this.images.forEach((image, index) => {
-                    const thumb = document.createElement('div');
-                    thumb.className = `preview-thumbnail ${index === 0 ? 'active' : ''}`;
-                    thumb.innerHTML = `<img src="${image.dataUrl}" alt="Thumbnail ${index + 1}">`;
-                    thumb.addEventListener('click', () => this.switchMainImage(index));
-                    thumbnailsContainer.appendChild(thumb);
-                });
+            // Show thumbnails from file input or this.images
+            if (thumbnailsContainer && !thumbnailsContainer.hasChildNodes()) {
+                if (hasExtraImages) {
+                    // Use file input images
+                    Array.from(extraImagesInput.files).slice(0, 4).forEach((file, index) => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const thumb = document.createElement('div');
+                            thumb.className = `preview-thumbnail ${index === 0 ? 'active' : ''}`;
+                            thumb.innerHTML = `<img src="${e.target.result}" alt="Thumbnail ${index + 1}">`;
+                            thumbnailsContainer.appendChild(thumb);
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                } else if (this.images.length > 0) {
+                    // Use this.images array
+                    this.images.forEach((image, index) => {
+                        const thumb = document.createElement('div');
+                        thumb.className = `preview-thumbnail ${index === 0 ? 'active' : ''}`;
+                        thumb.innerHTML = `<img src="${image.dataUrl}" alt="Thumbnail ${index + 1}">`;
+                        thumb.addEventListener('click', () => this.switchMainImage(index));
+                        thumbnailsContainer.appendChild(thumb);
+                    });
+                }
             }
         } else {
+            console.log('No images - showing placeholder');
             // Show placeholder
             if (mainImage && placeholder) {
                 mainImage.style.display = 'none';
@@ -600,13 +633,31 @@ class EnhancedProductCreator {
         const conditionInput = document.querySelector('input[name="condition"]:checked');
         
         if (badge && conditionInput) {
-            const conditionValue = conditionInput.value;
-            const conditionText = conditionInput.closest('label').querySelector('.condition-title').textContent;
+            console.log('Updating condition badge for:', conditionInput.value);
+            // Find the corresponding label using the 'for' attribute
+            const correspondingLabel = document.querySelector(`label[for="${conditionInput.id}"]`);
             
-            badge.innerHTML = `<i class="fas fa-star"></i><span>${conditionText}</span>`;
-            badge.style.display = 'flex';
-        } else if (badge) {
-            badge.style.display = 'none';
+            if (correspondingLabel) {
+                const conditionTitleElement = correspondingLabel.querySelector('.condition-title');
+                if (conditionTitleElement) {
+                    const conditionText = conditionTitleElement.textContent;
+                    console.log('Found condition text:', conditionText);
+                    
+                    badge.innerHTML = `<i class="fas fa-star"></i><span>${conditionText}</span>`;
+                    badge.style.display = 'flex';
+                } else {
+                    console.log('Could not find condition-title element');
+                    badge.style.display = 'none';
+                }
+            } else {
+                console.log('Could not find corresponding label for input:', conditionInput.id);
+                badge.style.display = 'none';
+            }
+        } else {
+            console.log('Badge or condition input not found');
+            if (badge) {
+                badge.style.display = 'none';
+            }
         }
     }
     
@@ -1061,4 +1112,138 @@ document.addEventListener('DOMContentLoaded', () => {
     productCreator = new EnhancedProductCreator();
     // Make it globally accessible for onclick handlers
     window.productCreator = productCreator;
+    
+    // Additional setup for image preview with correct IDs
+    setupImagePreview();
 });
+
+// Setup image preview functionality
+function setupImagePreview() {
+    console.log('Setting up image preview...');
+    
+    const mainImageInput = document.getElementById('mainImage');
+    const extraImagesInput = document.getElementById('extraImages');
+    const previewMainImage = document.getElementById('previewMainImage');
+    const previewPlaceholder = document.getElementById('previewPlaceholder');
+    const previewThumbnails = document.getElementById('previewThumbnails');
+    
+    console.log('Elements found:', {
+        mainImageInput: !!mainImageInput,
+        extraImagesInput: !!extraImagesInput,
+        previewMainImage: !!previewMainImage,
+        previewPlaceholder: !!previewPlaceholder,
+        previewThumbnails: !!previewThumbnails
+    });
+    
+    if (!mainImageInput || !extraImagesInput || !previewMainImage) {
+        console.error('Preview elements not found');
+        return;
+    }
+    
+    // Handle main image upload
+    mainImageInput.addEventListener('change', function(e) {
+        console.log('Main image selected:', e.target.files.length);
+        const file = e.target.files[0];
+        if (file) {
+            console.log('Processing main image:', file.name);
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                console.log('Image loaded, setting preview');
+                previewMainImage.src = e.target.result;
+                previewMainImage.style.display = 'block';
+                previewMainImage.style.width = '100%';
+                previewMainImage.style.height = '100%';
+                previewMainImage.style.objectFit = 'cover';
+                if (previewPlaceholder) {
+                    previewPlaceholder.style.display = 'none';
+                }
+                
+                // Also update the main class preview system
+                if (window.productCreator) {
+                    window.productCreator.updatePreview();
+                }
+            };
+            reader.onerror = function(e) {
+                console.error('Error reading image:', e);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // Handle extra images upload
+    extraImagesInput.addEventListener('change', function(e) {
+        console.log('Extra images selected:', e.target.files.length);
+        const files = Array.from(e.target.files);
+        if (previewThumbnails) {
+            previewThumbnails.innerHTML = '';
+            files.slice(0, 4).forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const thumbnail = document.createElement('img');
+                    thumbnail.src = e.target.result;
+                    thumbnail.alt = `Extra image ${index + 1}`;
+                    thumbnail.style.cssText = 'width: 60px; height: 60px; object-fit: cover; border-radius: 8px; margin-right: 8px; border: 2px solid rgba(139, 92, 246, 0.3);';
+                    previewThumbnails.appendChild(thumbnail);
+                    console.log('Thumbnail added:', index + 1);
+                    
+                    // Update the main class preview system after the last image
+                    if (index === files.length - 1 && window.productCreator) {
+                        window.productCreator.updatePreview();
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    });
+    
+    // Live preview update for form fields
+    const productNameInput = document.getElementById('productName');
+    const productPriceInput = document.getElementById('productPrice');
+    const productDescriptionInput = document.getElementById('productDescription');
+    const productCategorySelect = document.getElementById('productCategory');
+    const conditionRadios = document.querySelectorAll('input[name="condition"]');
+    
+    const previewTitle = document.getElementById('previewTitle');
+    const previewPrice = document.getElementById('previewPrice');
+    const previewDescription = document.getElementById('previewDescription');
+    const previewCategory = document.getElementById('previewCategory');
+    const conditionBadge = document.getElementById('conditionBadge');
+    
+    if (productNameInput && previewTitle) {
+        productNameInput.addEventListener('input', function() {
+            previewTitle.textContent = this.value || 'Nome del prodotto';
+        });
+    }
+    
+    if (productPriceInput && previewPrice) {
+        productPriceInput.addEventListener('input', function() {
+            const price = this.value ? parseFloat(this.value).toFixed(2) : '0.00';
+            previewPrice.textContent = `€ ${price}`;
+        });
+    }
+    
+    if (productDescriptionInput && previewDescription) {
+        productDescriptionInput.addEventListener('input', function() {
+            previewDescription.textContent = this.value || 'Descrizione del prodotto...';
+        });
+    }
+    
+    if (productCategorySelect && previewCategory) {
+        productCategorySelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            previewCategory.textContent = selectedOption.text || 'Categoria';
+        });
+    }
+    
+    if (conditionRadios.length > 0 && conditionBadge) {
+        conditionRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.checked) {
+                    const conditionText = this.nextElementSibling.querySelector('.condition-title').textContent;
+                    conditionBadge.querySelector('span').textContent = conditionText;
+                    conditionBadge.style.display = 'flex';
+                }
+            });
+        });
+    }
+}

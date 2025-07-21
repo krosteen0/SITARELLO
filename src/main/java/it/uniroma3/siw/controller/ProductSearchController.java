@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import it.uniroma3.siw.model.ProductImage;
 import it.uniroma3.siw.repository.CategoryRepository;
 import it.uniroma3.siw.repository.ProductImageRepository;
 import it.uniroma3.siw.repository.ProductRepository;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/products")
@@ -37,13 +39,19 @@ public class ProductSearchController {
     @Autowired
     private CategoryRepository categoryRepository;
     
-    private void addAuthenticationAttributes(Model model) {
+    private void addAuthenticationAttributes(Model model, HttpServletRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAuthenticated = auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser");
         
         model.addAttribute("isAuthenticated", isAuthenticated);
         if (isAuthenticated && auth != null) {
             model.addAttribute("username", auth.getName());
+        }
+        
+        // Aggiungere token CSRF
+        CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+        if (csrfToken != null) {
+            model.addAttribute("_csrf", csrfToken);
         }
     }
     
@@ -61,12 +69,36 @@ public class ProductSearchController {
      * Visualizza tutti i prodotti con possibilità di ricerca e filtri
      */
     @GetMapping
-    public String showAllProducts(Model model) {
+    public String showAllProducts(@RequestParam(required = false) Long category,
+                                  @RequestParam(required = false) String searchTerm,
+                                  Model model,
+                                  HttpServletRequest request) {
         try {
-            addAuthenticationAttributes(model);
+            addAuthenticationAttributes(model, request);
             
-            // Carica tutti i prodotti senza filtri
-            List<Product> products = productRepository.findAll();
+            List<Product> products;
+            ProductSearchDTO searchDTO = new ProductSearchDTO();
+            
+            // Se c'è un filtro per categoria, filtra i prodotti
+            if (category != null) {
+                Category categoryEntity = categoryRepository.findById(category).orElse(null);
+                if (categoryEntity != null) {
+                    products = productRepository.findProductsWithFilters("", categoryEntity, null, null);
+                    searchDTO.setCategoria(categoryEntity.getName());
+                    logger.info("Filtering products by category: {}", categoryEntity.getName());
+                } else {
+                    products = productRepository.findAll();
+                }
+            } else if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+                // Se c'è un termine di ricerca
+                products = productRepository.findProductsWithFilters(searchTerm, null, null, null);
+                searchDTO.setSearchTerm(searchTerm);
+                logger.info("Filtering products by search term: {}", searchTerm);
+            } else {
+                // Carica tutti i prodotti senza filtri
+                products = productRepository.findAll();
+            }
+            
             // Carica manualmente le immagini per tutti i prodotti
             loadImagesForProducts(products);
             
@@ -74,8 +106,9 @@ public class ProductSearchController {
             
             model.addAttribute("products", products);
             model.addAttribute("categories", categories);
-            model.addAttribute("searchDTO", new ProductSearchDTO());
+            model.addAttribute("searchDTO", searchDTO);
             model.addAttribute("totalProducts", products.size());
+            model.addAttribute("hasFilters", category != null || (searchTerm != null && !searchTerm.trim().isEmpty()));
             
             logger.info("Loaded {} products for public view", products.size());
             return "products-search";
@@ -91,9 +124,11 @@ public class ProductSearchController {
      * Gestisce la ricerca e i filtri sui prodotti
      */
     @GetMapping("/search")
-    public String searchProducts(@ModelAttribute ProductSearchDTO searchDTO, Model model) {
+    public String searchProducts(@ModelAttribute ProductSearchDTO searchDTO, 
+                                Model model, 
+                                HttpServletRequest request) {
         try {
-            addAuthenticationAttributes(model);
+            addAuthenticationAttributes(model, request);
             
             logger.info("Searching products with filters: {}", searchDTO);
             
@@ -156,9 +191,11 @@ public class ProductSearchController {
      * API endpoint per ricerca rapida (per auto-completamento o AJAX)
      */
     @GetMapping("/quick-search")
-    public String quickSearch(@RequestParam(required = false) String q, Model model) {
+    public String quickSearch(@RequestParam(required = false) String q, 
+                             Model model, 
+                             HttpServletRequest request) {
         try {
-            addAuthenticationAttributes(model);
+            addAuthenticationAttributes(model, request);
             
             List<Product> products;
             if (q != null && !q.trim().isEmpty()) {

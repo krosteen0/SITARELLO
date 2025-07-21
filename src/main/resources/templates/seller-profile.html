@@ -97,7 +97,8 @@
                         
                         <div class="product-actions">
             <a th:href="@{'/product/details/' + ${product.id}}" class="btn btn-primary btn-sm">👁️ Visualizza</a>
-            <button th:if="${isAuthenticated}" class="btn btn-success btn-sm" type="button" th:attr="onclick='addToCart(' + ${product.id} + ')'" style="margin-left:0.5rem;">
+            <!-- Pulsante Aggiungi al Carrello - Solo se autenticato e NON è il proprio profilo -->
+            <button th:if="${isAuthenticated and !isOwnProfile}" class="btn btn-success btn-sm" type="button" th:attr="onclick='addToCart(' + ${product.id} + ')'" style="margin-left:0.5rem;">
                 <i class="fas fa-cart-plus"></i> Aggiungi al Carrello
             </button>
                         </div>

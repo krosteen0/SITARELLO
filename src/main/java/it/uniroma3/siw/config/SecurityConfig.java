@@ -21,13 +21,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/users/register", "/users/login", "/login", "/css/**", "/js/**").permitAll()
                         .requestMatchers("/product/create/**", "/product/edit/**", "/product/delete/**", 
-                                        "/users/profile", "/users/products").authenticated()
+                                        "/users/profile", "/users/products", "/cart/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
                         .loginPage("/users/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/")
+                        .defaultSuccessUrl("/", true)  // true = sempre reindirizza alla homepage
                         .permitAll()
                 )
                 .logout(logout -> logout
@@ -35,6 +35,7 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/")
                         .permitAll()
                 )
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**")) // Mantieni CSRF per le richieste web
                 .userDetailsService(usersService);
         return http.build();
     }

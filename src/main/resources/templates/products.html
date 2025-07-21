@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elenco Prodotti - Sitarello</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <link rel="stylesheet" th:href="@{/css/products-new.css?v=2}" />
+    <link rel="stylesheet" th:href="@{/css/products.css?v=2}" />
     <link rel="stylesheet" th:href="@{/css/footer.css}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,9 +31,9 @@
             <div class="header-content">
                 <h1 class="page-title">
                     <i class="fas fa-box-open"></i>
-                    Tutti i Prodotti
+                    I Tuoi Prodotti
                 </h1>
-                <p class="page-subtitle">Scopri la nostra selezione completa di prodotti di qualità</p>
+                <p class="page-subtitle">Un riassunto dei prodotti che hai pubblicato</p>
             </div>
         </div>
         
@@ -75,18 +75,6 @@
                         <a th:href="@{'/product/details/' + ${product.id}}" class="btn btn-primary">
                             <i class="fas fa-eye"></i> Visualizza
                         </a>
-                        <button class="btn btn-cart btn-outline" type="button"
-                            th:if="${isAuthenticated}"
-                            th:attr="onclick='addToCart(' + ${product.id} + ')'"
-                            title="Aggiungi al Carrello">
-                            <i class="fas fa-cart-plus"></i>
-                        </button>
-                        <button class="btn btn-cart btn-outline" type="button"
-                            th:if="${!isAuthenticated}"
-                            onclick="alert('Devi effettuare il login per aggiungere prodotti al carrello!')"
-                            title="Aggiungi al Carrello">
-                            <i class="fas fa-cart-plus"></i>
-                        </button>
                         <!-- Pulsante di modifica solo se l'utente è autenticato e proprietario del prodotto -->
                         <a th:if="${isAuthenticated and product.seller.username == username}" 
                            th:href="@{'/product/edit/' + ${product.id}}" 

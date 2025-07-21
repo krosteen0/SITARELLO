@@ -6,10 +6,11 @@
     <meta name="_csrf_header" th:content="${_csrf.headerName}" />
     <title>Ricerca Prodotti - Sitarello</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <link rel="stylesheet" th:href="@{/css/products-new.css?v=2}" />
-    <link rel="stylesheet" th:href="@{/css/products-search-new.css?v=1}" />
+    <link rel="stylesheet" th:href="@{/css/products.css?v=2}" />
+    <link rel="stylesheet" th:href="@{/css/products-search.css?v=1}" />
     <link rel="stylesheet" th:href="@{/css/rating-stars.css}" />
     <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="products-page">
     <!-- Animated Background -->
@@ -149,26 +150,31 @@
                     </div>
                     
                     <div class="product-actions">
-                        <a th:href="@{'/product/details/' + ${product.id}}" class="btn btn-primary">
-                            <i class="fas fa-eye"></i> Visualizza
-                        </a>
-                        <button class="btn btn-cart btn-outline" type="button"
-                            th:if="${isAuthenticated}"
-                            th:attr="onclick='addToCart(' + ${product.id} + ')'"
-                            title="Aggiungi al Carrello">
-                            <i class="fas fa-cart-plus"></i> Aggiungi al Carrello
-                        </button>
-                        <button class="btn btn-cart btn-outline" type="button"
-                            th:if="${!isAuthenticated}"
-                            onclick="alert('Devi effettuare il login per aggiungere prodotti al carrello!')"
-                            title="Aggiungi al Carrello">
-                            <i class="fas fa-cart-plus"></i> Aggiungi al Carrello
-                        </button>
-                        <a th:if="${isAuthenticated and product.seller.username == username}" 
-                           th:href="@{'/product/edit/' + ${product.id}}" 
-                           class="btn btn-outline">
-                            <i class="fas fa-edit"></i> Modifica
-                        </a>
+                        <div class="action-row">
+                            <a th:href="@{'/product/details/' + ${product.id}}" class="btn btn-outline">
+                                <i class="fas fa-eye"></i> Visualizza
+                            </a>
+                            <!-- Pulsante Aggiungi al Carrello - Solo se autenticato e NON è il proprio prodotto -->
+                            <button class="btn btn-outline" type="button"
+                                th:if="${isAuthenticated and product.seller.username != username}"
+                                th:attr="onclick='addToCart(' + ${product.id} + ')'"
+                                title="Aggiungi al Carrello">
+                                <i class="fas fa-cart-plus"></i> Aggiungi al Carrello
+                            </button>
+                            <!-- Pulsante per utenti non autenticati -->
+                            <button class="btn btn-outline" type="button"
+                                th:if="${!isAuthenticated}"
+                                onclick="alert('Devi effettuare il login per aggiungere prodotti al carrello!')"
+                                title="Aggiungi al Carrello">
+                                <i class="fas fa-cart-plus"></i> Aggiungi al Carrello
+                            </button>
+                            <!-- Pulsante Modifica - Se è il proprio prodotto -->
+                            <a th:if="${isAuthenticated and product.seller.username == username}" 
+                               th:href="@{'/product/edit/' + ${product.id}}" 
+                               class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Modifica
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -184,7 +190,6 @@
     
     <!-- Include footer fragment -->
     <div th:insert="~{fragments/footer :: footer}"></div>
-    <script th:src="@{/js/cart-sidebar.js}" defer></script>
     <script th:src="@{/js/products-search.js}"></script>
 </body>
 </html>
